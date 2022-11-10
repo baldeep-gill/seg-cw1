@@ -1,8 +1,8 @@
-# Team *<enter team name here>* Small Group project
+# Team *Dromedary* Small Group project
 
 ## Team members
 The members of the team are:
-- *<name of team member 1>*
+- *Syraj Alkhalil k21007329*
 - *<name of team member 2>*
 - *<name of team member 3>*
 - *<name of team member 4>*
