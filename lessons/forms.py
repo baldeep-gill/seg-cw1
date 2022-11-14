@@ -6,5 +6,5 @@ class LessonRequestForm(forms.ModelForm):
         model = LessonRequest
         fields = ['availability', 'lessonNum', 'interval', 'duration', 'topic', 'teacher']
         widgets = {
-            
+            'availability': forms.DateTimeInput()
         }
