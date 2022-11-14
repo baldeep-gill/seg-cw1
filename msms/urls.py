@@ -20,4 +20,5 @@ from lessons import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
+    path('lesson-request/', views.lesson_request, name = 'lesson_request')
 ]
