@@ -1,9 +1,9 @@
 from django import forms
-from .models import LessonRequests
+from .models import LessonRequest
 
 class LessonRequestForm(forms.ModelForm):
     class Meta:
-        model = LessonRequests
+        model = LessonRequest
         fields = ['availability', 'lessonNum', 'interval', 'duration', 'topic', 'teacher']
         widgets = {
             'availability': forms.Textarea()
