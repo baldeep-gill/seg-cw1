@@ -1,10 +1,8 @@
 from django.shortcuts import render
 from .forms import LessonRequestForm
 
-# Create your views here.
-
 def home(request):
-    return render(request, 'base.html')
+    return render(request, 'home.html')
 
 def lesson_request(request):
     if request.method == 'POST':
@@ -14,4 +12,3 @@ def lesson_request(request):
     else:
         form = LessonRequestForm()
     return render(request, 'lesson_request.html', {'form': form})
-
