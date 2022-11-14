@@ -6,8 +6,9 @@ class LessonRequest(models.Model):
 
     # Ask which days of the week the student is available for lessons #
     # At some point this should just be some checkboxes next to the days #
-    availability = models.CharField(
-        max_length = 100,
+    availability = models.DateTimeField(
+        auto_now = False,
+        auto_now_add = False,
     )
 
     # How many lessons the student wants #
