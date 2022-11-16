@@ -7,11 +7,8 @@ from libgravatar import Gravatar
 # Create your models here.
 class Student(AbstractUser):
     """User model used for student"""
-
-
-
     #student number = student unique reference number
-    student_number = models.IntegerField(blank=False)
+    student_number = models.IntegerField(unique=True,blank=False)
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
