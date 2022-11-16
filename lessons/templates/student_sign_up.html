@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 {% block body %}
-<div>
-    <div class="container vh-100">
-        <div class="row h-100">
-            <div class="col-12 my-auto">
-                <h1>Sign Up</h1>
-                <p>Work in progress</p>
-                <p><a href="#" class="btn btn-lg btn-secondary">Sign up</a></p>
-                <p><a href="#" class="btn btn-lg btn-secondary">Lesson request</a></p>
-            </div>
-        </div>
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Sign up</h1>
+      <form action="{% url 'student_sign_up' %}" method="post">
+        {% csrf_token %}
+        {% include 'partials/form.html' with form=form %}
+        <input type="submit" value="Sign up" class="btn btn-primary">
+      </form>
     </div>
+  </div>
 </div>
 {% endblock %}
