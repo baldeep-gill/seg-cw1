@@ -2,7 +2,8 @@
 from django import forms
 from django.core.validators import RegexValidator
 from .models import Student
-from django.db.models import Max
+from .helpers import find_next_available_student_number
+
 
 class StudentSignUpForm(forms.ModelForm):
     """Form enabling unregistered students to sign up."""
@@ -34,15 +35,11 @@ class StudentSignUpForm(forms.ModelForm):
         if new_password != password_confirmation:
             self.add_error('password_confirmation', 'Confirmation does not match password.')
 
-    def find_id_for_new_student(self):
-        id = 1
-        while Student.objects.filter(student_number=id):
-            id += 1
-        return id
+
 
     def save(self):
         """Create a new user."""
-        new_student_number = self.find_id_for_new_student()
+        new_student_number = find_next_available_student_number()
 
         super().save(commit=False)
         student = Student.objects.create_user(
@@ -52,7 +49,6 @@ class StudentSignUpForm(forms.ModelForm):
             last_name=self.cleaned_data.get('last_name'),
             email=self.cleaned_data.get('email'),
             password=self.cleaned_data.get('new_password'),
-            #student_number = self.cleaned_data.get('student_number')
             student_number = new_student_number
         )
         return student
