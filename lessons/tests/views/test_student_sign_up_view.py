@@ -49,17 +49,16 @@ class SignUpViewTestCase(TestCase,LogInTester):
 
 
     def test_successful_sign_up(self):
-        """Students should be redirected to home page after successful sign up
-        They should not be logged in by the system after signing up"""
+        """Students should not be logged in automatically after sign up
+        They are shown a confirmation of their sign up and a button to return to the
+        home page to login instead"""
 
         before_count = Student.objects.count()
         response = self.client.post(self.url,self.form_input,follow=True)
         after_count = Student.objects.count()
         self.assertEqual(after_count,before_count+1)
 
-        response_url = reverse('home')
-        self.assertRedirects(response, response_url,status_code=302,target_status_code=200)
-        self.assertTemplateUsed(response, 'home.html')
+        self.assertTemplateUsed(response, 'student_sign_up_confirmation.html')
 
         student = Student.objects.get(email='johndoe@example.org')
         correct_student_number = find_next_available_student_number() - 1
@@ -72,6 +71,8 @@ class SignUpViewTestCase(TestCase,LogInTester):
         self.assertTrue(is_password_correct)
 
         self.assertFalse(self._is_logged_in())
+
+
 
 
 
