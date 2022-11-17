@@ -14,9 +14,9 @@ def student_sign_up(request):
         form = StudentSignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # login user after they have signed up
-            # login(request, user)
-            return redirect('home')
+            #redirected to home after sign up so they can login
+            return render(request, 'student_sign_up_confirmation.html')
+
     else:
         # creating empty sign up form
         form = StudentSignUpForm()
