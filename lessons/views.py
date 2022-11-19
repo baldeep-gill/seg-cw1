@@ -12,6 +12,9 @@ def home(request):
 def student_home(request):
     return render(request, 'student_home.html')
 
+def admin_home(request):
+    return render(request, 'admin_home.html')
+
 def student_sign_up(request):
     if request.method == 'POST':
         form = StudentSignUpForm(request.POST)
