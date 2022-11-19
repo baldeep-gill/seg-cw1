@@ -23,6 +23,7 @@ def log_in(request):
                 login(request, user)
                 #redirect user upon successful log in
                 return redirect('home')
+        messages.add_message(request, messages.ERROR, "User not found")
     form = LogInForm()
     return render(request, 'log_in.html', {'form':form})
 

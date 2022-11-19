@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% block body %}
     <h2>Log in</h2>
+    {% for message in messages %}
+    <p>{{message}}</p>
+    {% endfor %}
     <form action="{% url 'log_in' %}" method="post">
         {% csrf_token %}
         {% include 'partials/form.html' with form=form %}
