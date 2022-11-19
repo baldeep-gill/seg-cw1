@@ -37,7 +37,7 @@ class Command(BaseCommand):
     '''uname stands for username'''
     def _create_named_student_user(self, firstname, lastname, uname, email, password):
         studentnumber = find_next_available_student_number()
-        created_student = Student.objects.create(
+        created_student = Student.objects.create_user(
             first_name=firstname,
             last_name=lastname,
             email=email,
@@ -48,7 +48,7 @@ class Command(BaseCommand):
 
     '''uname stands for username'''
     def _create_named_admin_user(self, firstname, lastname, uname, email, password):
-        Admin.objects.create(
+        Admin.objects.create_user(
             first_name=firstname,
             last_name=lastname,
             email=email,
