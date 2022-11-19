@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.db.utils import IntegrityError
 from faker import Faker
-from lessons.models import Student
+from lessons.models import Student, StudentProfile
 from lessons.management.commands.unseed import Command as Unseeder
 from lessons.helpers import find_next_available_student_number
 
@@ -23,35 +23,30 @@ class Command(BaseCommand):
             try:
                 self._create_user()
             except (IntegrityError):
+                # print("epic fail")
                 continue
             user_count += 1
         print('User seeding complete')
 
     def _create_user(self):
-        student_number = find_next_available_student_number()
         first_name = self.faker.first_name()
         last_name = self.faker.last_name()
         email = self._email(first_name, last_name)
-        Student.objects.create_user(
-            student_number,
-            student_number=student_number,
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
-            password=Command.PASSWORD,
-        )
+        self._create_named_student_user(first_name, last_name, email, Command.PASSWORD)
+       
     
     def _create_named_student_user(self, firstname, lastname, email, password):
-        student_number = find_next_available_student_number()
+        studentnumber = find_next_available_student_number()
 
-        Student.objects.create_user(
-            student_number,
-            student_number=student_number,
+
+        created_student = Student.objects.create_user(
             first_name=firstname,
             last_name=lastname,
             email=email,
             password=password,
         )
+        print("Error creating user")
+        # StudentProfile.objects.create(user=created_student, student_number=studentnumber)
 
     def _email(self, first_name, last_name):
         email = f'{first_name}.{last_name}@example.org'

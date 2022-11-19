@@ -47,6 +47,26 @@ class StudentManager(BaseUserManager):
     def get_queryset(self, *args, **kwargs):
         return super().get_queryset(*args, **kwargs).filter(type=User.Role.STUDENT)
 
+    def create_user(self, first_name, last_name, email, password):
+        """
+        Creates and saves a User with the given email, date of
+        birth and password.
+        """
+        if not email:
+            raise ValueError('Users must have an email address')
+
+        user = self.model(
+            first_name=first_name,
+            last_name=last_name,
+            email=email
+        )
+
+
+        user.set_password(password)
+        user.save()
+        print("epic success" + first_name + last_name)
+        return user
+
 # A new table to store the student number and extra information about the user later on
 class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
