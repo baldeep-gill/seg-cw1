@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.db.utils import IntegrityError
 from faker import Faker
-from lessons.models import Student, StudentProfile
+from lessons.models import Student, StudentProfile, Admin
 from lessons.helpers import find_next_available_student_number
 
 class Command(BaseCommand):
@@ -24,13 +24,17 @@ class Command(BaseCommand):
         print('User seeding complete')
 
     def _create_user(self):
+        random_number = self.faker.random.randint(0, 100000)
         first_name = self.faker.first_name()
         last_name = self.faker.last_name()
-        email = self._email(first_name, last_name)
-        username = self._username(first_name, last_name)
-        self._create_named_student_user(first_name, last_name, email, username, Command.PASSWORD)
+        student_email = self._email(first_name, last_name)
+        student_username = self._username(first_name, last_name)
+        admin_username = self._username((first_name + str(random_number)), last_name)
+        admin_email = self._email(admin_username, last_name)
+        self._create_named_student_user(first_name, last_name, student_email, student_username, Command.PASSWORD)
+        self._create_named_admin_user(first_name, last_name, admin_email, admin_username, Command.PASSWORD)
        
-    '''un stands for username'''
+    '''uname stands for username'''
     def _create_named_student_user(self, firstname, lastname, uname, email, password):
         studentnumber = find_next_available_student_number()
         created_student = Student.objects.create(
@@ -41,6 +45,16 @@ class Command(BaseCommand):
             password=password,
         )
         StudentProfile.objects.create(user=created_student, student_number=studentnumber)
+
+    '''uname stands for username'''
+    def _create_named_admin_user(self, firstname, lastname, uname, email, password):
+        Admin.objects.create(
+            first_name=firstname,
+            last_name=lastname,
+            email=email,
+            username=uname,
+            password=password,
+        )
 
     def _email(self, first_name, last_name):
         email = f'{first_name}.{last_name}@example.org'
