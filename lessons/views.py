@@ -9,6 +9,9 @@ from django.contrib import messages
 def home(request):
     return render(request, 'home.html')
 
+def student_home(request):
+    return render(request, 'student_home.html')
+
 def student_sign_up(request):
     if request.method == 'POST':
         form = StudentSignUpForm(request.POST)
