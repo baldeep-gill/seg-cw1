@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block body %}
+    <h2>Log in</h2>
+    <form action="{% url 'log_in' %}" method="post">
+        {% csrf_token %}
+        {% include 'partials/form.html' with form=form %}
+        <input type="submit" value="Log in" class="btn btn-lg btn-secondary">
+    </form>
+{% endblock %}

@@ -5,6 +5,10 @@ from .models import User, Student, StudentProfile
 from django.db.models import Max
 from .helpers import find_next_available_student_number
 
+class LogInForm(forms.Form):
+    username = forms.CharField(label="Email")
+    password = forms.CharField(label="Password", widget=forms.PasswordInput())
+
 class StudentSignUpForm(forms.ModelForm):
     """Form enabling unregistered students to sign up."""
 
