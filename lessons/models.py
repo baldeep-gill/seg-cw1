@@ -8,15 +8,15 @@ from libgravatar import Gravatar
 '''The base user that all users inherit'''
 class User(AbstractUser):
     '''We will only have two types either a user or an admin (could be extended later on)'''
-    class Role(models.TextChoices):
+    class Types(models.TextChoices):
         ADMIN = "ADMIN", 'Admin'
         STUDENT = "STUDENT", 'Student'
     
     '''defualt role'''
-    base_role = Role.ADMIN
+    base_role = Types.ADMIN
 
     '''Fields that are shared by all users'''
-    type = models.CharField(gettext_lazy("Type"), max_length=50, choices=Role.choices, default=base_role)
+    type = models.CharField(gettext_lazy("Type"), max_length=50, choices=Types.choices, default=base_role)
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
@@ -36,16 +36,16 @@ class User(AbstractUser):
         return self.gravatar(size=60)
     
     def save(self, *args, **kwargs):
-        if not self.pk:
-            self.role = self.base_role
-            return super().save(*args, **kwargs)
+        if not self.id:
+            self.type = self.base_role
+        return super().save(*args, **kwargs)
 
 
 '''Student users'''
 # manages all students 
 class StudentManager(BaseUserManager):
     def get_queryset(self, *args, **kwargs):
-        return super().get_queryset(*args, **kwargs).filter(type=User.Role.STUDENT)
+        return super().get_queryset(*args, **kwargs).filter(type=User.Types.STUDENT)
 
 # A new table to store the student number and extra information about the user later on
 class StudentProfile(models.Model):
@@ -54,7 +54,7 @@ class StudentProfile(models.Model):
 
 # Student user
 class Student(User):
-    base_role = User.Role.STUDENT
+    base_role = User.Types.STUDENT
     objects = StudentManager()
     
     @property
@@ -70,11 +70,11 @@ class Student(User):
 # manages all Admins 
 class AdminManager(BaseUserManager):
     def get_queryset(self, *args, **kwargs):
-        return super().get_queryset(*args, **kwargs).filter(type=User.Role.ADMIN)
+        return super().get_queryset(*args, **kwargs).filter(type=User.Types.ADMIN)
 
 # Admin user
 class Admin(User):
-    base_role = User.Role.ADMIN
+    base_role = User.Types.ADMIN
     objects = AdminManager()
     class Meta:
         proxy = True
