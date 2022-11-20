@@ -1,10 +1,19 @@
-"""Forms for the lessons app."""
 from django import forms
+from .models import LessonRequest
 from django.core.validators import RegexValidator
 from .models import User, Student, StudentProfile
 from django.db.models import Max
 from .helpers import find_next_available_student_number
 
+class LessonRequestForm(forms.ModelForm):
+    class Meta:
+        model = LessonRequest
+        fields = ['availability', 'lessonNum', 'interval', 'duration', 'topic', 'teacher']
+        """widgets = {
+            'availability': forms.DateTimeInput()
+        }"""
+
+"""Forms for the lessons app."""
 class StudentSignUpForm(forms.ModelForm):
     """Form enabling unregistered students to sign up."""
 
@@ -53,6 +62,3 @@ class StudentSignUpForm(forms.ModelForm):
 
         StudentProfile.objects.create(user=student, student_number = new_student_number)
         return student
-
-
-
