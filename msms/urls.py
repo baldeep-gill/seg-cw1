@@ -19,17 +19,12 @@ from lessons import views
 
 urlpatterns = [
     path('django/admin/', admin.site.urls),
-    path('django/', admin.site.urls),
 
     path('', views.home, name='home'),
     path('student_sign_up/', views.student_sign_up, name='student_sign_up'),
     path('log_in/', views.log_in, name='log_in'),
 
-    path('student/', views.student_home, name='student'),
     path('student/home/', views.student_home, name='student_home'),
 
-    path('admin/', views.admin_home, name='admin'),
     path('admin/home/', views.admin_home, name='admin_home'),
-
-
 ]
