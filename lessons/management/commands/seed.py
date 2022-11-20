@@ -32,10 +32,10 @@ class Command(BaseCommand):
         admin_username = self._username((first_name + str(random_number)), last_name)
         admin_email = self._email(admin_username, last_name)
         self._create_named_student_user(first_name, last_name, student_email, student_username, Command.PASSWORD)
-        self._create_named_admin_user(first_name, last_name, admin_email, admin_username, Command.PASSWORD)
+        # self._create_named_admin_user(first_name, last_name, admin_email, admin_username, Command.PASSWORD)
        
     '''uname stands for username'''
-    def _create_named_student_user(self, firstname, lastname, uname, email, password):
+    def _create_named_student_user(self, firstname, lastname, email, uname, password):
         studentnumber = find_next_available_student_number()
         created_student = Student.objects.create_user(
             first_name=firstname,
@@ -47,7 +47,7 @@ class Command(BaseCommand):
         StudentProfile.objects.create(user=created_student, student_number=studentnumber)
 
     '''uname stands for username'''
-    def _create_named_admin_user(self, firstname, lastname, uname, email, password):
+    def _create_named_admin_user(self, firstname, lastname, email, uname, password):
         Admin.objects.create_user(
             first_name=firstname,
             last_name=lastname,
