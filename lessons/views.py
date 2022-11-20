@@ -25,10 +25,14 @@ def log_in(request):
             if user is not None:
                 login(request, user)
                 #redirect user upon successful log in
-                return redirect('home')
+                return redirect('student_home')
         messages.add_message(request, messages.ERROR, "User not found")
     form = LogInForm()
     return render(request, 'log_in.html', {'form':form})
+
+def log_out(request):
+    logout(request)
+    return redirect('home')
 
 def student_sign_up(request):
     if request.method == 'POST':

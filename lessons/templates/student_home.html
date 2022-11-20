@@ -19,6 +19,13 @@
                         Requests Made
                       </a>
                     </p>
+                    <p>
+                      <form action="{% url 'log_out' %}" method="post">
+                        {% csrf_token %}
+                        {% include 'partials/form.html' with form=form %}
+                        <input type="submit" value="Log out" class="btn btn-lg btn-secondary">
+                      </form>
+                    </p>
                   </div>
             </div>
         </div>
