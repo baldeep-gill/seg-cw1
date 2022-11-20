@@ -12,3 +12,7 @@ def lesson_request(request):
     else:
         form = LessonRequestForm()
     return render(request, 'lesson_request.html', {'form': form})
+
+
+def student_sign_up(request):
+    return render(request,'student_sign_up.html')
