@@ -5,6 +5,6 @@ class LessonRequestForm(forms.ModelForm):
     class Meta:
         model = LessonRequest
         fields = ['availability', 'lessonNum', 'interval', 'duration', 'topic', 'teacher']
-        widgets = {
+        """widgets = {
             'availability': forms.DateTimeInput()
-        }
+        }"""

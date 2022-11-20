@@ -4,11 +4,17 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 class LessonRequest(models.Model):
     """Code to model a students request for a lesson"""
 
+    # TODO: create a field to register the student that signed up for the lesson
+
     # Ask which days of the week the student is available for lessons #
-    # At some point this should just be some checkboxes next to the days #
-    availability = models.DateTimeField(
+    """availability = models.DateTimeField(
         auto_now = False,
         auto_now_add = False,
+    )"""
+
+    availability = models.CharField(
+        blank = False,
+        max_length = 100,
     )
 
     # How many lessons the student wants #
