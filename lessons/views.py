@@ -1,6 +1,6 @@
 
 from django.shortcuts import render, redirect
-from .forms import StudentSignUpForm
+from .forms import StudentSignUpForm, LogInForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
@@ -14,6 +14,21 @@ def student_home(request):
 
 def admin_home(request):
     return render(request, 'admin_home.html')
+
+def log_in(request):
+    if request.method == 'POST':
+        form = LogInForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                #redirect user upon successful log in
+                return redirect('home')
+        messages.add_message(request, messages.ERROR, "User not found")
+    form = LogInForm()
+    return render(request, 'log_in.html', {'form':form})
 
 def student_sign_up(request):
     if request.method == 'POST':

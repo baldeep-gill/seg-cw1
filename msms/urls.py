@@ -24,5 +24,6 @@ urlpatterns = [
     path('student/home', views.student_home, name='student_home'),
     #TODO admin/home leads to django admin interface so cant use it, have used msmadmin for now but there is probably a better name for it
     path('msmadmin/home', views.admin_home, name='admin_home'),
+    path('log_in', views.log_in, name='log_in'),
 
 ]
