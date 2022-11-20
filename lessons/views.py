@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from .forms import LessonRequestForm, StudentSignUpForm, LogInForm
+from .models import LessonRequest, User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
@@ -11,7 +12,25 @@ def lesson_request(request):
     if request.method == 'POST':
         form = LessonRequestForm(request.POST)
         if form.is_valid():
-            lessonReq = form.save()
+            # No need for 'if user.is_authenticated' as this is handled on the home.html template
+            current_user = request.user
+            availability = form.cleaned_data.get('availability')
+            lessonNum = form.cleaned_data.get('lessonNum')
+            interval = form.cleaned_data.get('interval')
+            duration = form.cleaned_data.get('duration')
+            topic = form.cleaned_data.get('topic')
+            teacher = form.cleaned_data.get('teacher')
+            lessonRequest = LessonRequest.objects.create(
+                author=current_user,
+                availability=availability,
+                lessonNum=lessonNum,
+                interval=interval,
+                duration=duration,
+                topic=topic,
+                teacher=teacher
+            )
+            lessonRequest.save()
+            return redirect('lesson_request')
     else:
         form = LessonRequestForm()
     return render(request, 'lesson_request.html', {'form': form})
@@ -32,7 +51,7 @@ def log_in(request):
             if user is not None:
                 login(request, user)
                 #redirect user upon successful log in
-                return redirect('home')
+                return redirect('lesson_request')
         messages.add_message(request, messages.ERROR, "User not found")
     form = LogInForm()
     return render(request, 'log_in.html', {'form':form})

@@ -1,7 +1,6 @@
 from django import forms
-from .models import LessonRequest
 from django.core.validators import RegexValidator
-from .models import User, Student, StudentProfile
+from .models import User, Student, StudentProfile, LessonRequest
 from django.db.models import Max
 from .helpers import find_next_available_student_number
 
