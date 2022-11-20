@@ -5,6 +5,7 @@ from .models import User, Student, StudentProfile
 from django.db.models import Max
 from .helpers import find_next_available_student_number
 
+"""Form for requesting a lesson"""
 class LessonRequestForm(forms.ModelForm):
     class Meta:
         model = LessonRequest

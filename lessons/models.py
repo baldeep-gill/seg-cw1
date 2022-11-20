@@ -6,64 +6,6 @@ from django.utils.translation import gettext_lazy
 from libgravatar import Gravatar
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-class LessonRequest(models.Model):
-    """Code to model a students request for a lesson"""
-
-    # TODO: create a field to register the student that signed up for the lesson
-
-    # Ask which days of the week the student is available for lessons #
-    """availability = models.DateTimeField(
-        auto_now = False,
-        auto_now_add = False,
-    )"""
-
-    availability = models.CharField(
-        blank = False,
-        max_length = 100,
-    )
-
-    # How many lessons the student wants #
-    lessonNum = models.IntegerField(
-        blank = False,
-        # If a student is using this service they should be booking at least 1 lesson #
-        validators = [
-            MinValueValidator(1),
-        ],
-    )
-
-    # How long (in weeks) should the lessons be spaced out #
-    interval = models.IntegerField(
-        blank = False,
-        default = 1,
-        validators = [
-            MinValueValidator(1),
-        ]
-    )
-
-    # Duration of each lesson in minutes #
-    duration = models.IntegerField(
-        blank = False,
-        default = 60,
-        validators = [
-            # We'll say a lesson should be a minimum of 30 mins, maximum of 2 hours #
-            MinValueValidator(30),
-            MaxValueValidator(120),
-        ],
-    )
-
-    # Student should enter a topic #
-    topic = models.CharField(
-        max_length = 50,
-    )
-
-    # Student can enter a teacher if they wish #
-    teacher = models.CharField(
-        blank = True,
-        max_length = 80,
-    )
-
-
-
 '''The base user that all users inherit'''
 class User(AbstractUser):
     '''We will only have two types either a user or an admin (could be extended later on)'''
@@ -138,3 +80,65 @@ class Admin(User):
     
     class Meta:
         proxy = True
+
+
+class LessonRequest(models.Model):
+    """Code to model a students request for a lesson"""
+
+    author = models.ForeignKey(
+        Student,
+        on_delete = models.CASCADE,
+        blank = False,
+    )
+
+    # Ask which days of the week the student is available for lessons #
+    # TODO: figure out how to get bootstrap to create a datetime field input 
+    """availability = models.DateTimeField(
+        auto_now = False,
+        auto_now_add = False,
+    )"""
+
+    availability = models.CharField(
+        blank = False,
+        max_length = 100,
+    )
+
+    # How many lessons the student wants #
+    lessonNum = models.IntegerField(
+        blank = False,
+        # If a student is using this service they should be booking at least 1 lesson #
+        validators = [
+            MinValueValidator(1),
+        ],
+    )
+
+    # How long (in weeks) should the lessons be spaced out #
+    interval = models.IntegerField(
+        blank = False,
+        default = 1,
+        validators = [
+            MinValueValidator(1),
+        ]
+    )
+
+    # Duration of each lesson in minutes #
+    duration = models.IntegerField(
+        blank = False,
+        default = 60,
+        validators = [
+            # We'll say a lesson should be a minimum of 30 mins, maximum of 2 hours #
+            MinValueValidator(30),
+            MaxValueValidator(120),
+        ],
+    )
+
+    # Student should enter a topic #
+    topic = models.CharField(
+        max_length = 50,
+    )
+
+    # Student can enter a teacher if they wish #
+    teacher = models.CharField(
+        blank = True,
+        max_length = 80,
+    )
