@@ -12,6 +12,9 @@ def home(request):
 def student_home(request):
     return render(request, 'student_home.html')
 
+def admin_home(request):
+    return render(request, 'admin_home.html')
+
 def log_in(request):
     if request.method == 'POST':
         form = LogInForm(request.POST)

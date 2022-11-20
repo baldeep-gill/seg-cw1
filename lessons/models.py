@@ -55,7 +55,7 @@ class StudentProfile(models.Model):
 # Student user
 class Student(User):
     base_role = User.Types.STUDENT
-    objects = StudentManager()
+    students = StudentManager()
     
     @property
     def more(self):
@@ -75,6 +75,7 @@ class AdminManager(BaseUserManager):
 # Admin user
 class Admin(User):
     base_role = User.Types.ADMIN
-    objects = AdminManager()
+    admins = AdminManager()
+    
     class Meta:
         proxy = True
