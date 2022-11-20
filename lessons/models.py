@@ -1,7 +1,8 @@
 """Models in the lessons app."""
 
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.utils.translation import gettext_lazy
 from libgravatar import Gravatar
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -63,14 +64,18 @@ class LessonRequest(models.Model):
 
 
 
-# Create your models here.
-class Student(AbstractUser):
-    """User model used for student"""
+'''The base user that all users inherit'''
+class User(AbstractUser):
+    '''We will only have two types either a user or an admin (could be extended later on)'''
+    class Types(models.TextChoices):
+        ADMIN = "ADMIN", 'Admin'
+        STUDENT = "STUDENT", 'Student'
+    
+    '''defualt role'''
+    base_role = Types.ADMIN
 
-
-
-    #student number = student unique reference number
-    student_number = models.IntegerField(blank=False)
+    '''Fields that are shared by all users'''
+    type = models.CharField(gettext_lazy("Type"), max_length=50, choices=Types.choices, default=base_role)
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
@@ -88,3 +93,48 @@ class Student(AbstractUser):
     def mini_gravatar(self):
         """Return a URL to a miniature version of the user's gravatar."""
         return self.gravatar(size=60)
+    
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.type = self.base_role
+        return super().save(*args, **kwargs)
+
+
+'''Student users'''
+# manages all students 
+class StudentManager(BaseUserManager):
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).filter(type=User.Types.STUDENT)
+
+# A new table to store the student number and extra information about the user later on
+class StudentProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    student_number = models.IntegerField(unique=True,blank=False)
+
+# Student user
+class Student(User):
+    base_role = User.Types.STUDENT
+    students = StudentManager()
+    
+    @property
+    def more(self):
+        '''this refers to the table in the database'''
+        return self.studentprofile
+
+    class Meta:
+        proxy = True
+
+
+'''Admin users'''
+# manages all Admins 
+class AdminManager(BaseUserManager):
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).filter(type=User.Types.ADMIN)
+
+# Admin user
+class Admin(User):
+    base_role = User.Types.ADMIN
+    admins = AdminManager()
+    
+    class Meta:
+        proxy = True
