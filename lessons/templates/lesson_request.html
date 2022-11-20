@@ -8,13 +8,7 @@
             <form action="{% url 'lesson_request' %}" method="post">
                 {% csrf_token %}
                 
-                {% load widget_tweaks %}
-                {% for field in form %}
-                <div class="mb-3">
-                    {{ field.label_tag }}
-                    {% render_field field class="form-control" %}                    
-                </div>
-                {% endfor %}
+                {% include 'partials/form.html' with form=form %}
 
                 <input type="submit" value="Submit" class="btn btn-primary">
             </form>
