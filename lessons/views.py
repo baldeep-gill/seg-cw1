@@ -2,17 +2,18 @@ from django.shortcuts import render, redirect
 from .forms import LessonRequestForm, StudentSignUpForm, LogInForm
 from .models import LessonRequest, User
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 # Create your views here.
 def home(request):
     return render(request, 'home.html')
 
+@login_required
 def lesson_request(request):
     if request.method == 'POST':
         form = LessonRequestForm(request.POST)
         if form.is_valid():
-            # No need for 'if user.is_authenticated' as this is handled on the home.html template
             current_user = request.user
             availability = form.cleaned_data.get('availability')
             lessonNum = form.cleaned_data.get('lessonNum')
