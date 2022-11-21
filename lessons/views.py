@@ -36,8 +36,12 @@ def log_in(request):
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
             if user is not None:
-                login(request, user)
-                redirect_url = next or 'student_home'
+                if isinstance(user, Admin):
+                    login(request, user)
+                    redirect_url = next or 'admin_home'
+                else:
+                    login(request, user)
+                    redirect_url = next or 'student_home'
                 # in here we need to determine the type of the user to know which other redirect url we need to go to
                 # TODO: determin the type of user
                 #redirect user upon successful log in
