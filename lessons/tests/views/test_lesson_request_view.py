@@ -11,4 +11,4 @@ class LessonRequestViewTestCase(TestCase):
         self.url = reverse('lesson_request')
 
     def test_login_url(self):
-        self.assertEqual(self.url, '/lesson_request/')
+        self.assertEqual(self.url, '/student/lesson_request/')
