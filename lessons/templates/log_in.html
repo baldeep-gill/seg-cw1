@@ -8,15 +8,18 @@
             <div class="col-12 my-auto">
                 <div class="card cover-card offset-sm-2 offset-md-4 offset-lg-7">
                     <h1 class="cover-heading">MSMS</h1>
-        <h2>Log in</h2>
-        {% for message in messages %}
-        <p>{{message}}</p>
-        {% endfor %}
-        <form action="{% url 'log_in' %}" method="post">
-          {% csrf_token %}
-          {% include 'partials/form.html' with form=form %}
-          <input type="submit" value="Log in" class="btn btn-lg btn-secondary">
-        </form>
+                        <h2>Log in</h2>
+                        {% for message in messages %}
+                            <p>{{message}}</p>
+                        {% endfor %}
+
+                        <form action="{% url 'log_in' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ next }}">
+
+                            {% include 'partials/form.html' with form=form %}
+                            <input type="submit" value="Log in" class="btn btn-lg btn-secondary">
+                        </form>
                 </div>
             </div>
         </div>
