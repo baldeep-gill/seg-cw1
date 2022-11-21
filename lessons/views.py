@@ -2,14 +2,12 @@ from django.shortcuts import render, redirect
 from .forms import LessonRequestForm, StudentSignUpForm, LogInForm
 from .models import LessonRequest, User
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 # Create your views here.
 def home(request):
     return render(request, 'home.html')
 
-@login_required
 def lesson_request(request):
     if request.method == 'POST':
         form = LessonRequestForm(request.POST)
