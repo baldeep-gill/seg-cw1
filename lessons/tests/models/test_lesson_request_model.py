@@ -1,11 +1,17 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from lessons.models import LessonRequest
+from lessons.models import LessonRequest, Student
 
 class LessonRequestTest(TestCase):
+    fixtures = [
+        'lessons/tests/fixtures/default_student.json',
+    ]
+
     def setUp(self):
         super(TestCase, self).setUp()
+        self.student = Student.objects.get(email="johndoe@example.org")
         self.lessonRequest = LessonRequest(
+            author = self.student,
             availability = "Monday",
             lessonNum = 2,
             interval = 1,
@@ -27,6 +33,10 @@ class LessonRequestTest(TestCase):
 
     def test_valid_request(self):
         self._assert_valid_request()
+
+    def test_null_user(self):
+        self.lessonRequest.author = None
+        self._assert_invalid_request()
 
     def test_one_lesson(self):
         self.lessonRequest.lessonNum = 1
