@@ -65,7 +65,7 @@ class SignUpViewTestCase(TestCase,LogInTester):
         self.assertEqual(student.first_name, 'John')
         self.assertEqual(student.last_name, 'Doe')
         self.assertEqual(student.email, 'johndoe@example.org')
-        self.assertEqual(student.student_number, correct_student_number)
+        self.assertEqual(student.more.student_number, correct_student_number)
         self.assertEqual(student.username, 'JohnDoe'+f'{correct_student_number}')
         is_password_correct = check_password('Password123', student.password)
         self.assertTrue(is_password_correct)
