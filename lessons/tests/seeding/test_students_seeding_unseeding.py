@@ -1,3 +1,5 @@
+#TODO Uncomment this when want to test seeder
+
 # from django.test import TestCase
 # from lessons.models import Student, Admin, User, StudentProfile
 # from django.core.management import call_command

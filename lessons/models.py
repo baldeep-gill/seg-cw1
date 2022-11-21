@@ -142,3 +142,40 @@ class LessonRequest(models.Model):
         blank = True,
         max_length = 80,
     )
+
+
+class Lesson(models.Model):
+    """Models a booked lesson for a student"""
+
+    # Lesson who the student is for
+    student = models.ForeignKey(
+        Student,
+        on_delete = models.CASCADE,
+        blank = False,
+    )
+
+    date = models.DateTimeField(
+        blank=False
+    )
+
+    # Duration of each lesson in minutes
+    duration = models.IntegerField(
+        blank = False,
+        default = 60,
+        validators = [
+            # We'll say a lesson should be a minimum of 30 mins, maximum of 2 hours #
+            MinValueValidator(30),
+            MaxValueValidator(120),
+        ],
+    )
+
+    # What the lesson is about
+    topic = models.CharField(
+        max_length = 50,
+    )
+
+    # Who teaches the lesson
+    teacher = models.CharField(
+        blank = True,
+        max_length = 80,
+    )
