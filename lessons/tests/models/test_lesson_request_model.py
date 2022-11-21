@@ -3,6 +3,8 @@ from django.test import TestCase
 from lessons.models import LessonRequest, Student
 
 class LessonRequestTest(TestCase):
+    """Unit tests for lesson request model"""
+    
     fixtures = [
         'lessons/tests/fixtures/default_student.json',
     ]
