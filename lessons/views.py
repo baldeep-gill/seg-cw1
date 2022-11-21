@@ -10,6 +10,9 @@ from .models import Admin, Student, User
 def home(request):
     return render(request, 'home.html')
 
+def lessons_success(request):
+    return render(request, 'successful_lessons_list.html')
+
 def lesson_request(request):
     if request.method == 'POST':
         form = LessonRequestForm(request.POST)
