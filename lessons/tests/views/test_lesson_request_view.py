@@ -35,6 +35,9 @@ class LessonRequestViewTestCase(TestCase):
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 0)
 
+    def test_login_url(self):
+        self.assertEqual(self.url, '/student/lesson_request/')
+
     def test_unsuccessful_post(self):
         self.form_input['interval'] = -1
         response = self.client.post(self.url, self.form_input)
@@ -44,4 +47,3 @@ class LessonRequestViewTestCase(TestCase):
         self.assertTrue(isinstance(form, LessonRequestForm))
         self.assertTrue(form.is_bound)
         
-    
