@@ -10,7 +10,11 @@
                 {% for lesson in lesson_requests %}
                     <tr>
                         <td>
-                            <p>{{ lesson.topic }}</p>
+                            <h3><b>{{ lesson.topic }}</b></h3>
+                            <p>Requesting <b>{{ lesson.lessonNum}}</b> lessons every <b>{{ lesson.interval }}</b> weeks</p>
+                            <p>Duration: {{ lesson.duration }} minutes</p>
+                            <p>Availability: {{ lesson.availability }}</p>
+                            <p>Requested teacher: {{ lesson.teacher }} </p>
                             <p><a href="{% url 'edit_requests' lesson.id %}">Edit</a></p>
                         </td>
                     </tr>
