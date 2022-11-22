@@ -4,7 +4,7 @@
     <div class="row">
         <div class="col-sm-12 col-md-6 offset-md-3">
             <h1>Edit lesson request</h1>
-            <form action="{% url 'edit_requests' %}" method="post">
+            <form action="{% url 'edit_requests' lesson_id %}" method="post">
                 {% csrf_token %}
                 
                 {% include 'partials/form.html' with form=form %}

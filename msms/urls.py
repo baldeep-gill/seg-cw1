@@ -28,5 +28,5 @@ urlpatterns = [
     path('log_in/', views.log_in, name='log_in'),
     path('student/log_out/', views.log_out, name='log_out'),
     path('student/requests/', views.show_requests, name='show_requests'),
-    path('student/requests/edit/', views.edit_requests, name='edit_requests'),
+    path('student/requests/edit/<lesson_id>', views.edit_requests, name='edit_requests'),
 ]

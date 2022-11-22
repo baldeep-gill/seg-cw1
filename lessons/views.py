@@ -104,16 +104,16 @@ def show_requests(request):
     else:
         return render(request, 'show_requests.html', {'user': user, 'lesson_requests': lesson_requests})
 
-def edit_requests(request):
-    current_user = request.user
+def edit_requests(request, lesson_id):
+    current_lesson = LessonRequest.objects.get(id=lesson_id)
     
     if request.method == 'POST':
-        form = EditForm(instance=current_user, data=request.POST)
+        form = EditForm(instance=current_lesson, data=request.POST)
         if form.is_valid():
             messages.add_message(request, messages.SUCCESS, "Request updated")
             form.save()
-            return redirect('student/home')
+            return redirect('show_requests')
     else:
-        form = EditForm(instance=current_user)
-    return render(request, 'edit_requests.html', {'form': form})
+        form = EditForm(instance=current_lesson)
+    return render(request, 'edit_requests.html', {'form': form, 'lesson_id': lesson_id})
 

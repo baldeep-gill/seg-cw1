@@ -9,7 +9,7 @@
                     <tr>
                         <td>
                             <p>{{ lesson.topic }}</p>
-                            <p><a href="{% url 'edit_requests' %}">Edit</a></p>
+                            <p><a href="{% url 'edit_requests' lesson.id %}">Edit</a></p>
                         </td>
                     </tr>
                 {% endfor %}
