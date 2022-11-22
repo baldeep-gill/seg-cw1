@@ -1,6 +1,6 @@
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User, Student, StudentProfile, LessonRequest
+from .models import User, Student, StudentProfile, LessonRequest, Lesson
 from django.db.models import Max
 from .helpers import find_next_available_student_number
 
@@ -12,6 +12,13 @@ class LessonRequestForm(forms.ModelForm):
         """widgets = {
             'availability': forms.DateTimeInput()
         }"""
+
+"""Form for booking a lesson request"""
+class BookLessonRequestForm(forms.ModelForm):
+    class Meta:
+        model = Lesson
+        fields = ['date','duration','topic','teacher']
+
 
 """Forms for the lessons app."""
 class LogInForm(forms.Form):

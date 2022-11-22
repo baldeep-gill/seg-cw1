@@ -26,10 +26,13 @@ urlpatterns = [
 
     path('student/home/', views.student_home, name='student_home'),
     path('student/lesson_request/', views.lesson_request, name='lesson_request'),
+    path('student/log_out/', views.log_out, name='log_out'),
 
     path('admin/home/', views.admin_home, name='admin_home'),
-    path('student/log_out/', views.log_out, name='log_out'),
+    path('admin/book_lesson_request/', views.book_lesson_request, name='book_lesson_request'),
 
     # for branch 06
     path('student/lessons/list', views.lessons_success, name='lesson_list'),
+
+
 ]
