@@ -50,16 +50,14 @@ def lesson_request(request):
     return render(request, 'lesson_request.html', {'form': form})
 
 
-@login_required
-@only_admins
+
 def book_lesson_request(request, request_id):
     try:
         lesson_request = LessonRequest.objects.get(id=request_id)
         student_making_request = User.objects.get(id=lesson_request.author_id)
         lesson_count = lesson_request.lessonNum
     except ObjectDoesNotExist:
-        #TODO redirect to unfulfilled request list once it has been implemented
-        return redirect("admin_home")
+        return redirect("admin_requests")
 
     if request.method == 'POST':
         form = BookLessonRequestForm(request.POST)
@@ -77,11 +75,12 @@ def book_lesson_request(request, request_id):
                 teacher=teacher
             )
             lesson.save()
-            #TODO redirect to unfulfilled request list when done
-            return redirect('admin_home')
+            lesson_request.delete()
+            return redirect('admin_requests')
     else:
         form = BookLessonRequestForm()
-    return render(request, 'book_lesson_request.html', {'form': form})
+    return render(request, 'book_lesson_request.html', {'form': form,
+                                                        'request_id':request_id})
 
 @login_required
 @only_students

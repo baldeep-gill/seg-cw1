@@ -34,6 +34,9 @@
               Requested teacher: {{ request.teacher }}
             </div>
             {% endif %}
+
+            <a href="{% url 'book_lesson_request' request.id %}">Fulfill Request</a>
+
           </div>
         </div>
         {% endfor %}

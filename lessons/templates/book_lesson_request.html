@@ -2,13 +2,14 @@
 {% block body %}
 <div class="container">
     <div class="row">
+
         <div class="col-sm-12 col-md-6 offset-md-3">
             <h1>Book this lesson request</h1>
-            <form action="{% url 'book_lesson_request' %}" method="post">
+            <p> For the date field type it in form yyyy-mm-dd, This is to be removed later</p>
+            <form action="{% url 'book_lesson_request' request_id%}" method="post">
                 {% csrf_token %}
-                
+                {{ form.media }}
                 {% include 'partials/form.html' with form=form %}
-
                 <input type="submit" value="Submit" class="btn btn-primary">
             </form>
         </div>

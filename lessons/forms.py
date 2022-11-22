@@ -3,6 +3,8 @@ from django.core.validators import RegexValidator
 from .models import User, Student, StudentProfile, LessonRequest, Lesson
 from django.db.models import Max
 from .helpers import find_next_available_student_number
+from django.contrib.admin.widgets import AdminDateWidget
+from django.forms.fields import DateTimeField
 
 """Form for requesting a lesson"""
 class LessonRequestForm(forms.ModelForm):
@@ -18,6 +20,9 @@ class BookLessonRequestForm(forms.ModelForm):
     class Meta:
         model = Lesson
         fields = ['date','duration','topic','teacher']
+        widgets = {
+            "date":AdminDateWidget()
+        }
 
 
 """Forms for the lessons app."""
