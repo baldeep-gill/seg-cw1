@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .forms import LessonRequestForm, StudentSignUpForm
-
+from .models import LessonRequest
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
@@ -36,3 +36,7 @@ def student_sign_up(request):
         form = StudentSignUpForm()
     return render(request, 'student_sign_up.html',{'form': form})
 
+
+def admin_requests(request):
+    lesson_request_data = LessonRequest.objects.all()
+    return render(request, 'admin_lesson_list.html', {'data': lesson_request_data})

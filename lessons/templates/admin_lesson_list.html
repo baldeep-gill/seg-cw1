@@ -1,0 +1,44 @@
+{% extends 'base.html' %} {% block body %} {% include 'partials/navbar.html' %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>See all requests here!</h1>
+      {% comment %}
+      <p>You can now log in from the home page</p>
+      {% endcomment %}
+      <p>
+        <a href="{% url 'home' %}" class="btn btn-lg btn-secondary"
+          >Return to home page</a
+        >
+      </p>
+      <div class="d-flex flex-row">
+        {% for request in data %}
+        <div class="card text-bg-secondary border-primary mb-3 mr-20 w-25">
+          <h5 class="card-header">{{ request.topic }}</h5>
+          <div class="card-body">
+            <p>
+              Requesting <b>{{ request.lessonNum }}</b> lessons over
+              <b>{{ request.interval }}</b> week {% if request.interval > 1%} s
+              {% endif %}
+            </p>
+            <p>
+              <i class="bi bi-clock-fill"></i> Duration: {{ request.duration }}
+              mins
+            </p>
+
+            <p>Availability: {{ request.availability }}</p>
+
+            {% if teacher != "" %}
+            <div>
+              <i class="bi bi-person-fill"></i>
+              Requested teacher: {{ request.teacher }}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
