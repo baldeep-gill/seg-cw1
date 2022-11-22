@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="container">
+    <div class="row content">
+        <div class="col-12 my-auto">
+            <h1>View and edit lesson requests</h1>
+            <table class="table">
+                {% for lesson in lesson_requests %}
+                    <tr>
+                        <td>
+                            <p>{{ lesson.topic }}</p>
+                            <p><a href="{% url 'edit_requests' %}">Edit</a></p>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
-from .forms import LessonRequestForm, StudentSignUpForm, LogInForm
+from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, EditForm
 from .models import LessonRequest, User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from .models import Admin, Student, User
 
 # Create your views here.
@@ -93,4 +94,26 @@ def student_sign_up(request):
         # creating empty sign up form
         form = StudentSignUpForm()
     return render(request, 'student_sign_up.html',{'form': form})
+
+def show_requests(request):
+    try:
+        user = request.user
+        lesson_requests = LessonRequest.objects.filter(author=user)
+    except ObjectDoesNotExist:
+        return redirect('home')
+    else:
+        return render(request, 'show_requests.html', {'user': user, 'lesson_requests': lesson_requests})
+
+def edit_requests(request):
+    current_user = request.user
+    
+    if request.method == 'POST':
+        form = EditForm(instance=current_user, data=request.POST)
+        if form.is_valid():
+            messages.add_message(request, messages.SUCCESS, "Request updated")
+            form.save()
+            return redirect('student/home')
+    else:
+        form = EditForm(instance=current_user)
+    return render(request, 'edit_requests.html', {'form': form})
 

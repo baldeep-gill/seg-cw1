@@ -4,14 +4,20 @@ from .models import User, Student, StudentProfile, LessonRequest
 from django.db.models import Max
 from .helpers import find_next_available_student_number
 
-"""Form for requesting a lesson"""
 class LessonRequestForm(forms.ModelForm):
+    """Form for requesting a lesson"""
     class Meta:
         model = LessonRequest
         fields = ['availability', 'lessonNum', 'interval', 'duration', 'topic', 'teacher']
         """widgets = {
             'availability': forms.DateTimeInput()
         }"""
+
+class EditForm(forms.ModelForm):
+    """Form to update lesson request"""
+    class Meta:
+        model = LessonRequest
+        fields = ['availability', 'lessonNum', 'interval', 'duration', 'topic', 'teacher']
 
 """Forms for the lessons app."""
 class LogInForm(forms.Form):
