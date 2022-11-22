@@ -12,7 +12,7 @@ def find_next_available_student_number():
 def only_students(view_function):
     def wrapper(request):
         try:
-            if Student.students.get(username=request.user.get_username()).exists():
+            if Student.students.get(username=request.user.get_username()):
                 return view_function(request)
         except User.DoesNotExist:
             return redirect('admin_home')
@@ -23,7 +23,7 @@ def only_students(view_function):
 def only_admins(view_function):
     def wrapper(request):
         try:
-            if Admin.admins.get(username=request.user.get_username()).exists():
+            if Admin.admins.get(username=request.user.get_username()):
                 return view_function(request)
         except User.DoesNotExist:
             return redirect('student_home')
