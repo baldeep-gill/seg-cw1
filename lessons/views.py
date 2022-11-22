@@ -3,7 +3,7 @@ from .forms import LessonRequestForm, StudentSignUpForm, LogInForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Admin, LessonRequest
+from .models import Admin, LessonRequest, Lesson, Student
 from .helpers import only_admins, only_students
 
 # Create your views here.
@@ -13,8 +13,9 @@ def home(request):
 @login_required
 @only_students
 def lessons_success(request):
-    current_user = request.user.username
-    lessons = LessonRequest.objects.all() # we filter this by the username and then pass it 
+    current_student_id = request.user.id
+    
+    lessons = Lesson.objects.filter(student_id=current_student_id) #get(student=current_user) # we filter this by the username and then pass it 
     return render(request, 'successful_lessons_list.html', {'lessons': lessons})
 
 def lesson_request(request):

@@ -8,21 +8,26 @@
     <div class="row">
       <div class="col-12">
         <h1>Fulfilled Lesson Requests</h1>
-        <table class="table">
-          {% for lesson in lessons %}
-            <tr>
-              <td>
-                
-              </td>
-              <td>
+        {% if lessons %}
+          <table class="table">
+            {% for lesson in lessons %}
+              <tr>
+                <td>
+                  {{lesson.duration}}
+                </td>
+                <td>
+                  {{lesson.topic}}
+                </td>
+                <td>
+                  {{lesson.teacher}}
+                </td>
+              </tr>
+              {% endfor %}
+            </table>
+        {% else %}
+          <h1> you don't have any confirmed booked lessons boi</h1>
+        {% endif %}
 
-              </td>
-              <td>
-                
-              </td>
-            </tr>
-          {% endfor %}
-        </table>
       </div>
     </div>
   </div>
