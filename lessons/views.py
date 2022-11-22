@@ -5,11 +5,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Admin, Student, User
+from .helpers import only_admins, only_students
 
 # Create your views here.
 def home(request):
     return render(request, 'home.html')
 
+@login_required
+@only_students
 def lessons_success(request):
     return render(request, 'successful_lessons_list.html')
 
@@ -40,20 +43,14 @@ def lesson_request(request):
     return render(request, 'lesson_request.html', {'form': form})
 
 @login_required
+@only_students
 def student_home(request):
-    try:
-        if(Student.students.get(username=request.user.get_username())):
-            return render(request, 'student_home.html')
-    except User.DoesNotExist:
-        return render(request, 'admin_home.html')
+    return render(request, 'student_home.html')
 
 @login_required
+@only_admins
 def admin_home(request):
-    try:
-        if(Admin.admins.get(username=request.user.get_username()).exists()):
-            return render(request, 'admin_home.html')
-    except User.DoesNotExist:
-        return render(request, 'student_home.html')
+    return render(request, 'admin_home.html')
     
 def log_in(request):
     if request.method == 'POST':
