@@ -16,6 +16,7 @@
                             <p>Availability: {{ lesson.availability }}</p>
                             <p>Requested teacher: {{ lesson.teacher }} </p>
                             <p><a href="{% url 'edit_requests' lesson.id %}">Edit</a></p>
+                            <p><a href="{% url 'delete_requests' lesson.id %}">Delete</a></p>
                         </td>
                     </tr>
                 {% endfor %}
