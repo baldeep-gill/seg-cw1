@@ -1,15 +1,22 @@
 from django.shortcuts import render, redirect
 from .forms import LessonRequestForm, StudentSignUpForm, LogInForm
-from .models import LessonRequest, User
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .models import Admin, LessonRequest
+from .helpers import only_admins, only_students
 
 # Create your views here.
 def home(request):
     return render(request, 'home.html')
 
 @login_required
+@only_students
+def lessons_success(request):
+    current_user = request.user.username
+    lessons = LessonRequest.objects.all() # we filter this by the username and then pass it 
+    return render(request, 'successful_lessons_list.html', {'lessons': lessons})
+
 def lesson_request(request):
     if request.method == 'POST':
         form = LessonRequestForm(request.POST)
@@ -36,26 +43,44 @@ def lesson_request(request):
         form = LessonRequestForm()
     return render(request, 'lesson_request.html', {'form': form})
 
+@login_required
+@only_students
 def student_home(request):
     return render(request, 'student_home.html')
 
+@login_required
+@only_admins
 def admin_home(request):
     return render(request, 'admin_home.html')
-
+    
 def log_in(request):
     if request.method == 'POST':
         form = LogInForm(request.POST)
+        next = request.POST.get('next') or ''
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
             if user is not None:
-                login(request, user)
-                #redirect user upon successful log in
-                return redirect('lesson_request')
+                if isinstance(user, Admin):
+                    login(request, user)
+                    redirect_url = next or 'admin_home'
+                else:
+                    login(request, user)
+                    redirect_url = next or 'student_home'
+                # in here we need to determine the type of the user to know which other redirect url we need to go to
+                # TODO: determin the type of user
+                #redirect user upon successful log i
+                return redirect(redirect_url)
         messages.add_message(request, messages.ERROR, "User not found")
+    else:
+        next = request.GET.get('next') or ''
     form = LogInForm()
     return render(request, 'log_in.html', {'form':form})
+
+def log_out(request):
+    logout(request)
+    return redirect('home')
 
 def student_sign_up(request):
     if request.method == 'POST':

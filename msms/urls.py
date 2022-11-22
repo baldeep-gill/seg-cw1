@@ -28,4 +28,8 @@ urlpatterns = [
     path('student/lesson_request/', views.lesson_request, name='lesson_request'),
 
     path('admin/home/', views.admin_home, name='admin_home'),
+    path('student/log_out/', views.log_out, name='log_out'),
+
+    # for branch 06
+    path('student/lessons/list', views.lessons_success, name='lesson_list'),
 ]
