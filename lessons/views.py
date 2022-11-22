@@ -11,6 +11,7 @@ from .models import Admin, Student, User
 def home(request):
     return render(request, 'home.html')
 
+@login_required
 def lesson_request(request):
     if request.method == 'POST':
         form = LessonRequestForm(request.POST)
@@ -110,7 +111,6 @@ def edit_requests(request, lesson_id):
     if request.method == 'POST':
         form = EditForm(instance=current_lesson, data=request.POST)
         if form.is_valid():
-            messages.add_message(request, messages.SUCCESS, "Request updated")
             form.save()
             return redirect('show_requests')
     else:
