@@ -180,3 +180,47 @@ class Lesson(models.Model):
         blank = True,
         max_length = 80,
     )
+
+class Invoice(models.Model):
+    """Models an invoice for a booked lesson"""
+
+    # Invoice who the student is for
+    student = models.ForeignKey(
+        Student,
+        on_delete = models.CASCADE,
+        blank = False,
+    )
+
+    # Invoice lesson is for
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete = models.CASCADE,
+        blank = False,
+    )
+
+    # Date and time when invoice was generated
+    date = models.DateTimeField(
+        blank=False
+    )
+
+    # Price of the lesson
+    price = models.IntegerField(
+        blank=False
+    )
+
+    # Number of the invoice for the student
+    invoice_number = models.IntegerField(
+        blank = False,
+    )
+
+    # Unique reference number which can be used to identify invoice
+    # Of the form student_number-invoice number
+    unique_reference_number = models.CharField(
+        blank = False,
+        unique=True
+    )
+
+
+
+
+
