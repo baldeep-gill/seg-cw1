@@ -217,7 +217,8 @@ class Invoice(models.Model):
     # Of the form student_number-invoice number
     unique_reference_number = models.CharField(
         blank = False,
-        unique=True
+        unique=True,
+        max_length=80
     )
 
 
