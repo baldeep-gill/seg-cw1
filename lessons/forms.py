@@ -2,21 +2,13 @@ from django import forms
 from django.core.validators import RegexValidator
 from .models import User, Student, StudentProfile, LessonRequest, Lesson
 from django.db.models import Max
-from .helpers import find_next_available_student_number
+from .helpers import find_next_available_student_number, day_of_the_week_validator
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateTimeField
 from django.core.exceptions import ValidationError
 
 
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
 
-def day_of_the_week_validator(value):
-    days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
-    if value not in days:
-        raise ValidationError(
-            _('Needs to be a day of the week')
-        )
 
 
 """Form for requesting a lesson"""
@@ -28,8 +20,9 @@ class LessonRequestForm(forms.ModelForm):
             'availability': forms.DateTimeInput()
         }"""
 
-"""Form for booking a lesson request"""
+
 class BookLessonRequestForm(forms.ModelForm):
+    """Form for fulfilling/booking lesson requests"""
     class Meta:
         model = Lesson
         fields = ['duration','topic','teacher']
@@ -38,7 +31,7 @@ class BookLessonRequestForm(forms.ModelForm):
     day = forms.CharField(label="Day of the week",validators=[day_of_the_week_validator])
     time = forms.TimeField(label="Time")
     interval_between_lessons = forms.IntegerField(label="Weeks Between lessons")
-    number_of_lessons = forms.IntegerField(label="NUmber of lessons")
+    number_of_lessons = forms.IntegerField(label="Number of lessons")
 
 
 """Forms for the lessons app."""

@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Admin, LessonRequest, Lesson, Student
-from .helpers import only_admins, only_students
+from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given
 from django.core.exceptions import ObjectDoesNotExist
 
 import datetime
@@ -55,6 +55,7 @@ def lesson_request(request):
 
 
 def book_lesson_request(request, request_id):
+    """View to allow admins to fulfill/book a lesson request"""
     try:
         lesson_request = LessonRequest.objects.get(id=request_id)
         student_making_request = User.objects.get(id=lesson_request.author_id)
@@ -71,17 +72,16 @@ def book_lesson_request(request, request_id):
             start_date = form.cleaned_data.get('start_date')
             time = form.cleaned_data.get('time')
             interval_between_lessons = form.cleaned_data.get('interval_between_lessons')
-            number_of_lesons = form.cleaned_data.get('number_of_lessons')
+            number_of_lessons = form.cleaned_data.get('number_of_lessons')
             day = form.cleaned_data.get('day')
 
+            #combines the start date picked and the time each day into one dateTime object
             new_date = datetime.datetime(start_date.year,start_date.month,start_date.day,time.hour,time.minute)
-            weekday_dict = {"Monday":0,"Tuesday":1,"Wednesday":2,"Thursday":3,"Friday":4,"Saturday":5,"Sunday":6}
-            while new_date.weekday() != weekday_dict[day]:
-                tdelta = datetime.timedelta(days=1)
-                new_date = new_date + tdelta
+            new_date = get_next_given_day_of_week_after_date_given(new_date,day)
 
+            #we will generate a lesson every lesson interval weeks at the time given
             tdelta = datetime.timedelta(weeks=interval_between_lessons)
-            for i in range(number_of_lesons):
+            for i in range(number_of_lessons):
                 lesson = Lesson.objects.create(
                     student=student,
                     date=new_date,
@@ -92,13 +92,12 @@ def book_lesson_request(request, request_id):
                 lesson.save()
                 new_date = new_date + tdelta
 
-
-
+            #TODO need to update this to set request to fulfilled and not delete it
             lesson_request.delete()
             return redirect('admin_requests')
     else:
         form = BookLessonRequestForm()
-    return render(request, 'book_lesson_request.html', {'form': form, 'request_id':request_id, 'lesson_request':lesson_request,'student':student_making_request})
+    return render(request, 'book_lesson_request.html', {'form': form,'lesson_request':lesson_request,'student':student_making_request})
 
 @login_required
 @only_students

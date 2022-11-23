@@ -154,6 +154,7 @@ class Lesson(models.Model):
         blank = False,
     )
 
+    # Date and time of lesson
     date = models.DateTimeField(
         blank=False
     )

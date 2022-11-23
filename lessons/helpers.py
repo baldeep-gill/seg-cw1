@@ -1,5 +1,8 @@
 from .models import Admin, Student, User
 from django.shortcuts import redirect
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+import datetime
 
 
 def find_next_available_student_number():
@@ -28,3 +31,21 @@ def only_admins(view_function):
         except User.DoesNotExist:
             return redirect('student_home')
     return wrapper
+
+
+def day_of_the_week_validator(value):
+    """Validates that the input to a field can only be a day of the week"""
+    days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+    if value not in days:
+        raise ValidationError(
+            _('Needs to be a day of the week')
+        )
+
+def get_next_given_day_of_week_after_date_given(date,day):
+    """Takes a date and a day of the week and returns the first date after passed in date on that day
+    If the date passed in is on the passed in day of the week then just return"""
+    weekday_dict = {"Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3, "Friday": 4, "Saturday": 5, "Sunday": 6}
+    while date.weekday() != weekday_dict[day]:
+        tdelta = datetime.timedelta(days=1)
+        date = date + tdelta
+    return date
