@@ -4,7 +4,7 @@
 The members of the team are:
 - *Syraj Alkhalil k21007329*
 - *Baldeep Gill k21034937*
-- *<name of team member 3>*
+- *Harry Davis k21049391*
 - *<name of team member 4>*
 - *<name of team member 5>*
 
