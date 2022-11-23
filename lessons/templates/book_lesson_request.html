@@ -1,9 +1,29 @@
 {% extends 'base.html' %}
 {% block body %}
 <div class="container">
-    <div class="row">
+    <div class="row content">
 
-        <div class="col-sm-12 col-md-6 offset-md-3">
+        <div class="col-sm-12 col-md-4">
+            <h1> Student Details </h1>
+            {% include 'partials/user_profile.html' with user=student %}
+
+            <h1> Request Details </h1>
+            <p> Availability: {{ lesson_request.availability }} </p>
+            <p> Duration of each lesson: {{ lesson_request.duration }} </p>
+            <p> How many weeks between lessons: {{ lesson_request.interval }} </p>
+            <p> Lesson Topic: {{ lesson_request.topic }} </p>
+
+            {% if lesson_request.teacher != "" %}
+            <div>
+              <i class="bi bi-person-fill"></i>
+              Requested teacher: {{ lesson_request.teacher }}
+            </div>
+            {% endif %}
+
+        </div>
+
+
+        <div class="col-sm-12 col-md-8">
             <h1>Book this lesson request</h1>
             <p> For the date field type it in form yyyy-mm-dd, This is to be removed later</p>
             <form action="{% url 'book_lesson_request' request_id%}" method="post">
@@ -13,6 +33,9 @@
                 <input type="submit" value="Submit" class="btn btn-primary">
             </form>
         </div>
+
     </div>
 </div>
+
+
 {% endblock %}

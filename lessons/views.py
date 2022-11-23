@@ -56,7 +56,6 @@ def book_lesson_request(request, request_id):
     try:
         lesson_request = LessonRequest.objects.get(id=request_id)
         student_making_request = User.objects.get(id=lesson_request.author_id)
-        lesson_count = lesson_request.lessonNum
     except ObjectDoesNotExist:
         return redirect("admin_requests")
 
@@ -80,8 +79,7 @@ def book_lesson_request(request, request_id):
             return redirect('admin_requests')
     else:
         form = BookLessonRequestForm()
-    return render(request, 'book_lesson_request.html', {'form': form,
-                                                        'request_id':request_id})
+    return render(request, 'book_lesson_request.html', {'form': form, 'request_id':request_id, 'lesson_request':lesson_request,'student':student_making_request})
 
 @login_required
 @only_students

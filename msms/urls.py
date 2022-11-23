@@ -29,7 +29,7 @@ urlpatterns = [
     path('student/log_out/', views.log_out, name='log_out'),
 
     path('admin/home/', views.admin_home, name='admin_home'),
-    path('admin/unfulfilled_requests', views.admin_requests, name='admin_requests'),
+    path('admin/unfulfilled_requests/', views.admin_requests, name='admin_requests'),
     path('admin/book_lesson_request/<int:request_id>', views.book_lesson_request, name='book_lesson_request'),
 
     # for branch 06
