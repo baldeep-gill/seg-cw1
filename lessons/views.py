@@ -9,6 +9,8 @@ from .models import Admin, LessonRequest, Lesson, Student
 from .helpers import only_admins, only_students
 from django.core.exceptions import ObjectDoesNotExist
 
+import datetime
+
 
 # Create your views here.
 def home(request):
@@ -63,18 +65,35 @@ def book_lesson_request(request, request_id):
         form = BookLessonRequestForm(request.POST)
         if form.is_valid():
             student = student_making_request
-            date = form.cleaned_data.get('date')
             duration = form.cleaned_data.get('duration')
             topic = form.cleaned_data.get('topic')
             teacher = form.cleaned_data.get('teacher')
-            lesson = Lesson.objects.create(
-                student=student,
-                date=date,
-                duration=duration,
-                topic=topic,
-                teacher=teacher
-            )
-            lesson.save()
+            start_date = form.cleaned_data.get('start_date')
+            time = form.cleaned_data.get('time')
+            interval_between_lessons = form.cleaned_data.get('interval_between_lessons')
+            number_of_lesons = form.cleaned_data.get('number_of_lessons')
+            day = form.cleaned_data.get('day')
+
+            new_date = datetime.datetime(start_date.year,start_date.month,start_date.day,time.hour,time.minute)
+            weekday_dict = {"Monday":0,"Tuesday":1,"Wednesday":2,"Thursday":3,"Friday":4,"Saturday":5,"Sunday":6}
+            while new_date.weekday() != weekday_dict[day]:
+                tdelta = datetime.timedelta(days=1)
+                new_date = new_date + tdelta
+
+            tdelta = datetime.timedelta(weeks=interval_between_lessons)
+            for i in range(number_of_lesons):
+                lesson = Lesson.objects.create(
+                    student=student,
+                    date=new_date,
+                    duration=duration,
+                    topic=topic,
+                    teacher=teacher
+                )
+                lesson.save()
+                new_date = new_date + tdelta
+
+
+
             lesson_request.delete()
             return redirect('admin_requests')
     else:

@@ -5,6 +5,19 @@ from django.db.models import Max
 from .helpers import find_next_available_student_number
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateTimeField
+from django.core.exceptions import ValidationError
+
+
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+
+def day_of_the_week_validator(value):
+    days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+    if value not in days:
+        raise ValidationError(
+            _('Needs to be a day of the week')
+        )
+
 
 """Form for requesting a lesson"""
 class LessonRequestForm(forms.ModelForm):
@@ -19,10 +32,13 @@ class LessonRequestForm(forms.ModelForm):
 class BookLessonRequestForm(forms.ModelForm):
     class Meta:
         model = Lesson
-        fields = ['date','duration','topic','teacher']
-        widgets = {
-            "date":AdminDateWidget()
-        }
+        fields = ['duration','topic','teacher']
+
+    start_date = forms.DateTimeField(label="Start Date",widget=forms.SelectDateWidget)
+    day = forms.CharField(label="Day of the week",validators=[day_of_the_week_validator])
+    time = forms.TimeField(label="Time")
+    interval_between_lessons = forms.IntegerField(label="Weeks Between lessons")
+    number_of_lessons = forms.IntegerField(label="NUmber of lessons")
 
 
 """Forms for the lessons app."""
@@ -78,3 +94,4 @@ class StudentSignUpForm(forms.ModelForm):
 
         StudentProfile.objects.create(user=student, student_number = new_student_number)
         return student
+
