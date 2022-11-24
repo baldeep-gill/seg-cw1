@@ -1,6 +1,4 @@
 from django.test import TestCase
-from django.core.exceptions import ValidationError
-from django import forms
 from lessons.models import Student, LessonRequest
 from lessons.forms import EditForm
 

@@ -1,8 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth import login
-from lessons.forms import LessonRequestForm
-from lessons.models import Student, LessonRequest
+from lessons.models import Student
 from lessons.tests.helpers import create_requests
 
 class LessonRequestViewTestCase(TestCase):
