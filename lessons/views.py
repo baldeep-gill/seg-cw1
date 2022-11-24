@@ -1,15 +1,17 @@
 from django.shortcuts import render, redirect
-from .forms import LessonRequestForm, StudentSignUpForm, LogInForm
+from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, EditForm
 from .models import LessonRequest, User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from .models import Admin, Student, User
 
 # Create your views here.
 def home(request):
     return render(request, 'home.html')
 
+@login_required
 def lesson_request(request):
     if request.method == 'POST':
         form = LessonRequestForm(request.POST)
@@ -93,4 +95,35 @@ def student_sign_up(request):
         # creating empty sign up form
         form = StudentSignUpForm()
     return render(request, 'student_sign_up.html',{'form': form})
+
+@login_required
+def show_requests(request):
+    try:
+        user = request.user
+        lesson_requests = LessonRequest.objects.filter(author=user)
+    except ObjectDoesNotExist:
+        return redirect('home')
+    else:
+        return render(request, 'show_requests.html', {'user': user, 'lesson_requests': lesson_requests})
+
+@login_required
+def edit_requests(request, lesson_id):
+    try:
+        current_lesson = LessonRequest.objects.get(id=lesson_id)
+    except ObjectDoesNotExist:
+        return redirect('show_requests')
+    else:
+        if request.method == 'POST':
+            form = EditForm(instance=current_lesson, data=request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('show_requests')
+        else:
+            form = EditForm(instance=current_lesson)
+        return render(request, 'edit_requests.html', {'form': form, 'lesson_id': lesson_id})
+
+def delete_requests(request, lesson_id):
+    current_lesson = LessonRequest.objects.get(id=lesson_id)
+    current_lesson.delete()
+    return redirect('show_requests')
 

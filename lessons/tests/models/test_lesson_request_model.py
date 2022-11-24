@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from lessons.models import LessonRequest, Student
 
-class LessonRequestTest(TestCase):
+class LessonRequestTestCase(TestCase):
     """Unit tests for lesson request model"""
     
     fixtures = [
