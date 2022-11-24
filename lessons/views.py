@@ -145,7 +145,7 @@ def log_in(request):
     else:
         next = request.GET.get('next') or ''
     form = LogInForm()
-    return render(request, 'log_in.html', {'form':form})
+    return render(request, 'log_in.html', {'form':form, 'next': next})
 
 def log_out(request):
     logout(request)
