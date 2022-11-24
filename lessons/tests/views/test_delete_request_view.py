@@ -6,11 +6,15 @@ from lessons.models import Student, LessonRequest
 class DeleteRequestViewTestCase(TestCase):
     """Tests for the delete request view"""
 
-    fixtures = ['lessons/tests/fixtures/default_student.json']
+    fixtures = [
+        'lessons/tests/fixtures/default_student.json',
+        'lessons/tests/fixtures/other_students.json'
+    ]
 
     def setUp(self):
         super(TestCase, self).setUp()
         self.student = Student.objects.get(email="johndoe@example.org")
+        self.other_student = Student.objects.get(email="janedoe@example.org")
         
         self.lessonRequest = LessonRequest(
             author = self.student,
@@ -55,45 +59,17 @@ class DeleteRequestViewTestCase(TestCase):
         response = self.client.get(url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    # def test_not_logged_in_get_request(self):
-    #     redirect_url = reverse("log_in") + f"?next={self.url}"
-    #     response = self.client.get(self.url)
-    #     self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+    def test_not_logged_in_get_request(self):
+        redirect_url = reverse("log_in") + f"?next={self.url}"
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    # def test_unsuccessful_update(self):
-    #     self.client.force_login(self.student)
-    #     self.form_input['lessonNum'] = "two"
-    #     before = LessonRequest.objects.count()
-    #     response = self.client.post(self.url, self.form_input)
-    #     after = LessonRequest.objects.count()
-    #     self.assertEqual(before, after)
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTemplateUsed(response, "edit_requests.html")
-    #     form = response.context['form']
-    #     self.assertTrue(isinstance(form, EditForm))
-    #     self.assertTrue(form.is_bound)
-    #     self.lessonRequest.refresh_from_db()
-    #     self.assertEqual(self.lessonRequest.availability, "Monday")
-    #     self.assertEqual(self.lessonRequest.lessonNum, 2)
-    #     self.assertEqual(self.lessonRequest.interval, 1)
-    #     self.assertEqual(self.lessonRequest.duration, 60)
-    #     self.assertEqual(self.lessonRequest.topic, "Piano")
-    #     self.assertEqual(self.lessonRequest.teacher, "Mr Bob")
-
-    # def test_successful_update(self):
-    #     self.client.force_login(self.student)
-    #     self.form_input['lessonNum'] = 5
-    #     before = LessonRequest.objects.count()
-    #     response = self.client.post(self.url, self.form_input, follow=True)
-    #     after = LessonRequest.objects.count()
-    #     self.assertEqual(before, after)
-    #     response_url = reverse('show_requests')
-    #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'show_requests.html')
-    #     self.lessonRequest.refresh_from_db()
-    #     self.assertEqual(self.lessonRequest.availability, "Monday")
-    #     self.assertEqual(self.lessonRequest.lessonNum, 5)
-    #     self.assertEqual(self.lessonRequest.interval, 1)
-    #     self.assertEqual(self.lessonRequest.duration, 60)
-    #     self.assertEqual(self.lessonRequest.topic, "Piano")
-    #     self.assertEqual(self.lessonRequest.teacher, "Mr Bob")
+    def test_user_cant_delete_other_requests(self):
+        """Ensure that users can't delete other users' requests"""
+        redirect_url = reverse('home')
+        self.client.force_login(self.other_student)
+        before = LessonRequest.objects.count()
+        response = self.client.get(self.url)
+        after = LessonRequest.objects.count()
+        self.assertEqual(before, after)
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)

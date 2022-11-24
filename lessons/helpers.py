@@ -20,10 +20,10 @@ def find_next_available_invoice_number_for_student(student):
 
 '''decorator for preventing students and admins from accessing each other's pages'''
 def only_students(view_function):
-    def wrapper(request):
+    def wrapper(request, *args, **kwargs):
         try:
             if Student.students.get(username=request.user.get_username()):
-                return view_function(request)
+                return view_function(request, *args, **kwargs)
         except User.DoesNotExist:
             return redirect('admin_home')
     return wrapper
@@ -31,10 +31,10 @@ def only_students(view_function):
 
 '''decorator for preventing students and admins from accessing each other's pages'''
 def only_admins(view_function):
-    def wrapper(request):
+    def wrapper(request, *args, **kwargs):
         try:
             if Admin.admins.get(username=request.user.get_username()):
-                return view_function(request)
+                return view_function(request, *args, **kwargs)
         except User.DoesNotExist:
             return redirect('student_home')
     return wrapper

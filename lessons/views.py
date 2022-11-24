@@ -166,6 +166,7 @@ def admin_requests(request):
     return render(request, 'admin_lesson_list.html', {'data': lesson_request_data})
 
 @login_required
+@only_students
 def show_requests(request):
     try:
         user = request.user
@@ -176,6 +177,7 @@ def show_requests(request):
         return render(request, 'show_requests.html', {'user': user, 'lesson_requests': lesson_requests})
 
 @login_required
+@only_students
 def edit_requests(request, lesson_id):
     try:
         current_lesson = LessonRequest.objects.get(id=lesson_id)
@@ -191,11 +193,17 @@ def edit_requests(request, lesson_id):
             form = EditForm(instance=current_lesson)
         return render(request, 'edit_requests.html', {'form': form, 'lesson_id': lesson_id})
 
+@login_required
+@only_students
 def delete_requests(request, lesson_id):
     try:
         current_lesson = LessonRequest.objects.get(id=lesson_id)
     except ObjectDoesNotExist:
         return redirect('show_requests')
     else:
-        current_lesson.delete()
-        return redirect('show_requests')
+        user = request.user
+        if current_lesson.author != user:
+            return redirect('home')
+        else:
+            current_lesson.delete()
+            return redirect('show_requests')
