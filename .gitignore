@@ -10,6 +10,8 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 media
+lessions/migrations/*
+!lessions/migrations/__init__.py
 
 # If your build process includes running collectstatic, then you probably don't need or want to include staticfiles/
 # in your Git repository. Update and uncomment the following line accordingly.
@@ -433,6 +435,11 @@ GitHub.sublime-settings
 [Ss]cripts
 pyvenv.cfg
 pip-selfcheck.json
+
+## migrations ##
+!lessons/migrations/__init__.py
+lessons/migrations/*
+
 
 ### VisualStudioCode ###
 .vscode/*

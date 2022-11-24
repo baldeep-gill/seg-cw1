@@ -1,0 +1,27 @@
+<div class="card bg-dark border-secondary text-light mb-3 w-25">
+  <h5 class="card-header">{{ request.topic }}</h5>
+  <div class="card-body">
+    <p>
+      Requesting <b>{{ request.lessonNum }}</b> lessons over
+      <b>{{ request.interval }}</b> week {% if request.interval > 1%} s {% endif %}
+    </p>
+    <p>
+      <i class="bi bi-clock-fill"></i> Duration: {{ request.duration }} mins
+    </p>
+
+    <p>Availability: {{ request.availability }}</p>
+
+    {% if teacher != "" %}
+    <div>
+      <i class="bi bi-person-fill"></i>
+      Requested teacher: {{ request.teacher }}
+    </div>
+    {% endif %}
+
+    <a href="{% url 'book_lesson_request' request.id%}"> Fulfill request </a>
+
+    <div class="row">
+      <div>
+    </div>
+  </div>
+</div>

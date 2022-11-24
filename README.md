@@ -3,8 +3,8 @@
 ## Team members
 The members of the team are:
 - *Syraj Alkhalil k21007329*
-- *<name of team member 2>*
-- *<name of team member 3>*
+- *Baldeep Gill k21034937*
+- *Harry Davis k21049391*
 - *<name of team member 4>*
 - *<name of team member 5>*
 
