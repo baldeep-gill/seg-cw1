@@ -103,8 +103,6 @@ def book_lesson_request(request, request_id):
                 lesson.save()
                 new_date = new_date + tdelta
 
-            print(invoice.price)
-
             #TODO need to update this to set request to fulfilled and not delete it
             lesson_request.delete()
             return redirect('admin_requests')
