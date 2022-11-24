@@ -144,12 +144,58 @@ class LessonRequest(models.Model):
     )
 
 
+class Invoice(models.Model):
+    """Models an invoice for a set of lessons"""
+
+    # Invoice who the student is for
+    student = models.ForeignKey(
+        Student,
+        on_delete = models.CASCADE,
+        blank = False,
+    )
+
+    # Date and time when invoice was generated
+    date = models.DateTimeField(
+        blank=False
+    )
+
+    # Number of the invoice for the student
+    invoice_number = models.IntegerField(
+        blank = False,
+    )
+
+    # Unique reference number which can be used to identify individual invoices
+    # Is of the form student_number-invoice number
+    unique_reference_number = models.CharField(
+        blank = False,
+        unique=True,
+        max_length=80
+    )
+
+    @property
+    def lessons(self):
+        return Lesson.objects.filter(invoice=self)
+
+    @property
+    def price(self):
+        price = 0
+        for lesson in self.lessons:
+            price += lesson.duration * lesson.price_per_minute
+        return price
+
 class Lesson(models.Model):
     """Models a booked lesson for a student"""
 
     # Lesson who the student is for
     student = models.ForeignKey(
         Student,
+        on_delete = models.CASCADE,
+        blank = False,
+    )
+
+    # Invoice lesson is part of
+    invoice = models.ForeignKey(
+        Invoice,
         on_delete = models.CASCADE,
         blank = False,
     )
@@ -181,45 +227,10 @@ class Lesson(models.Model):
         max_length = 80,
     )
 
-class Invoice(models.Model):
-    """Models an invoice for a booked lesson"""
-
-    # Invoice who the student is for
-    student = models.ForeignKey(
-        Student,
-        on_delete = models.CASCADE,
-        blank = False,
-    )
-
-    # Invoice lesson is for
-    lesson = models.ForeignKey(
-        Lesson,
-        on_delete = models.CASCADE,
-        blank = False,
-    )
-
-    # Date and time when invoice was generated
-    date = models.DateTimeField(
-        blank=False
-    )
-
-    # Price of the lesson
-    price = models.IntegerField(
-        blank=False
-    )
-
-    # Number of the invoice for the student
-    invoice_number = models.IntegerField(
-        blank = False,
-    )
-
-    # Unique reference number which can be used to identify invoice
-    # Of the form student_number-invoice number
-    unique_reference_number = models.CharField(
-        blank = False,
-        unique=True,
-        max_length=80
-    )
+    @property
+    def price_per_minute(self):
+        """Returns the cost of this lesson per minute in pounds/£"""
+        return 1
 
 
 

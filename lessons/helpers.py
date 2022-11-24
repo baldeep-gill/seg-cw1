@@ -1,4 +1,4 @@
-from .models import Admin, Student, User
+from .models import Admin, Student, User, Invoice
 from django.shortcuts import redirect
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -9,6 +9,13 @@ def find_next_available_student_number():
     """Will find the next available student number for a new student"""
     if(Student.students.last()):
         return Student.students.last().id + 1 
+    return 1
+
+def find_next_available_invoice_number_for_student(student):
+    """Will find the next available invoice number for a given student"""
+    invoices_for_student = Invoice.objects.filter(student=student)
+    if(invoices_for_student.last()):
+        return invoices_for_student.last().invoice_number + 1
     return 1
 
 '''decorator for preventing students and admins from accessing each other's pages'''

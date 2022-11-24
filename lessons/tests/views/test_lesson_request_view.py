@@ -22,7 +22,7 @@ class LessonRequestViewTestCase(TestCase):
         }
 
     def test_request_url(self):
-        self.assertEqual(self.url, '/lesson_request/')
+        self.assertEqual(self.url, '/student/lesson_request/')
 
     def test_get_request_page(self):
         self.client.login(username=self.student.username, password="Password123")

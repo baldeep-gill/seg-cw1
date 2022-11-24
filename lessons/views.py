@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect
 from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm
-from .models import LessonRequest, User, Lesson
+from .models import LessonRequest, User, Lesson, Invoice
 from .forms import LessonRequestForm, StudentSignUpForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Admin, LessonRequest, Lesson, Student
-from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given
+from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student
 from django.core.exceptions import ObjectDoesNotExist
 
 import datetime
@@ -79,11 +79,22 @@ def book_lesson_request(request, request_id):
             new_date = datetime.datetime(start_date.year,start_date.month,start_date.day,time.hour,time.minute)
             new_date = get_next_given_day_of_week_after_date_given(new_date,day)
 
+            #generate an invoice for the lessons we will generate
+            new_invoice_number = find_next_available_invoice_number_for_student(student)
+            invoice = Invoice.objects.create(
+                student=student,
+                date=datetime.datetime.now(),
+                invoice_number=new_invoice_number,
+                unique_reference_number=f'{student.id}-{new_invoice_number}'
+            )
+            invoice.save()
+
             #we will generate a lesson every lesson interval weeks at the time given
             tdelta = datetime.timedelta(weeks=interval_between_lessons)
             for i in range(number_of_lessons):
                 lesson = Lesson.objects.create(
                     student=student,
+                    invoice=invoice,
                     date=new_date,
                     duration=duration,
                     topic=topic,
@@ -91,6 +102,8 @@ def book_lesson_request(request, request_id):
                 )
                 lesson.save()
                 new_date = new_date + tdelta
+
+            print(invoice.price)
 
             #TODO need to update this to set request to fulfilled and not delete it
             lesson_request.delete()
