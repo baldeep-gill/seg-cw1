@@ -5,7 +5,7 @@ The members of the team are:
 - *Syraj Alkhalil k21007329*
 - *Baldeep Gill k21034937*
 - *Harry Davis k21049391*
-- *<name of team member 4>*
+- *Qadir Ijaz Fernandez k21095034*
 - *<name of team member 5>*
 
 ## Project structure
