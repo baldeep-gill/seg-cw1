@@ -32,6 +32,8 @@ urlpatterns = [
     path('admin/unfulfilled_requests/', views.admin_requests, name='admin_requests'),
     path('admin/book_lesson_request/<int:request_id>', views.book_lesson_request, name='book_lesson_request'),
 
+    path('admin/requests', views.admin_requests, name='admin_requests'),
+    
     # for branch 06
     path('student/lessons/list', views.lessons_success, name='lesson_list'),
 
