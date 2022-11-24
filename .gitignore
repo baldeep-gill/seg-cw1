@@ -436,6 +436,11 @@ GitHub.sublime-settings
 pyvenv.cfg
 pip-selfcheck.json
 
+## migrations ##
+!lessons/migrations/__init__.py
+lessons/migrations/*
+
+
 ### VisualStudioCode ###
 .vscode/*
 !.vscode/settings.json

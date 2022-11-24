@@ -1,16 +1,13 @@
 from django.shortcuts import render, redirect
-from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm
-from .models import LessonRequest, User, Lesson, Invoice
-from .forms import LessonRequestForm, StudentSignUpForm
+from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Admin, LessonRequest, Lesson, Student
+from .models import Admin, LessonRequest, Lesson, Student, User, Invoice
 from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student
 from django.core.exceptions import ObjectDoesNotExist
 
 import datetime
-
 
 # Create your views here.
 def home(request):
@@ -103,8 +100,6 @@ def book_lesson_request(request, request_id):
                 lesson.save()
                 new_date = new_date + tdelta
 
-            print(invoice.price)
-
             #TODO need to update this to set request to fulfilled and not delete it
             lesson_request.delete()
             return redirect('admin_requests')
@@ -127,9 +122,9 @@ def log_in(request):
         form = LogInForm(request.POST)
         next = request.POST.get('next') or ''
         if form.is_valid():
-            username = form.cleaned_data.get('username')
+            email = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
+            user = authenticate(username=email, password=password)
             if user is not None:
                 if isinstance(user, Admin):
                     login(request, user)
@@ -141,7 +136,7 @@ def log_in(request):
                 # TODO: determin the type of user
                 #redirect user upon successful log i
                 return redirect(redirect_url)
-        messages.add_message(request, messages.ERROR, "User not found")
+        messages.add_message(request, messages.ERROR, "User not found, please try again.")
     else:
         next = request.GET.get('next') or ''
     form = LogInForm()
@@ -169,3 +164,34 @@ def student_sign_up(request):
 def admin_requests(request):
     lesson_request_data = LessonRequest.objects.all()
     return render(request, 'admin_lesson_list.html', {'data': lesson_request_data})
+
+@login_required
+def show_requests(request):
+    try:
+        user = request.user
+        lesson_requests = LessonRequest.objects.filter(author=user)
+    except ObjectDoesNotExist:
+        return redirect('home')
+    else:
+        return render(request, 'show_requests.html', {'user': user, 'lesson_requests': lesson_requests})
+
+@login_required
+def edit_requests(request, lesson_id):
+    try:
+        current_lesson = LessonRequest.objects.get(id=lesson_id)
+    except ObjectDoesNotExist:
+        return redirect('show_requests')
+    else:
+        if request.method == 'POST':
+            form = EditForm(instance=current_lesson, data=request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('show_requests')
+        else:
+            form = EditForm(instance=current_lesson)
+        return render(request, 'edit_requests.html', {'form': form, 'lesson_id': lesson_id})
+
+def delete_requests(request, lesson_id):
+    current_lesson = LessonRequest.objects.get(id=lesson_id)
+    current_lesson.delete()
+    return redirect('show_requests')

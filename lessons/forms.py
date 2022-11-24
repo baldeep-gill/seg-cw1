@@ -7,12 +7,8 @@ from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateTimeField
 from django.core.exceptions import ValidationError
 
-
-
-
-
-"""Form for requesting a lesson"""
 class LessonRequestForm(forms.ModelForm):
+    """Form for requesting a lesson"""
     class Meta:
         model = LessonRequest
         fields = ['availability', 'lessonNum', 'interval', 'duration', 'topic', 'teacher']
@@ -33,6 +29,12 @@ class BookLessonRequestForm(forms.ModelForm):
     interval_between_lessons = forms.IntegerField(label="Weeks Between lessons")
     number_of_lessons = forms.IntegerField(label="Number of lessons")
 
+
+class EditForm(forms.ModelForm):
+    """Form to update lesson request"""
+    class Meta:
+        model = LessonRequest
+        fields = ['availability', 'lessonNum', 'interval', 'duration', 'topic', 'teacher']
 
 """Forms for the lessons app."""
 class LogInForm(forms.Form):

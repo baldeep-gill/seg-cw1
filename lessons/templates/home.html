@@ -20,17 +20,6 @@
                         Login
                       </a>
                     </p>
-                    <p>
-                      {% if user.is_authenticated %}
-                        <a href="{% url 'lesson_request' %}" class="btn btn-lg btn-secondary" role="button">
-                          Lesson request
-                        </a>
-                      {% else %}
-                        <a href="{% url 'lesson_request' %}" class="btn btn-lg btn-secondary disabled" role="button">
-                          Lesson request
-                        </a>
-                      {% endif %}
-                    </p>
                   </div>
             </div>
         </div>
