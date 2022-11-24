@@ -20,4 +20,11 @@ from lessons import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
+    path('lesson_request/', views.lesson_request, name = 'lesson_request'),
+    path('student_sign_up/', views.student_sign_up, name='student_sign_up'),
+    path('student/home', views.student_home, name='student_home'),
+    #TODO admin/home leads to django admin interface so cant use it, have used msmadmin for now but there is probably a better name for it
+    path('msmadmin/home', views.admin_home, name='admin_home'),
+    path('log_in/', views.log_in, name='log_in'),
+    path('student/log_out/', views.log_out, name='log_out'),
 ]
