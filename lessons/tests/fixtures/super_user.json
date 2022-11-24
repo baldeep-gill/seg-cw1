@@ -9,7 +9,8 @@
       "email" : "admin@example.org",
       "password": "pbkdf2_sha256$390000$ClI0lWk9lcKWyPOtJgXJQV$bAl9pKg31jSSk0vP+5OXmf8bwBFdkoUrAZWeIgrIaEA=",
       "is_active" : true,
-      "is_superuser": true
+      "is_superuser": true,
+      "type": "ADMIN"
     }
   }
 ]

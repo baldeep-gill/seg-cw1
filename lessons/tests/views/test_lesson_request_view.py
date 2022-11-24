@@ -27,8 +27,8 @@ class LessonRequestViewTestCase(TestCase):
     def test_get_request(self):
         self.client.force_login(self.student)
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "lesson_request.html")
+        self.assertEqual(response.status_code, 200)
         form = response.context['form']
         self.assertTrue(isinstance(form, LessonRequestForm))
         self.assertFalse(form.is_bound)

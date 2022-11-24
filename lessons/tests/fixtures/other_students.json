@@ -8,7 +8,8 @@
       "username" : "JaneDoe2",
       "email" : "janedoe@example.org",
       "password": "pbkdf2_sha256$390000$ClI0lWk9lcKWyPOtJgXJQV$bAl9pKg31jSSk0vP+5OXmf8bwBFdkoUrAZWeIgrIaEA=",
-      "is_active" : true
+      "is_active" : true,
+      "type": "STUDENT"
     }
   }
 ]
