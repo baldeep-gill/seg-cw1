@@ -96,6 +96,7 @@ def student_sign_up(request):
         form = StudentSignUpForm()
     return render(request, 'student_sign_up.html',{'form': form})
 
+@login_required
 def show_requests(request):
     try:
         user = request.user
