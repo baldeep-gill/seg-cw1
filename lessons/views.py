@@ -57,9 +57,9 @@ def log_in(request):
         form = LogInForm(request.POST)
         next = request.POST.get('next') or ''
         if form.is_valid():
-            username = form.cleaned_data.get('username')
+            email = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
+            user = authenticate(username=email, password=password)
             if user is not None:
                 if isinstance(user, Admin):
                     login(request, user)
@@ -71,7 +71,7 @@ def log_in(request):
                 # TODO: determin the type of user
                 #redirect user upon successful log i
                 return redirect(redirect_url)
-        messages.add_message(request, messages.ERROR, "User not found")
+        messages.add_message(request, messages.ERROR, "User not found, please try again.")
     else:
         next = request.GET.get('next') or ''
     form = LogInForm()
