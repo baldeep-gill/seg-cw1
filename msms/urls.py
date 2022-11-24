@@ -27,6 +27,8 @@ urlpatterns = [
     path('student/home/', views.student_home, name='student_home'),
     path('student/lesson_request/', views.lesson_request, name='lesson_request'),
     path('student/log_out/', views.log_out, name='log_out'),
+    path('admin/log_out/', views.log_out, name='log_out'),
+
 
     path('admin/home/', views.admin_home, name='admin_home'),
     path('admin/unfulfilled_requests/', views.admin_requests, name='admin_requests'),
