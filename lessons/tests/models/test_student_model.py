@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from lessons.models import Student
+from lessons.models import Student, StudentProfile
 
 # Create your tests here.
 
@@ -88,8 +88,11 @@ class UserModeTestCase(TestCase):
     """
     def test_student_number_must_be_unique(self):
         second_user = Student.objects.get(email="janedoe@example.org")
-        self.student.student_number = second_user.student_number
-        self._assert_user_is_invalid()
+        self._create_a_student_profile(self.student)
+        student_number_2 = self._create_a_student_profile(second_user)
+        self.student.more.student_number = student_number_2
+        # self._assert_user_is_invalid()
+        self._assert_student_profile_is_invalid()
 
     def test_student_number_must_not_be_blank(self):
         self.student.email = ''
@@ -112,3 +115,9 @@ class UserModeTestCase(TestCase):
         with self.assertRaises(ValidationError):
             self.student.full_clean()
 
+    def _assert_student_profile_is_invalid(self):
+        with self.assertRaises(ValidationError):
+            self.student.more.full_clean()
+
+    def _create_a_student_profile(self, student: Student):
+        StudentProfile.objects.create(user=student, student_number=student.pk)

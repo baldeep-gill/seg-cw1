@@ -18,15 +18,22 @@ from django.urls import path
 from lessons import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('django/admin/', admin.site.urls),
+
     path('', views.home, name='home'),
-    path('student/lesson_request/', views.lesson_request, name = 'lesson_request'),
     path('student_sign_up/', views.student_sign_up, name='student_sign_up'),
-    path('student/home', views.student_home, name='student_home'),
-    #TODO admin/home leads to django admin interface so cant use it, have used msmadmin for now but there is probably a better name for it
-    path('msmadmin/home', views.admin_home, name='admin_home'),
     path('log_in/', views.log_in, name='log_in'),
+
+    path('student/home/', views.student_home, name='student_home'),
+    path('student/lesson_request/', views.lesson_request, name='lesson_request'),
     path('student/log_out/', views.log_out, name='log_out'),
+
+    path('admin/home/', views.admin_home, name='admin_home'),
+    path('admin/unfulfilled_requests/', views.admin_requests, name='admin_requests'),
+    path('admin/book_lesson_request/<int:request_id>', views.book_lesson_request, name='book_lesson_request'),
+
+    path('student/lessons/list', views.lessons_success, name='lesson_list'),
+
     path('student/requests/', views.show_requests, name='show_requests'),
     path('student/requests/edit/<lesson_id>', views.edit_requests, name='edit_requests'),
     path('student/requests/delete/<lesson_id>', views.delete_requests, name='delete_requests'),
