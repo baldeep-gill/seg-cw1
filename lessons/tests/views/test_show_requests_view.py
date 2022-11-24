@@ -4,7 +4,7 @@ from lessons.models import Student
 from lessons.tests.helpers import create_requests
 
 class ShowRequestViewTestCase(TestCase):
-    """Tests for the lesson request view"""
+    """Tests for the show lesson requests view"""
 
     fixtures = ['lessons/tests/fixtures/default_student.json']
 
