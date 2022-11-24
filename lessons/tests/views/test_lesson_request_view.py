@@ -35,9 +35,6 @@ class LessonRequestViewTestCase(TestCase):
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 0)
 
-    def test_login_url(self):
-        self.assertEqual(self.url, '/student/lesson_request/')
-
     def test_not_logged_in_get_request(self):
         redirect_url = reverse("log_in") + f"?next={self.url}"
         response = self.client.get(self.url)
