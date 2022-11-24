@@ -2,7 +2,7 @@ from django.test import TestCase
 from lessons.models import Student, LessonRequest
 from lessons.forms import EditForm
 
-class LessonRequestFromTestCase(TestCase):
+class EditRequestFormTestCase(TestCase):
     """Unit tests for lesson request edit form"""
 
     fixtures = [

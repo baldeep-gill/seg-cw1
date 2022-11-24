@@ -3,7 +3,7 @@ from django.urls import reverse
 from lessons.forms import EditForm
 from lessons.models import Student, LessonRequest
 
-class LessonRequestViewTestCase(TestCase):
+class EditRequestViewTestCase(TestCase):
     """Tests for the edit request views"""
 
     fixtures = ['lessons/tests/fixtures/default_student.json']
