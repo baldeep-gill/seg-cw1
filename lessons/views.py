@@ -106,6 +106,7 @@ def show_requests(request):
     else:
         return render(request, 'show_requests.html', {'user': user, 'lesson_requests': lesson_requests})
 
+@login_required
 def edit_requests(request, lesson_id):
     current_lesson = LessonRequest.objects.get(id=lesson_id)
     
