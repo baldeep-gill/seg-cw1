@@ -132,3 +132,8 @@ AUTH_USER_MODEL = 'lessons.User'
 
 # Login URL for redirecting users from login protected views
 LOGIN_URL = 'log_in'
+
+AUTHENTICATION_BACKENDS = [
+    'lessons.backends.EmailLogin',
+    'django.contrib.auth.backends.ModelBackend'
+]

@@ -10,18 +10,14 @@
                     <h1 class="cover-heading">Student Home</h1>
                     <p class="cover-text">Do your student stuff here</p>
                     <p>
-                      {% if user.is_authenticated %}
-                        <a href="{% url 'lesson_request' %}" class="btn btn-lg btn-secondary" role="button">
-                          Lesson request
-                        </a>
-                      {% else %}
-                        <a href="{% url 'lesson_request' %}" class="btn btn-lg btn-secondary disabled" role="button">
-                          Lesson request
-                        </a>
-                      {% endif %}
+
+                      <a href="{% url 'lesson_request' %}" class="btn btn-lg btn-secondary">
+                        Lesson Request
+                      </a>
+
                     </p>
                     <p>
-                      <a href='#' class="btn btn-lg btn-secondary">
+                      <a href="{% url 'show_requests' %}" class="btn btn-lg btn-secondary">
                         Requests Made
                       </a>
                     </p>
