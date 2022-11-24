@@ -108,16 +108,19 @@ def show_requests(request):
 
 @login_required
 def edit_requests(request, lesson_id):
-    current_lesson = LessonRequest.objects.get(id=lesson_id)
-    
-    if request.method == 'POST':
-        form = EditForm(instance=current_lesson, data=request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('show_requests')
+    try:
+        current_lesson = LessonRequest.objects.get(id=lesson_id)
+    except ObjectDoesNotExist:
+        return redirect('show_requests')
     else:
-        form = EditForm(instance=current_lesson)
-    return render(request, 'edit_requests.html', {'form': form, 'lesson_id': lesson_id})
+        if request.method == 'POST':
+            form = EditForm(instance=current_lesson, data=request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('show_requests')
+        else:
+            form = EditForm(instance=current_lesson)
+        return render(request, 'edit_requests.html', {'form': form, 'lesson_id': lesson_id})
 
 def delete_requests(request, lesson_id):
     current_lesson = LessonRequest.objects.get(id=lesson_id)
