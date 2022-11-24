@@ -1,10 +1,17 @@
 from django import forms
-from .models import LessonRequest
 from django.core.validators import RegexValidator
-from .models import User, Student, StudentProfile
+from .models import User, Student, StudentProfile, LessonRequest, Lesson
 from django.db.models import Max
-from .helpers import find_next_available_student_number
+from .helpers import find_next_available_student_number, day_of_the_week_validator
+from django.contrib.admin.widgets import AdminDateWidget
+from django.forms.fields import DateTimeField
+from django.core.exceptions import ValidationError
 
+
+
+
+
+"""Form for requesting a lesson"""
 class LessonRequestForm(forms.ModelForm):
     class Meta:
         model = LessonRequest
@@ -13,7 +20,25 @@ class LessonRequestForm(forms.ModelForm):
             'availability': forms.DateTimeInput()
         }"""
 
+
+class BookLessonRequestForm(forms.ModelForm):
+    """Form for fulfilling/booking lesson requests"""
+    class Meta:
+        model = Lesson
+        fields = ['duration','topic','teacher']
+
+    start_date = forms.DateTimeField(label="Start Date",widget=forms.SelectDateWidget)
+    day = forms.CharField(label="Day of the week",validators=[day_of_the_week_validator])
+    time = forms.TimeField(label="Time")
+    interval_between_lessons = forms.IntegerField(label="Weeks Between lessons")
+    number_of_lessons = forms.IntegerField(label="Number of lessons")
+
+
 """Forms for the lessons app."""
+class LogInForm(forms.Form):
+    username = forms.CharField(label="Email")
+    password = forms.CharField(label="Password", widget=forms.PasswordInput())
+
 class StudentSignUpForm(forms.ModelForm):
     """Form enabling unregistered students to sign up."""
 
@@ -62,3 +87,4 @@ class StudentSignUpForm(forms.ModelForm):
 
         StudentProfile.objects.create(user=student, student_number = new_student_number)
         return student
+

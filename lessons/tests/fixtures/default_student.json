@@ -3,7 +3,6 @@
     "model": "lessons.student",
     "pk" : 1,
     "fields" : {
-      "student_number" : 1,
       "first_name" : "John",
       "last_name" : "Doe",
       "username" : "johnDoe1",
