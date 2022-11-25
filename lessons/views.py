@@ -44,7 +44,7 @@ def lesson_request(request):
                 teacher=teacher
             )
             lessonRequest.save()
-            return redirect('lesson_request')
+            return redirect('student_home')
     else:
         form = LessonRequestForm()
     return render(request, 'lesson_request.html', {'form': form})
