@@ -9,9 +9,15 @@
       <p>
         <a href="{% url 'home' %}" class="btn btn-lg btn-secondary">Return to home page</a>
       </p>
-      <div class="d-flex flex-row gap-5">
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex flex-wrap gap-3 justify-content-around">
         {% for request in data %}
-           {% include 'partials/request_card.html' with request=request %}
+           <div class="w-25">
+            {% include 'partials/request_card.html' with request=request show_button=True %}
+           </div>
         {% endfor %}
       </div>
     </div>

@@ -8,18 +8,9 @@
             {% include 'partials/user_profile.html' with user=student %}
 
             <h1> Request Details </h1>
-            <p> Availability: {{ lesson_request.availability }} </p>
-            <p> Duration of each lesson: {{ lesson_request.duration }} </p>
-            <p> How many weeks between lessons: {{ lesson_request.interval }} </p>
-            <p> Lesson Topic: {{ lesson_request.topic }} </p>
-
-            {% if lesson_request.teacher != "" %}
-            <div>
-              <i class="bi bi-person-fill"></i>
-              Requested teacher: {{ lesson_request.teacher }}
+            <div class="m-3">
+                {% include 'partials/request_card.html' with request=lesson_request show_button=False %}
             </div>
-            {% endif %}
-
         </div>
 
 
