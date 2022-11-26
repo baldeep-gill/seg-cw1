@@ -71,9 +71,6 @@ class StudentSignUpForm(forms.ModelForm):
         if new_password != password_confirmation:
             self.add_error('password_confirmation', 'Confirmation does not match password.')
 
-    def find_id_for_new_student(self):
-        return Student.students.last().id + 1
-
     def save(self):
         """Create a new user."""
         new_student_number = find_next_available_student_number()
@@ -113,3 +110,12 @@ class PasswordForm(forms.Form):
         password_confirmation = self.cleaned_data.get('password_confirmation')
         if new_password != password_confirmation:
             self.add_error('password_confirmation', 'Confirmation does not match password.')
+
+class UserForm(forms.ModelForm):
+    """Form to update user profiles."""
+
+    class Meta:
+        """Form options."""
+
+        model = User
+        fields = ['first_name', 'last_name', 'username', 'email']

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm
+from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
@@ -194,10 +194,29 @@ def password(request):
                 current_user.save()
                 login(request, current_user)
                 messages.add_message(request, messages.SUCCESS, "Password updated!")
-                return redirect('feed')
+                if isinstance(current_user, Admin):
+                    return redirect('admin_home')
+                else:
+                    return redirect('student_home')
+
     form = PasswordForm()
     return render(request, 'password.html', {'form': form})
 
+@login_required
+def profile(request):
+    current_user = request.user
+    if request.method == 'POST':
+        form = UserForm(instance=current_user, data=request.POST)
+        if form.is_valid():
+            messages.add_message(request, messages.SUCCESS, "Profile updated!")
+            form.save()
+            if isinstance(current_user, Admin):
+                return redirect('admin_home')
+            else:
+                return redirect('student_home')
+    else:
+        form = UserForm(instance=current_user)
+    return render(request, 'profile.html', {'form': form})
 
 @login_required
 def edit_requests(request, lesson_id):
