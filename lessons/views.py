@@ -4,12 +4,13 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Admin, LessonRequest, Lesson, Student, User, Invoice
-from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student
+from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student, login_prohibited
 from django.core.exceptions import ObjectDoesNotExist
 
 import datetime
 
 # Create your views here.
+@login_prohibited
 def home(request):
     return render(request, 'home.html')
 
@@ -50,7 +51,8 @@ def lesson_request(request):
     return render(request, 'lesson_request.html', {'form': form})
 
 
-
+@login_required
+@only_admins
 def book_lesson_request(request, request_id):
     """View to allow admins to fulfill/book a lesson request"""
     try:
@@ -116,7 +118,8 @@ def student_home(request):
 @only_admins
 def admin_home(request):
     return render(request, 'admin_home.html')
-    
+
+@login_prohibited
 def log_in(request):
     if request.method == 'POST':
         form = LogInForm(request.POST)
@@ -146,6 +149,7 @@ def log_out(request):
     logout(request)
     return redirect('home')
 
+@login_prohibited
 def student_sign_up(request):
     if request.method == 'POST':
         form = StudentSignUpForm(request.POST)

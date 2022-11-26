@@ -1,5 +1,6 @@
 from .models import Admin, Student, User, Invoice
 from django.shortcuts import redirect
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 import datetime
@@ -39,6 +40,18 @@ def only_admins(view_function):
             return redirect('student_home')
     return wrapper
 
+
+def login_prohibited(view_function):
+    def modified_view_function(request):
+        if request.user.is_authenticated:
+            try:
+                if Admin.admins.get(username=request.user.get_username()):
+                    return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN_ADMIN)
+            except User.DoesNotExist:
+                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN_STUDENT)
+        else:
+            return view_function(request)
+    return modified_view_function
 
 def day_of_the_week_validator(value):
     """Validates that the input to a field can only be a day of the week"""

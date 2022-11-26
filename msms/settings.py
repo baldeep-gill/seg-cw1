@@ -133,6 +133,10 @@ AUTH_USER_MODEL = 'lessons.User'
 # Login URL for redirecting users from login protected views
 LOGIN_URL = 'log_in'
 
+# URL where @login_prohibited redirects to
+REDIRECT_URL_WHEN_LOGGED_IN_ADMIN = 'admin_home'
+REDIRECT_URL_WHEN_LOGGED_IN_STUDENT = 'student_home'
+
 AUTHENTICATION_BACKENDS = [
     'lessons.backends.EmailLogin',
     'django.contrib.auth.backends.ModelBackend'
