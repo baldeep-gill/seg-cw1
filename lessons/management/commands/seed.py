@@ -11,6 +11,7 @@ class Command(BaseCommand):
     USER_COUNT = 101
     # Includes 100 students, 1 additional admin
     LESSON_COUNT = 15
+    # TODO: Use the LESSON_COUNT and USER_COUNT in tests rather than manually written numbers
     
     def __init__(self):
         super().__init__()
