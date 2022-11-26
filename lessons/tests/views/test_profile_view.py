@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
 from lessons.forms import UserForm
-from lessons.models import Student
+from lessons.models import Student, Admin
 from lessons.tests.helpers import reverse_with_next
 
 class ProfileViewTest(TestCase):
@@ -11,11 +11,13 @@ class ProfileViewTest(TestCase):
 
     fixtures = [
         'lessons/tests/fixtures/default_student.json',
-        'lessons/tests/fixtures/other_students.json'
+        'lessons/tests/fixtures/other_students.json',
+        'lessons/tests/fixtures/admin_user.json',
     ]
 
     def setUp(self):
         self.user = Student.objects.get(username='JohnDoe2')
+        self.admin = Admin.objects.get(username='@student_admin')
         self.url = reverse('profile')
         self.form_input = {
             'first_name': 'John2',
@@ -41,7 +43,7 @@ class ProfileViewTest(TestCase):
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    def test_unsuccesful_profile_update(self):
+    def test_unsuccesful_profile_update_for_students(self):
         self.client.login(username=self.user.email, password='Password123')
         self.form_input['username'] = ''
         before_count = Student.objects.count()
@@ -77,7 +79,7 @@ class ProfileViewTest(TestCase):
         self.assertEqual(self.user.last_name, 'Doe')
         self.assertEqual(self.user.email, 'johndoe@example.org')
 
-    def test_succesful_profile_update(self):
+    def test_succesful_profile_update_for_students(self):
         self.client.login(username=self.user.email, password='Password123')
         before_count = Student.objects.count()
         response = self.client.post(self.url, self.form_input, follow=True)
@@ -94,6 +96,42 @@ class ProfileViewTest(TestCase):
         self.assertEqual(self.user.first_name, 'John2')
         self.assertEqual(self.user.last_name, 'Doe2')
         self.assertEqual(self.user.email, 'johndoe2@example.org')
+
+    def test_succesful_profile_update_for_admins(self):
+        self.client.login(username=self.admin.email, password='Password123')
+        before_count = Admin.objects.count()
+        response = self.client.post(self.url, self.form_input, follow=True)
+        after_count = Admin.objects.count()
+        self.assertEqual(after_count, before_count)
+        response_url = reverse('admin_home')
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'admin_home.html')
+        messages_list = list(response.context['messages'])
+        self.assertEqual(len(messages_list), 1)
+        self.assertEqual(messages_list[0].level, messages.SUCCESS)
+        self.admin.refresh_from_db()
+        self.assertEqual(self.admin.username, '@johndoe2')
+        self.assertEqual(self.admin.first_name, 'John2')
+        self.assertEqual(self.admin.last_name, 'Doe2')
+        self.assertEqual(self.admin.email, 'johndoe2@example.org')
+
+    def test_unsuccesful_profile_update_for_admins(self):
+        self.client.login(username=self.user.email, password='Password123')
+        self.form_input['username'] = ''
+        before_count = Admin.objects.count()
+        response = self.client.post(self.url, self.form_input)
+        after_count = Admin.objects.count()
+        self.assertEqual(after_count, before_count)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'profile.html')
+        form = response.context['form']
+        self.assertTrue(isinstance(form, UserForm))
+        self.assertTrue(form.is_bound)
+        self.admin.refresh_from_db()
+        self.assertEqual(self.admin.username, '@student_admin')
+        self.assertEqual(self.admin.first_name, 'student_admin')
+        self.assertEqual(self.admin.last_name, 'student_admin')
+        self.assertEqual(self.admin.email, 'student_admin@example.org')
 
     def test_post_profile_redirects_when_not_logged_in(self):
         redirect_url = reverse_with_next('log_in', self.url)
