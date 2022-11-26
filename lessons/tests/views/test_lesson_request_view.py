@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from lessons.forms import LessonRequestForm
-from lessons.models import Student, Admin
+from lessons.models import Student, Admin, LessonRequest
 
 class LessonRequestViewTestCase(TestCase):
     """Tests for the lesson request view"""
@@ -58,5 +58,14 @@ class LessonRequestViewTestCase(TestCase):
         self.client.force_login(self.admin)
         redirect_url = reverse("admin_home")
         response = self.client.get(self.url)
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+
+    def test_successful_post(self):
+        redirect_url = reverse("student_home")
+        self.client.force_login(self.student)
+        before = LessonRequest.objects.count()
+        response = self.client.post(self.url, self.form_input)
+        after = LessonRequest.objects.count()
+        self.assertEqual(before+1, after)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
         

@@ -168,13 +168,9 @@ def admin_requests(request):
 @login_required
 @only_students
 def show_requests(request):
-    try:
-        user = request.user
-        lesson_requests = LessonRequest.objects.filter(author=user)
-    except ObjectDoesNotExist:
-        return redirect('home')
-    else:
-        return render(request, 'show_requests.html', {'user': user, 'lesson_requests': lesson_requests})
+    user = request.user
+    lesson_requests = LessonRequest.objects.filter(author=user)
+    return render(request, 'show_requests.html', {'user': user, 'lesson_requests': lesson_requests})
 
 @login_required
 @only_students
