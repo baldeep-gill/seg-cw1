@@ -241,7 +241,7 @@ def delete_requests(request, lesson_id):
     else:
         user = request.user
         if current_lesson.author != user:
-            return redirect('home')
+            return redirect('student_home')
         else:
             current_lesson.delete()
             return redirect('show_requests')

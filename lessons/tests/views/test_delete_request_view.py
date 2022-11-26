@@ -68,7 +68,7 @@ class DeleteRequestViewTestCase(TestCase):
 
     def test_user_cant_delete_other_requests(self):
         """Ensure that users can't delete other users' requests"""
-        redirect_url = reverse('home')
+        redirect_url = reverse('student_home')
         self.client.force_login(self.other_student)
         before = LessonRequest.objects.count()
         response = self.client.get(self.url)
