@@ -1,16 +1,20 @@
 from django.test import TestCase
 from django.urls import reverse
 from lessons.forms import EditForm
-from lessons.models import Student, LessonRequest
+from lessons.models import Student, LessonRequest, Admin
 
 class EditRequestViewTestCase(TestCase):
     """Tests for the edit request views"""
 
-    fixtures = ['lessons/tests/fixtures/default_student.json']
+    fixtures = [
+        'lessons/tests/fixtures/default_student.json',
+        'lessons/tests/fixtures/admin_user.json',
+    ]
 
     def setUp(self):
         super(TestCase, self).setUp()
         self.student = Student.objects.get(email="johndoe@example.org")
+        self.admin = Admin.objects.get(email="student_admin@example.org")
         
         self.lessonRequest = LessonRequest(
             author = self.student,
@@ -96,3 +100,9 @@ class EditRequestViewTestCase(TestCase):
         self.assertEqual(self.lessonRequest.duration, 60)
         self.assertEqual(self.lessonRequest.topic, "Piano")
         self.assertEqual(self.lessonRequest.teacher, "Mr Bob")
+
+        def test_admin_reject_access(self):
+            self.client.force_login(self.admin)
+            redirect_url = reverse("admin_home")
+            response = self.client.get(self.url)
+            self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
