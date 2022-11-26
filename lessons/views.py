@@ -19,8 +19,7 @@ def home(request):
 @only_students
 def lessons_success(request):
     current_student_id = request.user.id
-    
-    lessons = Lesson.objects.filter(student_id=current_student_id) #get(student=current_user) # we filter this by the username and then pass it 
+    lessons = Lesson.objects.filter(student_id=current_student_id)
     return render(request, 'successful_lessons_list.html', {'lessons': lessons})
 
 @login_required
