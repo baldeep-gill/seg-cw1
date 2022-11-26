@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
-from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm
+from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.contrib.auth.hashers import check_password
 from django.contrib.auth.decorators import login_required
 from .models import Admin, LessonRequest, Lesson, Student, User, Invoice
 from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student, login_prohibited
@@ -178,6 +179,25 @@ def show_requests(request):
         return redirect('home')
     else:
         return render(request, 'show_requests.html', {'user': user, 'lesson_requests': lesson_requests})
+
+'''allow users to change passwords'''
+@login_required
+def password(request):
+    current_user = request.user
+    if request.method == 'POST':
+        form = PasswordForm(data=request.POST)
+        if form.is_valid():
+            password = form.cleaned_data.get('password')
+            if check_password(password, current_user.password):
+                new_password = form.cleaned_data.get('new_password')
+                current_user.set_password(new_password)
+                current_user.save()
+                login(request, current_user)
+                messages.add_message(request, messages.SUCCESS, "Password updated!")
+                return redirect('feed')
+    form = PasswordForm()
+    return render(request, 'password.html', {'form': form})
+
 
 @login_required
 def edit_requests(request, lesson_id):
