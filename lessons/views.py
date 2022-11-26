@@ -82,7 +82,6 @@ def book_lesson_request(request, request_id):
                 student=student,
                 date=datetime.datetime.now(),
                 invoice_number=new_invoice_number,
-                unique_reference_number=f'{student.id}-{new_invoice_number}'
             )
             invoice.save()
 
