@@ -17,6 +17,12 @@ def home(request):
 
 @login_required
 @only_students
+def transfers(request):
+    current_student_id = request.user.id # we filter using this idk what to filter yet
+    return render(request, 'transfers.html')
+
+@login_required
+@only_students
 def lessons_success(request):
     current_student_id = request.user.id
     lessons = Lesson.objects.filter(student_id=current_student_id)
