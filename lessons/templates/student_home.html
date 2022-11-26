@@ -10,11 +10,9 @@
                     <h1 class="cover-heading">Student Home</h1>
                     <p class="cover-text">Do your student stuff here</p>
                     <p>
-
                       <a href="{% url 'lesson_request' %}" class="btn btn-lg btn-secondary">
                         Lesson Request
                       </a>
-
                     </p>
                     <p>
                       <a href="{% url 'show_requests' %}" class="btn btn-lg btn-secondary">
@@ -22,11 +20,9 @@
                       </a>
                     </p>
                     <p>
-                      <form action="{% url 'log_out' %}" method="post">
-                        {% csrf_token %}
-                        {% include 'partials/form.html' with form=form %}
-                        <input type="submit" value="Log out" class="btn btn-lg btn-secondary">
-                      </form>
+                      <a href="{% url 'lesson_list' %}" class="btn btn-lg btn-secondary">
+                        Lessons approved
+                      </a>
                     </p>
                   </div>
             </div>
