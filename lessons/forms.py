@@ -1,5 +1,5 @@
 from django import forms
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MinValueValidator
 from .models import User, Student, StudentProfile, LessonRequest, Lesson
 from django.db.models import Max
 from .helpers import find_next_available_student_number, day_of_the_week_validator
@@ -26,8 +26,8 @@ class BookLessonRequestForm(forms.ModelForm):
     start_date = forms.DateTimeField(label="Start Date",widget=forms.SelectDateWidget)
     day = forms.CharField(label="Day of the week",validators=[day_of_the_week_validator])
     time = forms.TimeField(label="Time")
-    interval_between_lessons = forms.IntegerField(label="Weeks Between lessons")
-    number_of_lessons = forms.IntegerField(label="Number of lessons")
+    interval_between_lessons = forms.IntegerField(label="Weeks Between lessons",validators=[MinValueValidator(1)])
+    number_of_lessons = forms.IntegerField(label="Number of lessons",validators=[MinValueValidator(1)])
 
 
 class EditForm(forms.ModelForm):
