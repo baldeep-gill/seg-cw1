@@ -8,20 +8,10 @@
             <h1>View and edit lesson requests</h1>
             &nbsp;
             {% if lesson_requests %}
-                {% for lesson in lesson_requests %}
-                    <table class="table">
-                        <tr>
-                            <td>
-                                <h3><b>{{ lesson.topic }}</b></h3>
-                                <p>Requesting <b>{{ lesson.lessonNum}}</b> lessons every <b>{{ lesson.interval }}</b> weeks</p>
-                                <p>Duration: {{ lesson.duration }} minutes</p>
-                                <p>Availability: {{ lesson.availability }}</p>
-                                <p>Requested teacher: {{ lesson.teacher }} </p>
-                                <p><a href="{% url 'edit_requests' lesson.id %}">Edit</a></p>
-                                <p><a href="{% url 'delete_requests' lesson.id %}">Delete</a></p>
-                            </td>
-                        </tr>
-                    </table>
+                {% for request in lesson_requests %}
+                <div class="w-25">
+                    {% include 'partials/request_card.html' with request=request show_button=False student_card=True %}
+                </div>
                 {% endfor %}
             {% else %} 
                     <h5>No requests have been made</h5>

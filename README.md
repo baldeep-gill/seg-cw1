@@ -6,7 +6,7 @@ The members of the team are:
 - *Baldeep Gill k21034937*
 - *Harry Davis k21049391*
 - *Qadir Ijaz Fernandez k21095034*
-- *<name of team member 5>*
+- *Muhsin Mohamed k21088331*
 
 ## Project structure
 The project is called `msms` (Music School Management System).  It currently consists of a single app `lessons` where all functionality resides.
