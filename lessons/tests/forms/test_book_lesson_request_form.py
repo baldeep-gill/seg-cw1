@@ -23,7 +23,6 @@ class BookLessonRequestFromTestCase(TestCase):
             "time": "12:00",
             "interval_between_lessons": 1,
             "number_of_lessons": 6,
-
         }
 
     def test_form_contains_fields(self):

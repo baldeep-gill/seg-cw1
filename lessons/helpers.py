@@ -31,10 +31,10 @@ def only_students(view_function):
 
 '''decorator for preventing students and admins from accessing each other's pages'''
 def only_admins(view_function):
-    def wrapper(request):
+    def wrapper(request,**kwargs):
         try:
             if Admin.admins.get(username=request.user.get_username()):
-                return view_function(request)
+                return view_function(request,**kwargs)
         except User.DoesNotExist:
             return redirect('student_home')
     return wrapper

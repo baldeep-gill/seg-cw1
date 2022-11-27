@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import gettext_lazy
 from libgravatar import Gravatar
 from django.core.validators import MinValueValidator, MaxValueValidator
+import pytz
 
 '''The base user that all users inherit'''
 class User(AbstractUser):
@@ -203,7 +204,7 @@ class Lesson(models.Model):
 
     # Date and time of lesson
     date = models.DateTimeField(
-        blank=False
+        blank=False,
     )
 
     # Duration of each lesson in minutes

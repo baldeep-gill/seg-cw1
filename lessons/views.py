@@ -1,3 +1,4 @@
+import pytz
 from django.shortcuts import render, redirect
 from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm
 from django.contrib.auth import authenticate, login, logout
@@ -50,7 +51,8 @@ def lesson_request(request):
     return render(request, 'lesson_request.html', {'form': form})
 
 
-
+@login_required
+@only_admins
 def book_lesson_request(request, request_id):
     """View to allow admins to fulfill/book a lesson request"""
     try:
@@ -73,14 +75,14 @@ def book_lesson_request(request, request_id):
             day = form.cleaned_data.get('day')
 
             #combines the start date picked and the time each day into one dateTime object
-            new_date = datetime.datetime(start_date.year,start_date.month,start_date.day,time.hour,time.minute)
+            new_date = datetime.datetime(start_date.year,start_date.month,start_date.day,time.hour,time.minute,tzinfo=pytz.UTC)
             new_date = get_next_given_day_of_week_after_date_given(new_date,day)
 
             #generate an invoice for the lessons we will generate
             new_invoice_number = find_next_available_invoice_number_for_student(student)
             invoice = Invoice.objects.create(
                 student=student,
-                date=datetime.datetime.now(),
+                date=datetime.datetime.now(tz=pytz.UTC),
                 invoice_number=new_invoice_number,
             )
             invoice.save()
