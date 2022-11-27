@@ -36,19 +36,29 @@
       </div>
     {% endif %}
 
+    {% if not student_card %}
     <hr />
 
     <div>
       <h6><i class="bi bi-person-fill"></i> <b>Requested by</b> {{ request.author.first_name }} {{ request.author.last_name }}</h6>
       
     </div>
-    
+    {% endif %}
 
     {% if show_button %}
       <hr /> 
 
       <div class="d-flex justify-content-center">
-        <a href="{% url 'book_lesson_request' request.id%}" class="btn btn-secondary text-light"> Fulfill request </a>
+          <a href="{% url 'book_lesson_request' request.id%}" class="btn btn-secondary text-light"> Fulfill request </a>
+      </div>
+    {% endif %}
+
+    {% if student_card %}
+      <hr /> 
+
+      <div class="d-flex justify-content-around">
+          <a href="{% url 'edit_requests' request.id %}" class="btn btn-secondary text-light"><i class="bi bi-pen-fill"></i> Edit</a>
+          <a href="{% url 'delete_requests' request.id %}" class="btn btn-danger text-light"><i class="bi bi-trash"></i> Delete</a>
       </div>
     {% endif %}
 
