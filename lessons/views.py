@@ -122,9 +122,9 @@ def log_in(request):
         form = LogInForm(request.POST)
         next = request.POST.get('next') or ''
         if form.is_valid():
-            email = form.cleaned_data.get('username')
+            email = form.cleaned_data.get('email')
             password = form.cleaned_data.get('password')
-            user = authenticate(username=email, password=password)
+            user = authenticate(email=email, password=password)
             if user is not None:
                 if isinstance(user, Admin):
                     login(request, user)
@@ -132,9 +132,6 @@ def log_in(request):
                 else:
                     login(request, user)
                     redirect_url = next or 'student_home'
-                # in here we need to determine the type of the user to know which other redirect url we need to go to
-                # TODO: determin the type of user
-                #redirect user upon successful log i
                 return redirect(redirect_url)
         messages.add_message(request, messages.ERROR, "User not found, please try again.")
     else:

@@ -135,5 +135,4 @@ LOGIN_URL = 'log_in'
 
 AUTHENTICATION_BACKENDS = [
     'lessons.backends.EmailLogin',
-    'django.contrib.auth.backends.ModelBackend'
 ]
