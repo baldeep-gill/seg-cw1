@@ -76,8 +76,7 @@ class GuardianManager(BaseUserManager):
 
 # A new table to store the student number and extra information about the user later on
 class GuardianProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    student = models.ForeignKey(Student, blank=False)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, blank=False)
 
 # Guardian user
 class Guardian(User):
