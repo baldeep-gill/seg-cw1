@@ -13,6 +13,7 @@ class User(AbstractUser):
     class Types(models.TextChoices):
         ADMIN = "ADMIN", 'Admin'
         STUDENT = "STUDENT", 'Student'
+        GUARDIAN = "GUARDIAN", 'Guardian'
     
     '''defualt role'''
     base_role = Types.ADMIN
@@ -67,6 +68,29 @@ class Student(User):
     class Meta:
         proxy = True
 
+'''Guardian users'''
+# manages all guardians 
+class GuardianManager(BaseUserManager):
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).filter(type=User.Types.GUARDIAN)
+
+# A new table to store the student number and extra information about the user later on
+class GuardianProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, blank=False)
+
+# Guardian user
+class Guardian(User):
+    base_role = User.Types.GUARDIAN
+    guardians = GuardianManager()
+    
+    @property
+    def more(self):
+        '''this refers to the table in the database'''
+        return self.guardianprofile
+
+    class Meta:
+        proxy = True
 
 '''Admin users'''
 # manages all Admins 
