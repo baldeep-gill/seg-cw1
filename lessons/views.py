@@ -17,9 +17,9 @@ def home(request):
 
 @login_required
 @only_students
-def transfers(request):
+def balance(request):
     current_student_id = request.user.id # we filter using this idk what to filter yet
-    return render(request, 'transfers.html')
+    return render(request, 'balance.html')
 
 @login_required
 @only_students
