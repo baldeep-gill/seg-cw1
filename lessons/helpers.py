@@ -1,5 +1,6 @@
 from .models import Admin, Student, User, Invoice
 from django.shortcuts import redirect
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 import datetime
@@ -20,10 +21,10 @@ def find_next_available_invoice_number_for_student(student):
 
 '''decorator for preventing students and admins from accessing each other's pages'''
 def only_students(view_function):
-    def wrapper(request):
+    def wrapper(request, *args, **kwargs):
         try:
             if Student.students.get(username=request.user.get_username()):
-                return view_function(request)
+                return view_function(request, *args, **kwargs)
         except User.DoesNotExist:
             return redirect('admin_home')
     return wrapper
@@ -31,14 +32,27 @@ def only_students(view_function):
 
 '''decorator for preventing students and admins from accessing each other's pages'''
 def only_admins(view_function):
-    def wrapper(request,**kwargs):
+    def wrapper(request, *args, **kwargs):
         try:
             if Admin.admins.get(username=request.user.get_username()):
-                return view_function(request,**kwargs)
+                return view_function(request, *args, **kwargs)
+
         except User.DoesNotExist:
             return redirect('student_home')
     return wrapper
 
+
+def login_prohibited(view_function):
+    def modified_view_function(request):
+        if request.user.is_authenticated:
+            try:
+                if Admin.admins.get(username=request.user.get_username()):
+                    return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN_ADMIN)
+            except User.DoesNotExist:
+                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN_STUDENT)
+        else:
+            return view_function(request)
+    return modified_view_function
 
 def day_of_the_week_validator(value):
     """Validates that the input to a field can only be a day of the week"""

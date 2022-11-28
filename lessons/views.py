@@ -1,25 +1,43 @@
 import pytz
 from django.shortcuts import render, redirect
-from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm
+from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.contrib.auth.hashers import check_password
 from django.contrib.auth.decorators import login_required
 from .models import Admin, LessonRequest, Lesson, Student, User, Invoice
-from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student
+from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student, login_prohibited
 from django.core.exceptions import ObjectDoesNotExist
 
 import datetime
 
 # Create your views here.
+@login_prohibited
 def home(request):
     return render(request, 'home.html')
 
 @login_required
 @only_students
+def balance(request):
+    # first we need to get the student
+    current_student_id = request.user.id
+
+    # then we retrieve all the lessons they have from the db
+    invoices = Invoice.objects.filter(student_id=current_student_id)
+    
+    # total money owed
+    total = 0
+    for invoice in invoices:
+        total += invoice.price
+
+
+    return render(request, 'balance.html', {'invoices': invoices, 'total':total})
+
+@login_required
+@only_students
 def lessons_success(request):
     current_student_id = request.user.id
-    
-    lessons = Lesson.objects.filter(student_id=current_student_id) #get(student=current_user) # we filter this by the username and then pass it 
+    lessons = Lesson.objects.filter(student_id=current_student_id)
     return render(request, 'successful_lessons_list.html', {'lessons': lessons})
 
 @login_required
@@ -45,7 +63,7 @@ def lesson_request(request):
                 teacher=teacher
             )
             lessonRequest.save()
-            return redirect('lesson_request')
+            return redirect('student_home')
     else:
         form = LessonRequestForm()
     return render(request, 'lesson_request.html', {'form': form})
@@ -117,7 +135,8 @@ def student_home(request):
 @only_admins
 def admin_home(request):
     return render(request, 'admin_home.html')
-    
+
+@login_prohibited
 def log_in(request):
     if request.method == 'POST':
         form = LogInForm(request.POST)
@@ -147,6 +166,7 @@ def log_out(request):
     logout(request)
     return redirect('home')
 
+@login_prohibited
 def student_sign_up(request):
     if request.method == 'POST':
         form = StudentSignUpForm(request.POST)
@@ -167,16 +187,52 @@ def admin_requests(request):
     return render(request, 'admin_lesson_list.html', {'data': lesson_request_data})
 
 @login_required
+@only_students
 def show_requests(request):
-    try:
-        user = request.user
-        lesson_requests = LessonRequest.objects.filter(author=user)
-    except ObjectDoesNotExist:
-        return redirect('home')
-    else:
-        return render(request, 'show_requests.html', {'user': user, 'lesson_requests': lesson_requests})
+    user = request.user
+    lesson_requests = LessonRequest.objects.filter(author=user)
+    return render(request, 'show_requests.html', {'user': user, 'lesson_requests': lesson_requests})
+
+'''allow users to change passwords'''
+@login_required
+def password(request):
+    current_user = request.user
+    if request.method == 'POST':
+        form = PasswordForm(data=request.POST)
+        if form.is_valid():
+            password = form.cleaned_data.get('password')
+            if check_password(password, current_user.password):
+                new_password = form.cleaned_data.get('new_password')
+                current_user.set_password(new_password)
+                current_user.save()
+                login(request, current_user)
+                messages.add_message(request, messages.SUCCESS, "Password updated!")
+                if isinstance(current_user, Admin):
+                    return redirect('admin_home')
+                else:
+                    return redirect('student_home')
+
+    form = PasswordForm()
+    return render(request, 'password.html', {'form': form})
 
 @login_required
+def profile(request):
+    current_user = request.user
+    if request.method == 'POST':
+        form = UserForm(instance=current_user, data=request.POST)
+        if form.is_valid():
+            messages.add_message(request, messages.SUCCESS, "Profile updated!")
+            form.save()
+            if isinstance(current_user, Admin):
+                return redirect('admin_home')
+            else:
+                return redirect('student_home')
+    else:
+        form = UserForm(instance=current_user)
+    return render(request, 'profile.html', {'form': form})
+
+@login_required
+@only_students
 def edit_requests(request, lesson_id):
     try:
         current_lesson = LessonRequest.objects.get(id=lesson_id)
@@ -192,11 +248,17 @@ def edit_requests(request, lesson_id):
             form = EditForm(instance=current_lesson)
         return render(request, 'edit_requests.html', {'form': form, 'lesson_id': lesson_id})
 
+@login_required
+@only_students
 def delete_requests(request, lesson_id):
     try:
         current_lesson = LessonRequest.objects.get(id=lesson_id)
     except ObjectDoesNotExist:
         return redirect('show_requests')
     else:
-        current_lesson.delete()
-        return redirect('show_requests')
+        user = request.user
+        if current_lesson.author != user:
+            return redirect('student_home')
+        else:
+            current_lesson.delete()
+            return redirect('show_requests')
