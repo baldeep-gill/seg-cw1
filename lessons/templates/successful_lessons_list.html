@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% block body %}
 
-
 {% include 'partials/navbar.html' %}
 
 <div class="container">
@@ -9,23 +8,15 @@
       <div class="col-12">
         {% if lessons %}
           <h1>Fulfilled Lesson Requests</h1>
-          <table class="table">
             {% for lesson in lessons %}
-              <tr>
-                  <td>
-                      <h3><b>{{ lesson.topic }}</b></h3>
-                      <p>Duration: {{ lesson.duration }} minutes</p>
-                      <p>Availability: {{ lesson.availability }}</p>
-                      <p>Requested teacher: {{ lesson.teacher }} </p>
-                      <p>Date: {{ lesson.date }} </p>
-                  </td>
-              </tr>
-              {% endfor %}
-            </table>
+              <div style="padding-bottom:10px;">
+                {% include 'partials/lesson_list.html' with lesson=lesson %}
+              </div>
+            
+            {% endfor %}
         {% else %}
           <h1> You don't have any confirmed lessons yet</h1>
         {% endif %}
-
       </div>
     </div>
   </div>
