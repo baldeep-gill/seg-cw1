@@ -179,10 +179,10 @@ class Invoice(models.Model):
     @property
     def price(self):
         """Returns the total price associated with this invoice
-        Sum of the prices of the lessons"""
+        Sum of the proces of the lessons"""
         price = 0
         for lesson in self.lessons:
-            price += lesson.price
+            price += lesson.duration * lesson.price_per_minute
         return price
 
 class Lesson(models.Model):
@@ -229,11 +229,6 @@ class Lesson(models.Model):
         blank = False,
         max_length = 50,
     )
-
-    @property
-    def price(self):
-        """Calculates the price of this individual lesson"""
-        return self.price_per_minute * self.duration
 
     @property
     def price_per_minute(self):
