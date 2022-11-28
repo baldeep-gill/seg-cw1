@@ -36,6 +36,7 @@ def only_admins(view_function):
         try:
             if Admin.admins.get(username=request.user.get_username()):
                 return view_function(request, *args, **kwargs)
+
         except User.DoesNotExist:
             return redirect('student_home')
     return wrapper

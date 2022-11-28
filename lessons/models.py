@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import gettext_lazy
 from libgravatar import Gravatar
 from django.core.validators import MinValueValidator, MaxValueValidator
+import pytz
 
 '''The base user that all users inherit'''
 class User(AbstractUser):
@@ -147,7 +148,7 @@ class LessonRequest(models.Model):
 class Invoice(models.Model):
     """Models an invoice for a set of lessons"""
 
-    # Invoice who the student is for
+    # Invoice who student is for
     student = models.ForeignKey(
         Student,
         on_delete = models.CASCADE,
@@ -166,18 +167,19 @@ class Invoice(models.Model):
 
     # Unique reference number which can be used to identify individual invoices
     # Is of the form student_number-invoice number
-    unique_reference_number = models.CharField(
-        blank = False,
-        unique=True,
-        max_length=80
-    )
+    @property
+    def unique_reference_number(self):
+        return f'{self.student.id}-{self.invoice_number}'
 
     @property
     def lessons(self):
+        """Returns all the lessons belonging to this invoice"""
         return Lesson.objects.filter(invoice=self)
 
     @property
     def price(self):
+        """Returns the total price associated with this invoice
+        Sum of the proces of the lessons"""
         price = 0
         for lesson in self.lessons:
             price += lesson.duration * lesson.price_per_minute
@@ -186,14 +188,14 @@ class Invoice(models.Model):
 class Lesson(models.Model):
     """Models a booked lesson for a student"""
 
-    # Lesson who the student is for
+    # Lesson who the student is for, Lesson can't exist without an associated student
     student = models.ForeignKey(
         Student,
         on_delete = models.CASCADE,
         blank = False,
     )
 
-    # Invoice lesson is part of
+    # Invoice lesson is part of, Lesson can't exist without an associated invoice
     invoice = models.ForeignKey(
         Invoice,
         on_delete = models.CASCADE,
@@ -202,7 +204,7 @@ class Lesson(models.Model):
 
     # Date and time of lesson
     date = models.DateTimeField(
-        blank=False
+        blank=False,
     )
 
     # Duration of each lesson in minutes
@@ -219,12 +221,13 @@ class Lesson(models.Model):
     # What the lesson is about
     topic = models.CharField(
         max_length = 50,
+        blank=False
     )
 
     # Who teaches the lesson
     teacher = models.CharField(
-        blank = True,
-        max_length = 80,
+        blank = False,
+        max_length = 50,
     )
 
     @property
