@@ -22,6 +22,11 @@
                       </a>
                     </p>
                     <p>
+                      <a href="{% url 'show_invoices' %}" class="btn btn-lg btn-secondary">
+                        Your Invoices
+                      </a>
+                    </p>
+                    <p>
                       <form action="{% url 'log_out' %}" method="post">
                         {% csrf_token %}
                         {% include 'partials/form.html' with form=form %}
