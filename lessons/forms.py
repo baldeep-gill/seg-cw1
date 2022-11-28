@@ -88,11 +88,10 @@ class StudentSignUpForm(forms.ModelForm):
         return student
 
 class GuardianSignUpForm(forms.ModelForm):
-    """Form enabling unregistered students to sign up."""
+    """Form enabling unregistered guardians to sign up."""
 
     class Meta:
         """Form options."""
-
         model = Guardian
         fields = ['first_name', 'last_name', 'email']
 
@@ -116,20 +115,24 @@ class GuardianSignUpForm(forms.ModelForm):
             self.add_error('password_confirmation', 'Confirmation does not match password.')
 
     def save(self):
-        """Create a new user."""
-        random_number = random.randint(0, 1000000)
+        """Create a new guardian."""
+        random_number = Guardian.objects.last().id + 1
 
         super().save(commit=False)
-        student = Student.objects.create_user(
+        guardian = Guardian.objects.create_user(
             username = self.cleaned_data.get('first_name') + self.cleaned_data.get('last_name') + f'{random_number}' ,
             first_name=self.cleaned_data.get('first_name'),
             last_name=self.cleaned_data.get('last_name'),
             email=self.cleaned_data.get('email'),
             password=self.cleaned_data.get('new_password'),
         )
+        return guardian
 
-        StudentProfile.objects.create(user=student, student_number = random_number)
-        return student
+class GuradianAddStudent(forms.Form):
+    '''form enabling guardians to add students to their accounts'''
+    student_first_name = forms.CharField(label='The Student\'s First Name')
+    student_last_name = forms.CharField(label='The Student\' Last Name')
+    student_email = forms.EmailField(label='The Student\' Email')
 
 class PasswordForm(forms.Form):
     """Form enabling users to change their password."""
