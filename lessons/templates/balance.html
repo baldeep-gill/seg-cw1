@@ -3,5 +3,21 @@
 {% include 'partials/navbar.html' %}
 
 
+<div class="container">
+    <div class="row">
+      <div class="col-12">
+          <h1>Balance</h1>
+
+          {% if total%}
+            <p> damn boi u owe {{ total }} greate british pond... much u rich</p>
+            
+        {% else %}
+            <p> you owe nothing... for now :kek: <p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+    
 
 {% endblock %}

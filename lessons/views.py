@@ -18,8 +18,18 @@ def home(request):
 @login_required
 @only_students
 def balance(request):
-    current_student_id = request.user.id # we filter using this idk what to filter yet
-    return render(request, 'balance.html')
+    # first we need to get the student
+    current_student_id = request.user.id
+
+    # then we retrieve all the lessons they have from the db
+    invoices = Invoice.objects.filter(student_id=current_student_id)
+    
+    # total money owed
+    total = 0
+    for invoice in invoices:
+        total += invoice.price
+
+    return render(request, 'balance.html', {'total': total})
 
 @login_required
 @only_students
