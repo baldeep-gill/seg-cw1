@@ -29,7 +29,8 @@ def balance(request):
     for invoice in invoices:
         total += invoice.price
 
-    return render(request, 'balance.html', {'total': total})
+
+    return render(request, 'balance.html', {'invoices': invoices, 'total':total})
 
 @login_required
 @only_students
