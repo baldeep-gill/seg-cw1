@@ -200,3 +200,9 @@ def delete_requests(request, lesson_id):
     else:
         current_lesson.delete()
         return redirect('show_requests')
+
+
+def show_invoices(request):
+    current_student = request.user
+    invoices = Invoice.objects.filter(student=current_student)
+    return render(request, 'invoices_list.html', {'invoices': invoices})
