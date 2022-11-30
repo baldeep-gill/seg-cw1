@@ -39,7 +39,6 @@ def lessons_success(request):
     return render(request, 'successful_lessons_list.html', {'lessons': lessons})
 
 @login_required
-@only_students
 def lesson_request(request):
     if request.method == 'POST':
         form = LessonRequestForm(request.POST)
@@ -61,7 +60,7 @@ def lesson_request(request):
                 teacher=teacher
             )
             lessonRequest.save()
-            return redirect('student_home')
+            return redirect(redirect_user_after_login(request))
     else:
         form = LessonRequestForm()
     return render(request, 'lesson_request.html', {'form': form})
@@ -84,7 +83,7 @@ def add_student(request):
                 )
                 add_student.save()
                 return redirect('guardian_home')
-                
+
     form = GuradianAddStudent()
     return render(request, 'guardian_add_student.html', {'form': form})
 
