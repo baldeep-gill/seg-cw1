@@ -70,3 +70,12 @@ def get_next_given_day_of_week_after_date_given(date,day):
         tdelta = datetime.timedelta(days=1)
         date = date + tdelta
     return date
+
+'''redirect each kind of user to a different home screen '''
+def redirect_user_after_login(request):
+    if request.user.type == "STUDENT":
+        return settings.REDIRECT_URL_WHEN_LOGGED_IN_STUDENT
+    elif request.user.type == "GUARDIAN":
+        return settings.REDIRECT_URL_WHEN_LOGGED_IN_GUARDIAN
+    else:
+        return settings.REDIRECT_URL_WHEN_LOGGED_IN_ADMIN
