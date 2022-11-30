@@ -134,6 +134,21 @@ class GuradianAddStudent(forms.Form):
     student_last_name = forms.CharField(label='The Student\' Last Name')
     student_email = forms.EmailField(label='The Student\' Email')
 
+    def clean(self):
+        """Clean the data and generate messages for any errors."""
+        super().clean()
+        try:
+            student = Student.students.get(email=self.cleaned_data.get('student_email'))
+            if student.first_name != self.cleaned_data.get('student_first_name'):
+                self.add_error('student_first_name', 'are you sure of the spelling?')
+
+            if student.last_name != self.cleaned_data.get('student_last_name'):
+                self.add_error('student_last_name', 'are you sure of the spelling?')
+
+        except:
+            self.add_error('student_email', 'this student does not exist >~<.')
+
+
 class PasswordForm(forms.Form):
     """Form enabling users to change their password."""
 
