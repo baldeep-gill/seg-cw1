@@ -6,7 +6,6 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.decorators import login_required
 from .models import Admin, LessonRequest, Lesson, Student, User, Invoice
-from .helpers import prohibit_user_from_seeing_other_home_pages
 from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student, login_prohibited, redirect_user_after_login
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -18,7 +17,6 @@ def home(request):
     return render(request, 'home.html')
 
 @login_required
-@only_students
 def balance(request):
     # first we need to get the student
     current_student_id = request.user.id
@@ -30,7 +28,6 @@ def balance(request):
     total = 0
     for invoice in invoices:
         total += invoice.price
-
 
     return render(request, 'balance.html', {'invoices': invoices, 'total':total})
 

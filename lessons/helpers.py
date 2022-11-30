@@ -45,11 +45,12 @@ def only_admins(view_function):
 def login_prohibited(view_function):
     def modified_view_function(request):
         if request.user.is_authenticated:
-            try:
-                if Admin.admins.get(username=request.user.get_username()):
-                    return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN_ADMIN)
-            except User.DoesNotExist:
+            if request.user.type == "STUDENT":
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN_STUDENT)
+            elif request.user.type == "STUDENT":
+                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN_ADMIN)
+            else:
+                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN_GUARDIAN)
         else:
             return view_function(request)
     return modified_view_function
