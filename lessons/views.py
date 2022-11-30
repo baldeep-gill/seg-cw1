@@ -1,11 +1,11 @@
 import pytz
 from django.shortcuts import render, redirect
-from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm, GuardianSignUpForm
+from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm, GuardianSignUpForm, GuradianAddStudent
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.decorators import login_required
-from .models import Admin, LessonRequest, Lesson, Student, User, Invoice
+from .models import Admin, LessonRequest, Lesson, Student, User, Invoice, GuardianProfile
 from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student, login_prohibited, redirect_user_after_login
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -66,6 +66,27 @@ def lesson_request(request):
         form = LessonRequestForm()
     return render(request, 'lesson_request.html', {'form': form})
 
+@login_required
+def add_student(request):
+    if request.method == 'POST':
+        form = GuradianAddStudent(request.POST)
+        if form.is_valid():
+            # student_first_name = form.cleaned_data.get('student_first_name')
+            # student_last_name = form.cleaned_data.get('student_last_name')
+            student_email = form.cleaned_data.get('student_email')
+            student = Student.students.get(email=student_email)
+            try:
+                if GuardianProfile.objects.filter(student=student).exists():
+                    messages.add_message(request, messages.ERROR, "you already have this student under your account.")
+            except:
+                add_student = GuardianProfile.objects.create(
+                    student = student,
+                )
+                add_student.save()
+                return redirect('guardian_home')
+                
+    form = GuradianAddStudent()
+    return render(request, 'guardian_add_student.html', {'form': form})
 
 @login_required
 @only_admins
