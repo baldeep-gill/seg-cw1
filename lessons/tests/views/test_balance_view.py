@@ -26,11 +26,11 @@ class BalanceView(TestCase):
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
     
-    def test_get_request_as_an_admin(self):
-        self.client.login(username=self.admin.email, password='Password123')
-        redirect_url = reverse("admin_home")
-        response = self.client.get(self.url)
-        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+    # def test_get_request_as_an_admin(self):
+    #     self.client.login(username=self.admin.email, password='Password123')
+    #     redirect_url = reverse("admin_home")
+    #     response = self.client.get(self.url)
+    #     self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
     def test_access_with_login(self):
         self.client.login(username=self.student.email, password='Password123')

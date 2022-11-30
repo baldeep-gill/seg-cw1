@@ -54,11 +54,11 @@ class LessonRequestViewTestCase(TestCase):
         self.assertTrue(isinstance(form, LessonRequestForm))
         self.assertTrue(form.is_bound)
 
-    def test_admin_reject_access(self):
-        self.client.force_login(self.admin)
-        redirect_url = reverse("admin_home")
-        response = self.client.get(self.url)
-        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+    # def test_admin_reject_access(self):
+    #     self.client.force_login(self.admin)
+    #     redirect_url = reverse("admin_home")
+    #     response = self.client.get(self.url)
+    #     self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
     def test_successful_post(self):
         redirect_url = reverse("student_home")
