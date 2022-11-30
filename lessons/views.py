@@ -184,7 +184,13 @@ def student_sign_up(request):
 @only_admins
 def admin_requests(request):
     lesson_request_data = LessonRequest.objects.all()
-    return render(request, 'admin_lesson_list.html', {'data': lesson_request_data})
+    return render(request, 'admin_request_list.html', {'data': lesson_request_data})
+
+@login_required
+@only_admins
+def admin_lessons(request):
+    lessons = Lesson.objects.all()
+    return render(request, 'admin_lesson_list.html', {'lessons': lessons})
 
 @login_required
 @only_students
