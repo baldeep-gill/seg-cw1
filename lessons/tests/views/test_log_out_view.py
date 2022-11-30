@@ -14,7 +14,7 @@ class LogOutViewTestCase(TestCase, LogInTester):
         self.user = Student.objects.get(username='JohnDoe2')
 
     def test_log_out_url(self):
-        self.assertEqual(self.url,'/student/log_out/')
+        self.assertEqual(self.url,'/log_out/')
 
     def test_get_log_out(self):
         self.client.login(username=self.user.email, password='Password123')
