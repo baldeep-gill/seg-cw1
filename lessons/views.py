@@ -1,12 +1,13 @@
 import pytz
 from django.shortcuts import render, redirect
-from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm
+from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm, GuardianSignUpForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.decorators import login_required
 from .models import Admin, LessonRequest, Lesson, Student, User, Invoice
-from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student, login_prohibited
+from .helpers import prohibit_user_from_seeing_other_home_pages
+from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student, login_prohibited, redirect_user_after_login
 from django.core.exceptions import ObjectDoesNotExist
 
 import datetime
@@ -136,6 +137,10 @@ def student_home(request):
 def admin_home(request):
     return render(request, 'admin_home.html')
 
+@login_required
+def guardian_home(request):
+    return render(request, 'guardian_home.html')
+
 @login_prohibited
 def log_in(request):
     if request.method == 'POST':
@@ -146,15 +151,8 @@ def log_in(request):
             password = form.cleaned_data.get('password')
             user = authenticate(username=email, password=password)
             if user is not None:
-                if isinstance(user, Admin):
-                    login(request, user)
-                    redirect_url = next or 'admin_home'
-                else:
-                    login(request, user)
-                    redirect_url = next or 'student_home'
-                # in here we need to determine the type of the user to know which other redirect url we need to go to
-                # TODO: determin the type of user
-                #redirect user upon successful log i
+                login(request, user)
+                redirect_url = next or redirect_user_after_login(request)
                 return redirect(redirect_url)
         messages.add_message(request, messages.ERROR, "User not found, please try again.")
     else:
@@ -178,7 +176,21 @@ def student_sign_up(request):
     else:
         # creating empty sign up form
         form = StudentSignUpForm()
-    return render(request, 'student_sign_up.html',{'form': form})
+    return render(request, 'student_sign_up.html',{'form': form, 'guardian':False})
+
+@login_prohibited
+def guardian_sign_up(request):
+    if request.method == 'POST':
+        form = GuardianSignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            #redirected to home after sign up so they can login
+            return render(request, 'student_sign_up_confirmation.html')
+
+    else:
+        # creating empty sign up form
+        form = GuardianSignUpForm()
+    return render(request, 'student_sign_up.html',{'form': form, 'guardian':True})
 
 @login_required
 @only_admins
