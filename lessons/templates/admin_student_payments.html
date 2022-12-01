@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block body %}
+
+{% include 'partials/navbar.html' %}
+<div class="container">
+  <h1>Student invoices</h1>
+  {% include 'partials/user_profile.html' with user=student %}
+  <div class="col-12">
+    <div class="row">
+      <div class="col-6">
+        <h2>Invoices</h2>
+        {% for invoice in invoices %}
+          {% include 'partials/invoice_card.html' with invoice=invoice %}
+        {% empty %}
+          <h5>No unpaid invoices</h5>
+        {% endfor %}
+      </div>
+      <div class="col-6">
+        <h2>Transfers</h2>
+        {% for transfer in transfers %}
+            {% include 'partials/transfer_card.html' with transfer=transfer %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

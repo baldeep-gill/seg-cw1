@@ -5,9 +5,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.decorators import login_required
-from .models import Admin, LessonRequest, Lesson, Student, User, Invoice
+from .models import Admin, LessonRequest, Lesson, Student, User, Invoice, Transfer
 from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student, login_prohibited
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
+
 
 import datetime
 
@@ -22,16 +24,26 @@ def balance(request):
     # first we need to get the student
     current_student_id = request.user.id
 
+    student = Student.objects.get(id=current_student_id)
+
     # then we retrieve all the lessons they have from the db
-    invoices = Invoice.objects.filter(student_id=current_student_id)
+    # invoices = Invoice.objects.filter(student_id=current_student_id)
+    invoices = student.unpaid_invoices
+    transfers = student.transfers
+
+    print(transfers)
     
     # total money owed
-    total = 0
+    total_due = 0
     for invoice in invoices:
-        total += invoice.price
+        total_due += invoice.price
+
+    total_paid = 0
+    for transfer in transfers:
+        total_paid += transfer.invoice.price
 
 
-    return render(request, 'balance.html', {'invoices': invoices, 'total':total})
+    return render(request, 'balance.html', {'invoices': invoices, 'transfers': transfers, 'total_paid':total_paid, 'total_due': total_due})
 
 @login_required
 @only_students
@@ -262,3 +274,34 @@ def delete_requests(request, lesson_id):
         else:
             current_lesson.delete()
             return redirect('show_requests')
+
+@login_required
+@only_admins
+def all_student_balances(request):
+    all_students = Student.objects.all()
+    balances = {}
+    for student in all_students:
+        student_invoices = Invoice.objects.filter(student=student)
+        balance = 0
+        # print(student_invoices)
+        for invoice in student_invoices:
+            if(Transfer.objects.filter(invoice=invoice).count() == 0):
+                balance += invoice.price
+        # for lesson in student_lessons:
+        #     if(lesson.invoice.student_transfer == None):
+        #         balance += lesson.invoice.price
+        balances[student] = balance
+
+    return render(request, 'admin_payments.html', {'balances': balances})
+
+@login_required
+@only_admins
+def student_balance(request, student_id):
+    student = Student.objects.filter(id=student_id).first()
+    
+    transfer_list = student.transfers
+    invoice_list = student.unpaid_invoices
+    # student.invoices.exclude(id__in=transfer_list.values('invoice_id'))
+    
+    return render(request, 'admin_student_payments.html', {'invoices': invoice_list, 'transfers': transfer_list, 'student': student})
+
