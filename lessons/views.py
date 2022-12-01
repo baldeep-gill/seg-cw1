@@ -263,6 +263,8 @@ def delete_requests(request, lesson_id):
             return redirect('show_requests')
 
 
+@login_required
+@only_students
 def show_invoices(request):
     current_student = request.user
     invoices = Invoice.objects.filter(student=current_student)
