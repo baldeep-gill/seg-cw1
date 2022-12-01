@@ -10,7 +10,7 @@
           <h1>Fulfilled Lesson Requests</h1>
             {% for lesson in lessons %}
               <div style="padding-bottom:10px;">
-                {% include 'partials/lesson_list.html' with lesson=lesson %}
+                {% include 'partials/lesson_list.html' with lesson=lesson is_admin=True %}
               </div>
             {% endfor %}
         {% else %}
