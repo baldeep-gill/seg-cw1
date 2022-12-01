@@ -285,3 +285,14 @@ def edit_lessons(request, lesson_id):
         else:
             form = EditLessonForm(instance=lesson)
         return render(request, 'edit_lessons.html', {'form': form, 'lesson_id': lesson_id})
+
+@login_required
+@only_admins
+def delete_lessons(request, lesson_id):
+    try:
+        current_lesson = Lesson.objects.get(id=lesson_id)
+    except ObjectDoesNotExist:
+        return redirect('admin_lessons')
+    else:
+        current_lesson.delete()
+        return redirect('admin_lessons')
