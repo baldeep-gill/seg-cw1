@@ -32,6 +32,7 @@ urlpatterns = [
     path('admin/book_lesson_request/<int:request_id>', views.book_lesson_request, name='book_lesson_request'),
     path('admin/requests', views.admin_requests, name='admin_requests'),
     path('admin/lessons', views.admin_lessons, name='admin_lessons'),
+    path('admin/lessons/edit/<lesson_id>', views.edit_lessons, name='edit_lessons'),
     path('admin/log_out/', views.log_out, name='log_out'),
 
     # Student paths

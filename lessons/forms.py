@@ -36,7 +36,7 @@ class EditForm(forms.ModelForm):
         fields = ['availability', 'lessonNum', 'interval', 'duration', 'topic', 'teacher']
 
 class EditLessonForm(forms.ModelForm):
-    """Form to update lesson request"""
+    """Form to update lesson"""
     class Meta:
         model = Lesson
         fields = ['date', 'duration', 'topic', 'teacher']

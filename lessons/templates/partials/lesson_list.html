@@ -20,7 +20,7 @@
 
       {% if is_admin %}
       <div>
-          <a href="{% url 'admin_home' %}" class="btn btn-secondary text-light"><i class="bi bi-pen-fill"></i> Edit</a>
+          <a href="{% url 'edit_lessons' lesson.id %}" class="btn btn-secondary text-light"><i class="bi bi-pen-fill"></i> Edit</a>
           <a href="{% url 'admin_home' %}" class="btn btn-danger text-light"><i class="bi bi-trash"></i> Delete</a>
       </div>
       {% endif %}

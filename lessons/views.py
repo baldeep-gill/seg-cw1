@@ -1,6 +1,6 @@
 import pytz
 from django.shortcuts import render, redirect
-from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm
+from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm, EditLessonForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
@@ -268,3 +268,20 @@ def delete_requests(request, lesson_id):
         else:
             current_lesson.delete()
             return redirect('show_requests')
+
+@login_required
+@only_admins
+def edit_lessons(request, lesson_id):
+    try:
+        lesson = Lesson.objects.get(id=lesson_id)
+    except ObjectDoesNotExist:
+        return redirect('admin_lessons')
+    else:
+        if request.method == 'POST':
+            form = EditLessonForm(instance=lesson, data=request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('admin_lessons')
+        else:
+            form = EditLessonForm(instance=lesson)
+        return render(request, 'edit_lessons.html', {'form': form, 'lesson_id': lesson_id})
