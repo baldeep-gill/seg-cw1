@@ -64,6 +64,20 @@ class Student(User):
         '''this refers to the table in the database'''
         return self.studentprofile
 
+    @property
+    def invoices(self):
+        return Invoice.objects.filter(student=self)
+    
+    @property
+    def transfers(self):
+        return Transfer.objects.filter(invoice__student=self)
+
+    @property
+    def unpaid_invoices(self):
+        transfer_list = self.transfers
+        invoice_list = self.invoices.exclude(id__in=transfer_list.values('invoice_id'))
+        return invoice_list
+
     class Meta:
         proxy = True
 
@@ -145,6 +159,8 @@ class LessonRequest(models.Model):
     )
 
 
+
+
 class Invoice(models.Model):
     """Models an invoice for a set of lessons"""
 
@@ -165,6 +181,14 @@ class Invoice(models.Model):
         blank = False,
     )
 
+    # # Transfer completed by student for invoice. Empty if payment has not been confirmed
+    # student_transfer = models.ForeignKey(
+    #     Transfer,
+    #     blank=True,
+    #     null=True,
+    #     on_delete=models.CASCADE
+    # )
+
     # Unique reference number which can be used to identify individual invoices
     # Is of the form student_number-invoice number
     @property
@@ -184,6 +208,35 @@ class Invoice(models.Model):
         for lesson in self.lessons:
             price += lesson.duration * lesson.price_per_minute
         return price
+
+class Transfer(models.Model):
+    """Models a transfer completed by a student"""
+    
+    # The date and time when the transfer was received 
+    date_received = models.DateField(blank=False)
+
+    transfer_id = models.IntegerField(blank=False)
+
+    
+    """Administrator who verified the payment.
+    ALl payments are done through the school bank account
+    and have to be checked by an administrator user"""
+    verifier = models.ForeignKey(
+        Admin,
+        on_delete = models.CASCADE,
+        blank = False,
+    )
+
+    invoice = models.ForeignKey(
+        Invoice, 
+        on_delete = models.CASCADE,
+        blank = False
+    )
+    
+    @property
+    def lessons(self):
+        return Lesson.objects.filter(invoice=self.invoice())
+
 
 class Lesson(models.Model):
     """Models a booked lesson for a student"""
@@ -234,7 +287,6 @@ class Lesson(models.Model):
     def price_per_minute(self):
         """Returns the cost of this lesson per minute in pounds/£"""
         return 1
-
 
 
 
