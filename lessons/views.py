@@ -119,7 +119,6 @@ def book_lesson_request(request, request_id):
                 lesson.save()
                 new_date = new_date + tdelta
 
-            #TODO need to update this to set request to fulfilled and not delete it
             lesson_request.delete()
             return redirect('admin_requests')
     else:
@@ -262,3 +261,9 @@ def delete_requests(request, lesson_id):
         else:
             current_lesson.delete()
             return redirect('show_requests')
+
+
+def show_invoices(request):
+    current_student = request.user
+    invoices = Invoice.objects.filter(student=current_student)
+    return render(request, 'invoices_list.html', {'invoices': invoices})
