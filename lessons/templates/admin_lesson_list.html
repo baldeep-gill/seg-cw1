@@ -7,7 +7,10 @@
     <div class="row">
       <div class="col-12">
         {% if lessons %}
-          <h1>Fulfilled Lesson Requests</h1>
+          <h1>View all booked lessons!</h1>
+          <p>
+            <a href="{% url 'home' %}" class="btn btn-lg btn-secondary">Return to home page</a>
+          </p>
             {% for lesson in lessons %}
               <div style="padding-bottom:10px;">
                 {% include 'partials/lesson_list.html' with lesson=lesson is_admin=True %}
