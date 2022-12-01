@@ -7,42 +7,87 @@
       <div class="col-12">
           <h1>Balance</h1>
           <hr />
-            <div class="card bg-dark border-secondary text-light">
-                <h5 class="card-header bi bi-bank"> Total Due </h5>
-                
-                <div class="card-body">
-                    {% if invoices %}
-                    <div class="d-flex justify-content-around">
+          <div class="card bg-dark border-secondary text-light">
+            <h5 class="card-header bi bi-bank"> Total Due </h5>
+            
+            <div class="card-body">
+                {% if invoices %}
+                <div class="d-flex justify-content-around">
 
-                        <div>
-                            <h6><i class="bi bi-hash"></i> <b>Invoice number</b></h6>
-                            {% for invoice in invoices %}
-                                <p>{{ invoice.invoice_number }}</p>
-                            {% endfor %}
-                        </div>
-                        <div>
-                            <h6><i class="bi bi-bookmark-fill"></i> <b>Unique Reference Number</b></h6>
-                            {% for invoice in invoices %}
-                                <p>{{ invoice.unique_reference_number }}</p>
-                            {% endfor %}
-                        </div>
-                        <div>
-                            <h6><i class="bi bi-cash"></i> <b>Price</b></h6>
-                            {% for invoice in invoices %}
-                                <p>£ {{ invoice.price }}</p>
-                            {% endfor %}
-                        </div>
+                    <div>
+                        <h6><i class="bi bi-hash"></i> <b>Invoice number</b></h6>
+                        {% for invoice in invoices %}
+                            <p>{{ invoice.invoice_number }}</p>
+                        {% endfor %}
                     </div>
-                    <hr />
-
-                    <div clas="container">
-                        <p> <b>Total</b>:  £  {{total}} </p>
-                    </div>       
-                    {% else %}
-                        <h6> you owe nothing, for now... </h6>
-                    {% endif %}
+                    <div>
+                        <h6><i class="bi bi-bookmark-fill"></i> <b>Unique Reference Number</b></h6>
+                        {% for invoice in invoices %}
+                            <p>{{ invoice.unique_reference_number }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <h6><i class="bi bi-cash"></i> <b>Price</b></h6>
+                        {% for invoice in invoices %}
+                            <p>£ {{ invoice.price }}</p>
+                        {% endfor %}
+                    </div>
                 </div>
+                <hr />
+
+                <div clas="container">
+                    <h3> <b>Total</b>:  £  {{ total_due }} </h3>
+                </div>       
+                {% else %}
+                    <h6> you owe nothing, for now... </h6>
+                {% endif %}
             </div>
+        </div>
+
+        <hr />
+
+        <div class="card bg-dark border-secondary text-light">
+            <h5 class="card-header"><i class="bi bi-check-circle text-success"></i> Confirmed transfers </h5>
+            
+            <div class="card-body">
+                {% if transfers %}
+                <div class="d-flex justify-content-around">
+
+                    <div>
+                        <h6><i class="bi bi-hash"></i> <b>Invoice number</b></h6>
+                        {% for transfer in transfers %}
+                            <p>{{ transfer.invoice.invoice_number }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <h6><i class="bi bi-bookmark-fill"></i> <b>Unique Reference Number</b></h6>
+                        {% for transfer in transfers %}
+                            <p>{{ transfer.invoice.unique_reference_number }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <h6><i class="bi bi-cash"></i> <b>Price</b></h6>
+                        {% for transfer in transfers %}
+                            <p>£ {{ transfer.invoice.price }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <h6><i class="bi bi-cash"></i> <b>Received</b></h6>
+                        {% for transfer in transfers %}
+                            <p>{{ transfer.date_received }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                <hr />
+
+                <div clas="container">
+                    <h3> <b>Total</b>:  £  {{ total_paid }} </h3>
+                </div>       
+                {% else %}
+                    <h6> you owe nothing, for now... </h6>
+                {% endif %}
+            </div>
+        </div>
       </div>
     </div>
 </div>
