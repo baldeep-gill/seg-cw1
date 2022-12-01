@@ -35,6 +35,7 @@ urlpatterns = [
     path('admin/log_out/', views.log_out, name='log_out'),
     path('admin/payments', views.all_student_balances, name='payments'),
     path('admin/payments/<int:student_id>', views.student_balance, name='student_payments'),
+    path('admin/payments/<int:student_id>/<int:invoice_id>', views.approve_transaction, name='approve_transaction'),
 
     # Student paths
     path('student/lesson_request/', views.lesson_request, name='lesson_request'),

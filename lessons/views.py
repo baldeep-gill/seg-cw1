@@ -305,3 +305,16 @@ def student_balance(request, student_id):
     
     return render(request, 'admin_student_payments.html', {'invoices': invoice_list, 'transfers': transfer_list, 'student': student})
 
+@login_required
+@only_admins
+def approve_transaction(request, student_id, invoice_id):
+    if request.method == 'POST':
+        current_admin = request.user
+        invoice = Invoice.objects.filter(student_id=student_id).filter(invoice_number=invoice_id)
+        next_transfer_id = 1
+        if Transfer.objects.last():
+            next_transfer_id += Transfer.objects.last().transfer_id;
+        transfer = Transfer.objects.create(date_received=timezone.now(), transfer_id=next_transfer_id, verifier=current_admin, invoice=invoice.first())
+        transfer.save()
+
+    return redirect('student_payments', student_id=student_id)
