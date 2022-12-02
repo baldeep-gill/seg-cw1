@@ -61,6 +61,7 @@ class BalanceView(TestCase):
         self.client.login(username=self.student.email, password='Password123')
         response = self.client.get(self.url)
         self.assertContains(response, '£')
+        self.assertContains(response, 'Unique')
     
     def test_each_student_see_their_own_requests(self):
         new_invoice = Invoice.objects.create(
