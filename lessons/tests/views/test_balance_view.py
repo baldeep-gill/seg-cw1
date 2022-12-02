@@ -48,7 +48,6 @@ class BalanceView(TestCase):
             student=self.student,
             date=timezone.now(),
             invoice_number=1,
-            unique_reference_number=f'{self.student.id}-{1}'
         )
         Lesson.objects.create(
                     student=self.student,
@@ -68,7 +67,6 @@ class BalanceView(TestCase):
             student=self.student,
             date=timezone.now(),
             invoice_number=1,
-            unique_reference_number=f'{self.student.id}-{1}'
         )
         Lesson.objects.create(
                     student=self.student,
