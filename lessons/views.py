@@ -131,7 +131,6 @@ def book_lesson_request(request, request_id):
                 lesson.save()
                 new_date = new_date + tdelta
 
-            #TODO need to update this to set request to fulfilled and not delete it
             lesson_request.delete()
             return redirect('admin_requests')
     else:
@@ -276,6 +275,13 @@ def delete_requests(request, lesson_id):
             return redirect('show_requests')
 
 @login_required
+@only_students
+def show_invoices(request):
+    current_student = request.user
+    invoices = Invoice.objects.filter(student=current_student)
+    return render(request, 'invoices_list.html', {'invoices': invoices})
+
+@login_required
 @only_admins
 def all_student_balances(request):
     all_students = Student.objects.all()
@@ -313,8 +319,21 @@ def approve_transaction(request, student_id, invoice_id):
         invoice = Invoice.objects.filter(student_id=student_id).filter(invoice_number=invoice_id)
         next_transfer_id = 1
         if Transfer.objects.last():
-            next_transfer_id += Transfer.objects.last().transfer_id;
+            next_transfer_id += Transfer.objects.last().transfer_id
         transfer = Transfer.objects.create(date_received=timezone.now(), transfer_id=next_transfer_id, verifier=current_admin, invoice=invoice.first())
         transfer.save()
 
     return redirect('student_payments', student_id=student_id)
+
+@login_required
+@only_students
+def show_invoice_lessons(request, invoice_id):
+    """Shows the lessons associated with a given invoice"""
+    try:
+        current_invoice = Invoice.objects.get(id=invoice_id)
+    except ObjectDoesNotExist:
+        return redirect('show_invoices')
+    else:
+        lessons_to_display = current_invoice.lessons
+        return render(request, 'show_invoice_lessons.html', {'lessons': lessons_to_display, 'invoice':current_invoice})
+
