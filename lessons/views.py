@@ -325,3 +325,16 @@ def approve_transaction(request, student_id, invoice_id):
 
     return redirect('student_payments', student_id=student_id)
 
+@login_required
+@only_students
+def show_invoice_details(request, invoice_id):
+    """Shows the details for a specific invoice
+    This will be the lessons that are part of this invoice and their prices"""
+    try:
+        current_invoice = Invoice.objects.get(id=invoice_id)
+    except ObjectDoesNotExist:
+        return redirect('show_invoices')
+    else:
+        lessons_to_display = current_invoice.lessons
+        return render(request, 'show_invoice_details.html', {'lessons': lessons_to_display, 'invoice':current_invoice })
+

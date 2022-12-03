@@ -42,6 +42,7 @@ urlpatterns = [
     path('student/home/', views.student_home, name='student_home'),
     path('student/requests/', views.show_requests, name='show_requests'),
     path('student/invoices/', views.show_invoices, name='show_invoices'),
+    path('student/invoices/<invoice_id>', views.show_invoice_details, name='show_invoice_details'),
     path('student/requests/edit/<lesson_id>', views.edit_requests, name='edit_requests'),
     path('student/requests/delete/<lesson_id>', views.delete_requests, name='delete_requests'),
     path('student/lessons/list', views.lessons_success, name='lesson_list'),
