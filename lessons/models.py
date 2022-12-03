@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy
 from libgravatar import Gravatar
 from django.core.validators import MinValueValidator, MaxValueValidator
 import pytz
+from django.utils import timezone
 
 '''The base user that all users inherit'''
 class User(AbstractUser):
@@ -181,14 +182,6 @@ class Invoice(models.Model):
         blank = False,
     )
 
-    # # Transfer completed by student for invoice. Empty if payment has not been confirmed
-    # student_transfer = models.ForeignKey(
-    #     Transfer,
-    #     blank=True,
-    #     null=True,
-    #     on_delete=models.CASCADE
-    # )
-
     # Unique reference number which can be used to identify individual invoices
     # Is of the form student_number-invoice number
     @property
@@ -208,7 +201,7 @@ class Invoice(models.Model):
         for lesson in self.lessons:
             price += lesson.price
         return price
-
+        
     @property
     def paid(self):
         transfer = Transfer.objects.filter(invoice=self)
@@ -217,13 +210,19 @@ class Invoice(models.Model):
         else:
             return False
 
+
+def present_or_past_date(value):
+    if value > timezone.now():
+        raise models.ValidationError("The date cannot be in the past!")
+    return value
+
 class Transfer(models.Model):
     """Models a transfer completed by a student"""
     
     # The date and time when the transfer was received 
-    date_received = models.DateField(blank=False)
+    date_received = models.DateField(blank=False, default=timezone.now(), validators=[present_or_past_date])
 
-    transfer_id = models.IntegerField(blank=False)
+    transfer_id = models.IntegerField(blank=False, unique=True)
 
     
     """Administrator who verified the payment.
