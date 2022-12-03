@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy
 from libgravatar import Gravatar
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -212,8 +213,8 @@ class Invoice(models.Model):
 
 
 def present_or_past_date(value):
-    if value > timezone.now():
-        raise models.ValidationError("The date cannot be in the past!")
+    if value < timezone.now().date():
+        raise ValidationError("The date cannot be in the past!")
     return value
 
 class Transfer(models.Model):

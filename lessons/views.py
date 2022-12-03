@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.decorators import login_required
 from .models import Admin, LessonRequest, Lesson, Student, User, Invoice, Transfer
-from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student, login_prohibited
+from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student, login_prohibited, find_next_available_transfer_id
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 
@@ -30,8 +30,6 @@ def balance(request):
     # invoices = Invoice.objects.filter(student_id=current_student_id)
     invoices = student.unpaid_invoices
     transfers = student.transfers
-
-    print(transfers)
     
     # total money owed
     total_due = 0
@@ -289,13 +287,10 @@ def all_student_balances(request):
     for student in all_students:
         student_invoices = Invoice.objects.filter(student=student)
         balance = 0
-        # print(student_invoices)
         for invoice in student_invoices:
             if(Transfer.objects.filter(invoice=invoice).count() == 0):
                 balance += invoice.price
-        # for lesson in student_lessons:
-        #     if(lesson.invoice.student_transfer == None):
-        #         balance += lesson.invoice.price
+      
         balances[student] = balance
 
     return render(request, 'admin_payments.html', {'balances': balances})
@@ -317,9 +312,7 @@ def approve_transaction(request, student_id, invoice_id):
     if request.method == 'POST':
         current_admin = request.user
         invoice = Invoice.objects.filter(student_id=student_id).filter(invoice_number=invoice_id)
-        next_transfer_id = 1
-        if Transfer.objects.last():
-            next_transfer_id += Transfer.objects.last().transfer_id
+        next_transfer_id = find_next_available_transfer_id()
         transfer = Transfer.objects.create(date_received=timezone.now(), transfer_id=next_transfer_id, verifier=current_admin, invoice=invoice.first())
         transfer.save()
 
