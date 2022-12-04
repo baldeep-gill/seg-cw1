@@ -1,4 +1,4 @@
-from .models import Admin, Student, User, Invoice
+from .models import Admin, Student, User, Invoice, Transfer
 from django.shortcuts import redirect
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -18,6 +18,13 @@ def find_next_available_invoice_number_for_student(student):
     if(invoices_for_student.last()):
         return invoices_for_student.last().invoice_number + 1
     return 1
+
+def find_next_available_transfer_id():
+    """Will find the next available invoice number for a given student"""
+    next_transfer_id = 1
+    if Transfer.objects.last():
+        next_transfer_id += Transfer.objects.last().transfer_id
+    return next_transfer_id
 
 '''decorator for preventing students and admins from accessing each other's pages'''
 def only_students(view_function):

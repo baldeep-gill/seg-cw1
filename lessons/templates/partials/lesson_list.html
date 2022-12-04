@@ -29,6 +29,11 @@
           <a href="{% url 'delete_lessons' lesson.id %}" class="btn btn-danger text-light"><i class="bi bi-trash"></i> Delete</a>
       </div>
       {% endif %}
+
+          <div>
+          <h6><i class="bi bi-cash"></i> <b>Price</b></h6>
+          <p>{{ lesson.price }}</p>
+        </div>
   
       </div>
   </div>
