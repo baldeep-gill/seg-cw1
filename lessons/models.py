@@ -2,10 +2,12 @@
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy
 from libgravatar import Gravatar
 from django.core.validators import MinValueValidator, MaxValueValidator
 import pytz
+from django.utils import timezone
 
 '''The base user that all users inherit'''
 class User(AbstractUser):
@@ -63,6 +65,20 @@ class Student(User):
     def more(self):
         '''this refers to the table in the database'''
         return self.studentprofile
+
+    @property
+    def invoices(self):
+        return Invoice.objects.filter(student=self)
+    
+    @property
+    def transfers(self):
+        return Transfer.objects.filter(invoice__student=self)
+
+    @property
+    def unpaid_invoices(self):
+        transfer_list = self.transfers
+        invoice_list = self.invoices.exclude(id__in=transfer_list.values('invoice_id'))
+        return invoice_list
 
     class Meta:
         proxy = True
@@ -145,6 +161,8 @@ class LessonRequest(models.Model):
     )
 
 
+
+
 class Invoice(models.Model):
     """Models an invoice for a set of lessons"""
 
@@ -179,11 +197,54 @@ class Invoice(models.Model):
     @property
     def price(self):
         """Returns the total price associated with this invoice
-        Sum of the proces of the lessons"""
+        Sum of the prices of the lessons"""
         price = 0
         for lesson in self.lessons:
-            price += lesson.duration * lesson.price_per_minute
+            price += lesson.price
         return price
+        
+    @property
+    def paid(self):
+        transfer = Transfer.objects.filter(invoice=self)
+        if transfer:
+            return True
+        else:
+            return False
+
+
+def present_or_past_date(value):
+    if value > timezone.now():
+        raise ValidationError("The date cannot be in the future!")
+    return value
+
+class Transfer(models.Model):
+    """Models a transfer completed by a student"""
+    
+    # The date and time when the transfer was received 
+    date_received = models.DateTimeField(blank=False, default=timezone.now(), validators=[present_or_past_date])
+
+    transfer_id = models.IntegerField(blank=False, unique=True)
+
+    
+    """Administrator who verified the payment.
+    ALl payments are done through the school bank account
+    and have to be checked by an administrator user"""
+    verifier = models.ForeignKey(
+        Admin,
+        on_delete = models.CASCADE,
+        blank = False,
+    )
+
+    invoice = models.ForeignKey(
+        Invoice, 
+        on_delete = models.CASCADE,
+        blank = False
+    )
+    
+    @property
+    def lessons(self):
+        return Lesson.objects.filter(invoice=self.invoice())
+
 
 class Lesson(models.Model):
     """Models a booked lesson for a student"""
@@ -231,10 +292,14 @@ class Lesson(models.Model):
     )
 
     @property
+    def price(self):
+        """Calculates the price of this individual lesson"""
+        return self.price_per_minute * self.duration
+
+    @property
     def price_per_minute(self):
         """Returns the cost of this lesson per minute in pounds/£"""
         return 1
-
 
 
 

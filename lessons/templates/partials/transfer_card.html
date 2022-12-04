@@ -1,0 +1,8 @@
+<div class="card bg-dark border-secondary text-light mb-8">
+  <h5 class="card-header">Transfer for invoice {{ transfer.invoice.unique_reference_number }}</h5>
+  <div class="card-body">
+    <h6>Invoice Generated {{ transfer.invoice.date }}</h6>
+    <h6>Transfer Received {{ transfer.date_received }}</h6>
+    <h3>£{{ transfer.invoice.price }} <i class="bi bi-check-circle text-success"></i> </h3>
+    </div>
+</div>
