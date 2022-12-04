@@ -1,6 +1,6 @@
 import pytz
 from django.shortcuts import render, redirect
-from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm
+from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm, EditLessonForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
@@ -125,9 +125,9 @@ def log_in(request):
         form = LogInForm(request.POST)
         next = request.POST.get('next') or ''
         if form.is_valid():
-            email = form.cleaned_data.get('username')
+            username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            user = authenticate(username=email, password=password)
+            user = authenticate(username=username, password=password)
             if user is not None:
                 if isinstance(user, Admin):
                     login(request, user)
@@ -135,9 +135,6 @@ def log_in(request):
                 else:
                     login(request, user)
                     redirect_url = next or 'student_home'
-                # in here we need to determine the type of the user to know which other redirect url we need to go to
-                # TODO: determin the type of user
-                #redirect user upon successful log i
                 return redirect(redirect_url)
         messages.add_message(request, messages.ERROR, "User not found, please try again.")
     else:
@@ -167,7 +164,13 @@ def student_sign_up(request):
 @only_admins
 def admin_requests(request):
     lesson_request_data = LessonRequest.objects.all()
-    return render(request, 'admin_lesson_list.html', {'data': lesson_request_data})
+    return render(request, 'admin_request_list.html', {'data': lesson_request_data})
+
+@login_required
+@only_admins
+def admin_lessons(request):
+    lessons = Lesson.objects.all()
+    return render(request, 'admin_lesson_list.html', {'lessons': lessons})
 
 @login_required
 @only_students
@@ -247,13 +250,39 @@ def delete_requests(request, lesson_id):
             return redirect('show_requests')
 
 @login_required
+@only_admins
+def edit_lessons(request, lesson_id):
+    try:
+        lesson = Lesson.objects.get(id=lesson_id)
+    except ObjectDoesNotExist:
+        return redirect('admin_lessons')
+    else:
+        if request.method == 'POST':
+            form = EditLessonForm(instance=lesson, data=request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('admin_lessons')
+        else:
+            form = EditLessonForm(instance=lesson)
+        return render(request, 'edit_lessons.html', {'form': form, 'lesson_id': lesson_id})
+
+@login_required
+@only_admins
+def delete_lessons(request, lesson_id):
+    try:
+        current_lesson = Lesson.objects.get(id=lesson_id)
+    except ObjectDoesNotExist:
+        return redirect('admin_lessons')
+    else:
+        current_lesson.delete()
+        return redirect('admin_lessons')
+
+@login_required
 @only_students
 def show_invoices(request):
     current_student = request.user
     invoices = Invoice.objects.filter(student=current_student)
     return render(request, 'invoices_list.html', {'invoices': invoices})
-
-
 
 @login_required
 @only_students
@@ -333,4 +362,3 @@ def show_invoice_lessons(request, invoice_id):
     else:
         lessons_to_display = current_invoice.lessons
         return render(request, 'show_invoice_lessons.html', {'lessons': lessons_to_display, 'invoice':current_invoice})
-

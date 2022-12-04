@@ -1,0 +1,26 @@
+{% extends 'base.html' %} {% block body %} {% include 'partials/navbar.html' %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>See all requests here!</h1>
+      {% comment %}
+      <p>You can now log in from the home page</p>
+      {% endcomment %}
+      <p>
+        <a href="{% url 'home' %}" class="btn btn-lg btn-secondary">Return to home page</a>
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex flex-wrap gap-3 justify-content-around">
+        {% for request in data %}
+           <div class="w-25">
+            {% include 'partials/request_card.html' with request=request show_button=True %}
+           </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
