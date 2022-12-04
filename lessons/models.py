@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy
 from libgravatar import Gravatar
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils.translation import gettext_lazy as _
 
 import pytz
 from django.utils import timezone
@@ -302,6 +303,17 @@ class Lesson(models.Model):
         """Returns the cost of this lesson per minute in pounds/£"""
         return 1
 
+
+def valid_term_date_validator(date_to_check):
+    """Validates that a given term date does not fall in the range of any other term date"""
+    terms = Term.objects.all()
+    for term in terms:
+        if term.start_date <= date_to_check <= term.end_date:
+            raise ValidationError(
+                _('Term dates are not allowed to overlap!')
+            )
+
+
 class Term(models.Model):
     """Models a school term"""
 
@@ -314,11 +326,13 @@ class Term(models.Model):
     # Start date of term
     start_date = models.DateTimeField(
         blank=False,
+        validators=[valid_term_date_validator],
     )
 
     # End date of term
     end_date = models.DateTimeField(
         blank=False,
+        validators=[valid_term_date_validator],
     )
 
 

@@ -2,7 +2,7 @@ from django import forms
 from django.core.validators import RegexValidator, MinValueValidator
 from .models import User, Student, StudentProfile, LessonRequest, Lesson, Term
 from django.db.models import Max
-from .helpers import find_next_available_student_number, day_of_the_week_validator, valid_term_date_validator
+from .helpers import find_next_available_student_number, day_of_the_week_validator
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateTimeField
 from django.core.exceptions import ValidationError
@@ -130,10 +130,13 @@ class TermForm(forms.ModelForm):
     """Form for creating new school terms"""
     class Meta:
         model = Term
-        fields = ['name']
+        fields = ['name','start_date','end_date']
+        widgets = {'start_date':forms.SelectDateWidget,'end_date':forms.SelectDateWidget}
 
-    start_date = forms.DateTimeField(label="Start Date",widget=forms.SelectDateWidget,validators=[valid_term_date_validator])
-    end_date = forms.DateTimeField(label="End Date",widget=forms.SelectDateWidget,validators=[valid_term_date_validator])
-
-
+    def clean(self):
+        super().clean()
+        start_date = self.cleaned_data.get('start_date')
+        end_date = self.cleaned_data.get('end_date')
+        if end_date < start_date:
+            self.add_error('end_date','End date must be after start date')
 

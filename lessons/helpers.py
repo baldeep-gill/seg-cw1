@@ -69,15 +69,6 @@ def day_of_the_week_validator(value):
             _('Needs to be a day of the week')
         )
 
-def valid_term_date_validator(date_to_check):
-    """Validates that a given term date does not fall in the range of any other term date"""
-    terms = Term.objects.all()
-    for term in terms:
-        if term.start_date <= date_to_check <= term.end_date:
-            raise ValidationError(
-                _('Term dates are not allowed to overlap!')
-            )
-
 def get_next_given_day_of_week_after_date_given(date,day):
     """Takes a date and a day of the week and returns the first date after passed in date on that day
     If the date passed in is on the passed in day of the week then just return"""

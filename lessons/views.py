@@ -409,9 +409,22 @@ def edit_terms(request, term_id):
     else:
         if request.method == 'POST':
             form = TermForm(instance=term, data=request.POST)
+            term_details = {
+                'name':term.name,
+                'start_date':term.start_date,
+                'end_date':term.end_date,
+            }
+            term.delete()
             if form.is_valid():
                 form.save()
                 return redirect('admin_terms')
+            else:
+                term = Term.objects.create(
+                    name = term_details['name'],
+                    start_date = term_details['start_date'],
+                    end_date = term_details['end_date'],
+                )
+                term.save()
         else:
             form = TermForm(instance=term)
         return render(request, 'edit_terms.html', {'form': form, 'term_id': term_id})
