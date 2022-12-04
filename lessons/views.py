@@ -20,24 +20,24 @@ def home(request):
 def book_for_student(request):
     # if we don't need anything from this
     current_user = Guardian.objects.get(id=request.user.id)
-    # student_list = Guardian.objects.get(id=current_user.id).more
     flag = GuardianProfile.objects.filter(user_id=current_user.id).exists()
 
     # options to be displayed
     options = GuardianProfile.objects.filter(user=current_user)
-    optiontuples = tuple([(option.student_first_name, option.student_email) for option in options])
+    optiontuples = tuple([(option.student_email, option.student_first_name) for option in options])
 
     if request.method == 'POST':
-        form = GuradianBookStudent(request.POST)
+        form = GuradianBookStudent(data=request.POST, options=optiontuples)
         if form.is_valid():
-            current_user = Student.student.get(email=form.cleaned_data.get('students'))
+            student = form.cleaned_data['students']
+            current_user = Student.students.get(email=student)
             availability = form.cleaned_data.get('availability')
             lessonNum = form.cleaned_data.get('lessonNum')
             interval = form.cleaned_data.get('interval')
             duration = form.cleaned_data.get('duration')
             topic = form.cleaned_data.get('topic')
             teacher = form.cleaned_data.get('teacher')
-            lessonRequest = LessonRequestForm.objects.create(
+            lessonRequest = LessonRequest.objects.create(
                 author=current_user,
                 availability=availability,
                 lessonNum=lessonNum,
@@ -49,7 +49,7 @@ def book_for_student(request):
             lessonRequest.save()
             return redirect(redirect_user_after_login(request))
     else:
-        form = GuradianBookStudent(request=optiontuples)
+        form = GuradianBookStudent(options=optiontuples)
     return render(request, 'guardian_book_for_student.html', {'form': form, 'users': flag})
 
 @login_required
@@ -122,8 +122,8 @@ def add_student(request):
                 )
                 add_student.save()
                 return redirect('guardian_home')
-
-    form = GuradianAddStudent()
+    else:
+        form = GuradianAddStudent()
     return render(request, 'guardian_add_student.html', {'form': form})
 
 @login_required

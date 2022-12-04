@@ -155,11 +155,10 @@ class GuradianAddStudent(forms.Form):
 class GuradianBookStudent(forms.ModelForm):
     '''form enabling guardians to book lessons for students'''
     # the student we want to book
-    def __init__(self, request, *args, **kwargs):
-        main_request = request
+    def __init__(self, options, *args, **kwargs):
         super(GuradianBookStudent, self).__init__(*args, **kwargs)
         # options:
-        self.fields['students'] = forms.ChoiceField(choices=main_request, widget=forms.Select(choices=[]))
+        self.fields['students'] = forms.ChoiceField(choices=options, widget=forms.Select(choices=[]))
 
     class Meta:
         model = LessonRequest
