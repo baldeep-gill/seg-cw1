@@ -59,11 +59,11 @@ class TransferTestCase(TestCase):
 
     def test_date_cant_be_in_the_future(self):
         self.transfer.date_received = timezone.now() + datetime.timedelta(days=1)
-        self._assert_valid_transfer()
+        self._assert_invalid_transfer()
 
     def test_date_can_be_in_the_past(self):
-        self.transfer.date_received = timezone.now() - datetime.timedelta(days=2)
-        self._assert_invalid_transfer()
+        self.transfer.date_received = timezone.now() - datetime.timedelta(days=3)
+        self._assert_valid_transfer()
 
     """---TEST VERIFIERS FIELD---"""
 
