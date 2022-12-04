@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy
 from libgravatar import Gravatar
 from django.core.validators import MinValueValidator, MaxValueValidator
+
 import pytz
 from django.utils import timezone
 
@@ -303,6 +304,12 @@ class Lesson(models.Model):
 
 class Term(models.Model):
     """Models a school term"""
+
+    # Name of term, ie 'term 1' or 'Summer term'
+    name = models.CharField(
+        max_length = 50,
+        blank=False
+    )
 
     # Start date of term
     start_date = models.DateTimeField(

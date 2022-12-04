@@ -1,8 +1,8 @@
 from django import forms
 from django.core.validators import RegexValidator, MinValueValidator
-from .models import User, Student, StudentProfile, LessonRequest, Lesson
+from .models import User, Student, StudentProfile, LessonRequest, Lesson, Term
 from django.db.models import Max
-from .helpers import find_next_available_student_number, day_of_the_week_validator
+from .helpers import find_next_available_student_number, day_of_the_week_validator, valid_term_date_validator
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateTimeField
 from django.core.exceptions import ValidationError
@@ -124,3 +124,16 @@ class UserForm(forms.ModelForm):
 
         model = User
         fields = ['first_name', 'last_name', 'username', 'email']
+
+
+class TermForm(forms.ModelForm):
+    """Form for creating new school terms"""
+    class Meta:
+        model = Term
+        fields = ['name']
+
+    start_date = forms.DateTimeField(label="Start Date",widget=forms.SelectDateWidget,validators=[valid_term_date_validator])
+    end_date = forms.DateTimeField(label="End Date",widget=forms.SelectDateWidget,validators=[valid_term_date_validator])
+
+
+

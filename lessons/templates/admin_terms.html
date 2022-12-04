@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block body %}
+
+{% include 'partials/navbar.html' %}
+
+<div class="container">
+
+
+  <div class="row">
+    <div class="col-12">
+      <h1>Create Term</h1>
+      <form action="{% url 'admin_terms' %}" method="post">
+        {% csrf_token %}
+        {% include 'partials/form.html' with form=form %}
+        <input type="submit" value="Create" class="btn btn-primary">
+      </form>
+    </div>
+  </div>
+
+    <div class="row">
+      <div class="col-12">
+        {% if terms %}
+          <h1>View all Terms</h1>
+            {% for term in terms %}
+              <div style="padding-bottom:10px;">
+                {% include 'partials/term_list.html' with terms=terms is_admin=True %}
+              </div>
+            {% endfor %}
+        {% else %}
+          <h1> There aren't any terms yet. Try creating some...</h1>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
