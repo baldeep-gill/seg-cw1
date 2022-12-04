@@ -6,6 +6,9 @@
   <h1>Student invoices</h1>
   {% include 'partials/user_profile.html' with user=student %}
   <div class="col-12">
+    {% if not invoices and not transfers %}
+      <h1>No invoices or transfers</h1>
+    {% endif %}
     <div class="row">
       <div class="col-6">
         <h2>Invoices</h2>
