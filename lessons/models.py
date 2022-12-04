@@ -76,17 +76,15 @@ class GuardianManager(BaseUserManager):
 
 # A new table to store the student number and extra information about the user later on
 class GuardianProfile(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, blank=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    student_first_name = models.CharField(max_length=50, blank=False)
+    student_last_name = models.CharField(max_length=50, blank=False)
+    student_email = models.EmailField(unique=True, blank=False)
 
 # Guardian user
 class Guardian(User):
     base_role = User.Types.GUARDIAN
     guardians = GuardianManager()
-    
-    @property
-    def more(self):
-        '''this refers to the table in the database'''
-        return self.guardianprofile
 
     class Meta:
         proxy = True
