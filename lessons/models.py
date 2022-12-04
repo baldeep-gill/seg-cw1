@@ -301,6 +301,25 @@ class Lesson(models.Model):
         """Returns the cost of this lesson per minute in pounds/£"""
         return 1
 
+class Term(models.Model):
+    """Models a school term"""
+
+    # Start date of term
+    start_date = models.DateTimeField(
+        blank=False,
+    )
+
+    # End date of term
+    end_date = models.DateTimeField(
+        blank=False,
+    )
+
+
+
+
+
+
+
 
 
 
