@@ -2,9 +2,9 @@ from .models import User
 from django.contrib.auth.backends import ModelBackend
 
 class EmailLogin(ModelBackend):
-    def authenticate(self, request, email=None, password=None):
+    def authenticate(self, request, username=None, password=None):
         try: 
-            user = User.objects.get(email=email)
+            user = User.objects.get(email=username)
             if user.check_password(password) and self.user_can_authenticate(user):
                 return user
         except User.DoesNotExist:

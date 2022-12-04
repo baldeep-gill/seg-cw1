@@ -22,7 +22,7 @@ class ShowAdminRequestListViewTestCase(TestCase):
         self.client.force_login(self.admin)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "admin_lesson_list.html")
+        self.assertTemplateUsed(response, "admin_request_list.html")
     
     def test_get_request_as_student(self):
         self.client.force_login(self.student)
