@@ -17,32 +17,6 @@ import datetime
 @login_prohibited
 def home(request):
     return render(request, 'home.html')
-
-@login_required
-@only_students
-def balance(request):
-    # first we need to get the student
-    current_student_id = request.user.id
-
-    student = Student.objects.get(id=current_student_id)
-
-    # then we retrieve all the lessons they have from the db
-    # invoices = Invoice.objects.filter(student_id=current_student_id)
-    invoices = student.unpaid_invoices
-    transfers = student.transfers
-    
-    # total money owed
-    total_due = 0
-    for invoice in invoices:
-        total_due += invoice.price
-
-    total_paid = 0
-    for transfer in transfers:
-        total_paid += transfer.invoice.price
-
-
-    return render(request, 'balance.html', {'invoices': invoices, 'transfers': transfers, 'total_paid':total_paid, 'total_due': total_due})
-
 @login_required
 @only_students
 def lessons_success(request):
@@ -279,6 +253,34 @@ def show_invoices(request):
     invoices = Invoice.objects.filter(student=current_student)
     return render(request, 'invoices_list.html', {'invoices': invoices})
 
+
+
+@login_required
+@only_students
+def balance(request):
+    # first we need to get the student
+    current_student_id = request.user.id
+
+    student = Student.objects.get(id=current_student_id)
+
+    # then we retrieve all the lessons they have from the db
+    # invoices = Invoice.objects.filter(student_id=current_student_id)
+    invoices = student.unpaid_invoices
+    transfers = student.transfers
+    
+    # total money owed
+    total_due = 0
+    for invoice in invoices:
+        total_due += invoice.price
+
+    total_paid = 0
+    for transfer in transfers:
+        total_paid += transfer.invoice.price
+
+
+    return render(request, 'balance.html', {'invoices': invoices, 'transfers': transfers, 'total_paid':total_paid, 'total_due': total_due})
+
+
 @login_required
 @only_admins
 def all_student_balances(request):
@@ -291,7 +293,9 @@ def all_student_balances(request):
             if(Transfer.objects.filter(invoice=invoice).count() == 0):
                 balance += invoice.price
       
-        balances[student] = balance
+        # Ensures only people with pending payments show up
+        if(balance != 0):
+            balances[student] = balance
 
     return render(request, 'admin_payments.html', {'balances': balances})
 

@@ -21,25 +21,6 @@ class TransferTestCase(TestCase):
         self.student = Student.objects.get(email="johndoe@example.org")
         self.admin = Admin.objects.get(email="student_admin@example.org")
         self.invoice = Invoice.objects.get(invoice_number=100)
-        # # # Request for lesson
-        # # self.lessonRequest = LessonRequest(
-        # #     author = self.student,
-        # #     availability = "Monday",
-        # #     lessonNum = 2,
-        # #     interval = 1,
-        # #     duration = 60,
-        # #     topic = "Piano",
-        # #     teacher = "bob"
-        # # )
-
-        # # transfer which lesson will belong to
-        # invoice_number = 1
-        # self.invoice = Invoice(
-        #     student = self.student,
-        #     date = datetime.datetime(2022,10,21,tzinfo=pytz.UTC),
-        #     invoice_number=invoice_number,
-        # )
-        # # self.invoice.save()
 
         self.transfer = Transfer(
             date_received = timezone.now(),
@@ -48,15 +29,6 @@ class TransferTestCase(TestCase):
             invoice = self.invoice
         )
 
-        # # Lesson itself
-        # self.lesson = Lesson(
-        #     student = self.student,
-        #     transfer = self.transfer,
-        #     date = datetime.datetime(2022,12,3,tzinfo=pytz.UTC),
-        #     duration = 60,
-        #     topic = "Piano",
-        #     teacher = "bob"
-        # )
 
     def _assert_valid_transfer(self):
         try:
@@ -90,7 +62,7 @@ class TransferTestCase(TestCase):
         self._assert_valid_transfer()
 
     def test_date_can_be_in_the_past(self):
-        self.transfer.date_received = timezone.now() - datetime.timedelta(days=1)
+        self.transfer.date_received = timezone.now() - datetime.timedelta(days=2)
         self._assert_invalid_transfer()
 
     """---TEST VERIFIERS FIELD---"""
