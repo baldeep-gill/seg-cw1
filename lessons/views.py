@@ -109,9 +109,8 @@ def add_student(request):
             student_first_name = form.cleaned_data.get('student_first_name')
             student_last_name = form.cleaned_data.get('student_last_name')
             student_email = form.cleaned_data.get('student_email')
-            student = Student.students.get(email=student_email)
             try:
-                if GuardianProfile.objects.filter(student=student).exists():
+                if GuardianProfile.objects.get(student_email=student_email):
                     messages.add_message(request, messages.ERROR, "you already have this student under your account.")
             except:
                 add_student = GuardianProfile.objects.create(
