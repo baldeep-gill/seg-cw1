@@ -213,15 +213,15 @@ class Invoice(models.Model):
 
 
 def present_or_past_date(value):
-    if value < timezone.now().date():
-        raise ValidationError("The date cannot be in the past!")
+    if value > timezone.now():
+        raise ValidationError("The date cannot be in the future!")
     return value
 
 class Transfer(models.Model):
     """Models a transfer completed by a student"""
     
     # The date and time when the transfer was received 
-    date_received = models.DateField(blank=False, default=timezone.now(), validators=[present_or_past_date])
+    date_received = models.DateTimeField(blank=False, default=timezone.now(), validators=[present_or_past_date])
 
     transfer_id = models.IntegerField(blank=False, unique=True)
 
