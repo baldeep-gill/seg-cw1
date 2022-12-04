@@ -116,8 +116,11 @@ class GuardianSignUpForm(forms.ModelForm):
 
     def save(self):
         """Create a new guardian."""
-        random_number = Guardian.objects.last().id + 1
-
+        if Guardian.objects.last():
+            random_number = Guardian.objects.last().id + 1
+        else:
+            random_number = 1
+            
         super().save(commit=False)
         guardian = Guardian.objects.create_user(
             username = self.cleaned_data.get('first_name') + self.cleaned_data.get('last_name') + f'{random_number}' ,
@@ -148,6 +151,19 @@ class GuradianAddStudent(forms.Form):
         except:
             self.add_error('student_email', 'this student does not exist >~<.')
 
+
+class GuradianBookStudent(forms.ModelForm):
+    '''form enabling guardians to book lessons for students'''
+    # the student we want to book
+    def __init__(self, request, *args, **kwargs):
+        main_request = request
+        super(GuradianBookStudent, self).__init__(*args, **kwargs)
+        # options:
+        self.fields['students'] = forms.ChoiceField(choices=main_request, widget=forms.Select(choices=[]))
+
+    class Meta:
+        model = LessonRequest
+        fields = ['availability', 'lessonNum', 'interval', 'duration', 'topic', 'teacher']
 
 class PasswordForm(forms.Form):
     """Form enabling users to change their password."""

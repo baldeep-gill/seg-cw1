@@ -1,11 +1,11 @@
 import pytz
 from django.shortcuts import render, redirect
-from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm, GuardianSignUpForm, GuradianAddStudent
+from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm, GuardianSignUpForm, GuradianAddStudent, GuradianBookStudent
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.decorators import login_required
-from .models import Admin, LessonRequest, Lesson, Student, User, Invoice, GuardianProfile
+from .models import Admin, LessonRequest, Lesson, Student, User, Invoice, GuardianProfile, Guardian
 from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student, login_prohibited, redirect_user_after_login
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -15,6 +15,42 @@ import datetime
 @login_prohibited
 def home(request):
     return render(request, 'home.html')
+
+@login_required
+def book_for_student(request):
+    # if we don't need anything from this
+    current_user = Guardian.objects.get(id=request.user.id)
+    # student_list = Guardian.objects.get(id=current_user.id).more
+    flag = GuardianProfile.objects.filter(user_id=current_user.id).exists()
+
+    # options to be displayed
+    options = GuardianProfile.objects.filter(user=current_user)
+    optiontuples = tuple([(option.student_first_name, option.student_email) for option in options])
+
+    if request.method == 'POST':
+        form = GuradianBookStudent(request.POST)
+        if form.is_valid():
+            current_user = Student.student.get(email=form.cleaned_data.get('students'))
+            availability = form.cleaned_data.get('availability')
+            lessonNum = form.cleaned_data.get('lessonNum')
+            interval = form.cleaned_data.get('interval')
+            duration = form.cleaned_data.get('duration')
+            topic = form.cleaned_data.get('topic')
+            teacher = form.cleaned_data.get('teacher')
+            lessonRequest = LessonRequestForm.objects.create(
+                author=current_user,
+                availability=availability,
+                lessonNum=lessonNum,
+                interval=interval,
+                duration=duration,
+                topic=topic,
+                teacher=teacher
+            )
+            lessonRequest.save()
+            return redirect(redirect_user_after_login(request))
+    else:
+        form = GuradianBookStudent(request=optiontuples)
+    return render(request, 'guardian_book_for_student.html', {'form': form, 'users': flag})
 
 @login_required
 def balance(request):
@@ -70,8 +106,8 @@ def add_student(request):
     if request.method == 'POST':
         form = GuradianAddStudent(request.POST)
         if form.is_valid():
-            # student_first_name = form.cleaned_data.get('student_first_name')
-            # student_last_name = form.cleaned_data.get('student_last_name')
+            student_first_name = form.cleaned_data.get('student_first_name')
+            student_last_name = form.cleaned_data.get('student_last_name')
             student_email = form.cleaned_data.get('student_email')
             student = Student.students.get(email=student_email)
             try:
@@ -79,7 +115,10 @@ def add_student(request):
                     messages.add_message(request, messages.ERROR, "you already have this student under your account.")
             except:
                 add_student = GuardianProfile.objects.create(
-                    student = student,
+                    user = request.user,
+                    student_first_name = student_first_name,
+                    student_last_name = student_last_name,
+                    student_email = student_email
                 )
                 add_student.save()
                 return redirect('guardian_home')
