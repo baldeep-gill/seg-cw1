@@ -46,5 +46,5 @@ urlpatterns = [
     path('guardian_sign_up/', views.guardian_sign_up, name='guardian_sign_up'),
     path('guardian/home/', views.guardian_home, name='guardian_home'),
     path('guardian/add/', views.add_student, name='add_student'),
-
+    path('guardian/book/', views.book_for_student, name='book_for_student'),
 ]
