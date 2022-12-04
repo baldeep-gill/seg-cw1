@@ -43,7 +43,7 @@ class EditLessonForm(forms.ModelForm):
 
 """Forms for the lessons app."""
 class LogInForm(forms.Form):
-    username = forms.CharField(label="Email")
+    email = forms.CharField(label="Email")
     password = forms.CharField(label="Password", widget=forms.PasswordInput())
 
 class StudentSignUpForm(forms.ModelForm):
