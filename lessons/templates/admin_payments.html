@@ -29,11 +29,17 @@
       </table>
     </div>
     <div class="col-4">
-      <h2>Outstanding balances</h2>
+      <h2 class="mb-3">Outstanding balances</h2>
       {% for student, balance in balances.items %}
-      <p><a href="{% url 'student_payments' student.id %}">{{ student.first_name }} owes {{ balance }} quid</a></p>
+        <div class="card mb-3">
+          <h5 class="card-header"><img src="{{ student.mini_gravatar }}" class="rounded-circle profile-image"> {{ student.full_name }}</h5>
+          <div class="card-body">
+            <p>User has <b>£{{balance}}.00</b> outstanding</p>
+            <h7><a href="{% url 'student_payments' student.id %}">View user profile</a></h7>
+          </div>
+        </div>
       {% empty %}
-      <h4>No balances to see</h4>
+        <h4>No balances to see</h4>
       {% endfor %}
     </div>
   </div>
