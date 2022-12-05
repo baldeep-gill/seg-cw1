@@ -1,4 +1,4 @@
-from .models import Admin, Student, User, Invoice
+from .models import Student, Invoice
 from django.shortcuts import redirect
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -19,35 +19,49 @@ def find_next_available_invoice_number_for_student(student):
         return invoices_for_student.last().invoice_number + 1
     return 1
 
-'''decorator for preventing students and admins from accessing each other's pages'''
+'''decorator for preventing admins from accessing student pages'''
+def all_students(view_function):
+    def wrapper(request, *args, **kwargs):
+        if request.user.type == 'STUDENT' or request.user.type == 'GUARDIAN':
+            return view_function(request, *args, **kwargs)
+        else:
+            return redirect('home')
+    return wrapper
+
+'''decorator for preventing admins and normal students from accessing guardian pages'''
+def only_guardians(view_function):
+    def wrapper(request, *args, **kwargs):
+        if request.user.type == 'GUARDIAN':
+            return view_function(request, *args, **kwargs)
+        else:
+            return redirect('home')
+    return wrapper
+
+'''decorator for preventing admins and guardians from accessing student only pages'''
 def only_students(view_function):
     def wrapper(request, *args, **kwargs):
-        try:
-            if Student.students.get(username=request.user.get_username()):
-                return view_function(request, *args, **kwargs)
-        except User.DoesNotExist:
-            return redirect('admin_home')
+        if request.user.type == 'STUDENT':
+            return view_function(request, *args, **kwargs)
+        else:
+            return redirect('home')
     return wrapper
 
-
-'''decorator for preventing students and admins from accessing each other's pages'''
+'''decorator for preventing students and guardians from accessing admin pages'''
 def only_admins(view_function):
     def wrapper(request, *args, **kwargs):
-        try:
-            if Admin.admins.get(username=request.user.get_username()):
-                return view_function(request, *args, **kwargs)
-
-        except User.DoesNotExist:
-            return redirect('student_home')
+        if request.user.type == 'ADMIN':
+            return view_function(request, *args, **kwargs)
+        else:
+            return redirect('home')
     return wrapper
 
-
+'''decorator for preventing anyone from accessing the wrong page by redirecting them to their intended page'''
 def login_prohibited(view_function):
     def modified_view_function(request):
         if request.user.is_authenticated:
             if request.user.type == "STUDENT":
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN_STUDENT)
-            elif request.user.type == "STUDENT":
+            elif request.user.type == "ADMIN":
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN_ADMIN)
             else:
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN_GUARDIAN)

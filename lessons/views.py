@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.decorators import login_required
 from .models import Admin, LessonRequest, Lesson, Student, User, Invoice, GuardianProfile, Guardian
-from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student, login_prohibited, redirect_user_after_login
+from .helpers import only_admins, all_students, only_students, only_guardians, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student, login_prohibited, redirect_user_after_login
 from django.core.exceptions import ObjectDoesNotExist
 
 import datetime
@@ -17,6 +17,7 @@ def home(request):
     return render(request, 'home.html')
 
 @login_required
+@only_guardians
 def book_for_student(request):
     # if we don't need anything from this
     current_user = Guardian.objects.get(id=request.user.id)
@@ -53,6 +54,7 @@ def book_for_student(request):
     return render(request, 'guardian_book_for_student.html', {'form': form, 'users': flag})
 
 @login_required
+@all_students
 def balance(request):
     # first we need to get the student
     current_student_id = request.user.id
@@ -68,13 +70,14 @@ def balance(request):
     return render(request, 'balance.html', {'invoices': invoices, 'total':total})
 
 @login_required
-@only_students
+@all_students
 def lessons_success(request):
     current_student_id = request.user.id
     lessons = Lesson.objects.filter(student_id=current_student_id)
     return render(request, 'successful_lessons_list.html', {'lessons': lessons})
 
 @login_required
+@all_students
 def lesson_request(request):
     if request.method == 'POST':
         form = LessonRequestForm(request.POST)
@@ -102,6 +105,7 @@ def lesson_request(request):
     return render(request, 'lesson_request.html', {'form': form})
 
 @login_required
+@only_guardians
 def add_student(request):
     if request.method == 'POST':
         form = GuradianAddStudent(request.POST)
@@ -193,6 +197,7 @@ def admin_home(request):
     return render(request, 'admin_home.html')
 
 @login_required
+@only_guardians
 def guardian_home(request):
     return render(request, 'guardian_home.html')
 
@@ -254,7 +259,7 @@ def admin_requests(request):
     return render(request, 'admin_lesson_list.html', {'data': lesson_request_data})
 
 @login_required
-@only_students
+@all_students
 def show_requests(request):
     user = request.user
     lesson_requests = LessonRequest.objects.filter(author=user)
@@ -299,7 +304,7 @@ def profile(request):
     return render(request, 'profile.html', {'form': form})
 
 @login_required
-@only_students
+@all_students
 def edit_requests(request, lesson_id):
     try:
         current_lesson = LessonRequest.objects.get(id=lesson_id)
@@ -316,7 +321,7 @@ def edit_requests(request, lesson_id):
         return render(request, 'edit_requests.html', {'form': form, 'lesson_id': lesson_id})
 
 @login_required
-@only_students
+@all_students
 def delete_requests(request, lesson_id):
     try:
         current_lesson = LessonRequest.objects.get(id=lesson_id)
