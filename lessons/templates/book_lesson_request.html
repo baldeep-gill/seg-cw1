@@ -16,7 +16,6 @@
 
         <div class="col-sm-12 col-md-8">
             <h1>Book this lesson request</h1>
-            <p> For the date field type it in form yyyy-mm-dd, This is to be removed later</p>
             <form action="{% url 'book_lesson_request' lesson_request.id%}" method="post">
                 {% csrf_token %}
                 {{ form.media }}

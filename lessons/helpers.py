@@ -69,6 +69,14 @@ def day_of_the_week_validator(value):
             _('Needs to be a day of the week')
         )
 
+def does_date_fall_in_an_existing_term(date_to_check):
+    """Returns true if a date falls inside an existing term, false otherwise"""
+    terms = Term.objects.all()
+    for term in terms:
+        if term.start_date <= date_to_check <= term.end_date:
+            return True
+    return False
+
 def get_next_given_day_of_week_after_date_given(date,day):
     """Takes a date and a day of the week and returns the first date after passed in date on that day
     If the date passed in is on the passed in day of the week then just return"""

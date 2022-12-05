@@ -2,7 +2,7 @@ from django import forms
 from django.core.validators import RegexValidator, MinValueValidator
 from .models import User, Student, StudentProfile, LessonRequest, Lesson, Term
 from django.db.models import Max
-from .helpers import find_next_available_student_number, day_of_the_week_validator
+from .helpers import find_next_available_student_number, day_of_the_week_validator, does_date_fall_in_an_existing_term
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateTimeField
 from django.core.exceptions import ValidationError
@@ -139,4 +139,11 @@ class TermForm(forms.ModelForm):
         end_date = self.cleaned_data.get('end_date')
         if end_date < start_date:
             self.add_error('end_date','End date must be after start date')
+
+        if does_date_fall_in_an_existing_term(start_date):
+            self.add_error('start_date','This date falls within an existing term!')
+
+        if does_date_fall_in_an_existing_term(end_date):
+            self.add_error('end_date','This date falls within an existing term!')
+
 
