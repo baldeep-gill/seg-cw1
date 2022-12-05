@@ -34,7 +34,6 @@ urlpatterns = [
     path('admin/requests/', views.admin_requests, name='admin_requests'),
     path('admin/lessons/', views.admin_lessons, name='admin_lessons'),
     path('admin/lessons/edit/<lesson_id>', views.edit_lessons, name='edit_lessons'),
-    path('admin/log_out/', views.log_out, name='log_out'),
     path('admin/payments', views.all_student_balances, name='payments'),
     path('admin/payments/<int:student_id>', views.student_balance, name='student_payments'),
     path('admin/payments/<int:student_id>/<int:invoice_id>', views.approve_transaction, name='approve_transaction'),
