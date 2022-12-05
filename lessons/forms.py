@@ -16,7 +16,6 @@ class LessonRequestForm(forms.ModelForm):
             'availability': forms.DateTimeInput()
         }"""
 
-
 class BookLessonRequestForm(forms.ModelForm):
     """Form for fulfilling/booking lesson requests"""
     class Meta:
