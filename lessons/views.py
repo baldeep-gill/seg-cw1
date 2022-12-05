@@ -64,7 +64,7 @@ def book_lesson_request(request, request_id):
         return redirect("admin_requests")
 
     if request.method == 'POST':
-        form = BookLessonRequestForm(request.POST)
+        form = BookLessonRequestForm(lesson_request.id,request.POST)
         if form.is_valid():
             student = student_making_request
             duration = form.cleaned_data.get('duration')
@@ -106,7 +106,7 @@ def book_lesson_request(request, request_id):
             lesson_request.delete()
             return redirect('admin_requests')
     else:
-        form = BookLessonRequestForm()
+        form = BookLessonRequestForm(lesson_request.id)
     return render(request, 'book_lesson_request.html', {'form': form,'lesson_request':lesson_request,'student':student_making_request})
 
 @login_required
