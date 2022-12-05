@@ -79,5 +79,5 @@ class DeleteRequestViewTestCase(TestCase):
     def test_admin_reject_access(self):
         self.client.force_login(self.admin)
         redirect_url = reverse("admin_home")
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, follow=True)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
