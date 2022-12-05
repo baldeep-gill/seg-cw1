@@ -26,6 +26,7 @@ urlpatterns = [
     path('log_in/', views.log_in, name='log_in'),
     path('password/', views.password, name='password'),
     path('profile/', views.profile, name='profile'),
+    path('log_out/', views.log_out, name='log_out'),
 
     # Admin paths
     path('admin/home/', views.admin_home, name='admin_home'),
@@ -33,7 +34,6 @@ urlpatterns = [
     path('admin/requests/', views.admin_requests, name='admin_requests'),
     path('admin/lessons/', views.admin_lessons, name='admin_lessons'),
     path('admin/lessons/edit/<lesson_id>', views.edit_lessons, name='edit_lessons'),
-    path('admin/log_out/', views.log_out, name='log_out'),
     path('admin/payments', views.all_student_balances, name='payments'),
     path('admin/payments/<int:student_id>', views.student_balance, name='student_payments'),
     path('admin/payments/<int:student_id>/<int:invoice_id>', views.approve_transaction, name='approve_transaction'),
@@ -49,5 +49,10 @@ urlpatterns = [
     path('student/requests/delete/<lesson_id>', views.delete_requests, name='delete_requests'),
     path('student/lessons/list', views.lessons_success, name='lesson_list'),
     path('student/balance/', views.balance, name='balance'),
-    path('student/log_out/', views.log_out, name='log_out'),
+
+    # Guardian paths
+    path('guardian_sign_up/', views.guardian_sign_up, name='guardian_sign_up'),
+    path('guardian/home/', views.guardian_home, name='guardian_home'),
+    path('guardian/add/', views.add_student, name='add_student'),
+    path('guardian/book/', views.book_for_student, name='book_for_student'),
 ]

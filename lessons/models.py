@@ -15,6 +15,7 @@ class User(AbstractUser):
     class Types(models.TextChoices):
         ADMIN = "ADMIN", 'Admin'
         STUDENT = "STUDENT", 'Student'
+        GUARDIAN = "GUARDIAN", 'Guardian'
     
     '''defualt role'''
     base_role = Types.ADMIN
@@ -83,6 +84,26 @@ class Student(User):
     class Meta:
         proxy = True
 
+'''Guardian users'''
+# manages all guardians 
+class GuardianManager(BaseUserManager):
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).filter(type=User.Types.GUARDIAN)
+
+# A new table to store the student number and extra information about the user later on
+class GuardianProfile(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    student_first_name = models.CharField(max_length=50, blank=False)
+    student_last_name = models.CharField(max_length=50, blank=False)
+    student_email = models.EmailField(unique=True, blank=False)
+
+# Guardian user
+class Guardian(User):
+    base_role = User.Types.GUARDIAN
+    guardians = GuardianManager()
+
+    class Meta:
+        proxy = True
 
 '''Admin users'''
 # manages all Admins 
@@ -221,7 +242,7 @@ class Transfer(models.Model):
     """Models a transfer completed by a student"""
     
     # The date and time when the transfer was received 
-    date_received = models.DateTimeField(blank=False, default=timezone.now(), validators=[present_or_past_date])
+    date_received = models.DateTimeField(blank=False, default=timezone.now, validators=[present_or_past_date])
 
     transfer_id = models.IntegerField(blank=False, unique=True)
 
