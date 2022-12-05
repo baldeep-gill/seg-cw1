@@ -7,7 +7,7 @@
 
 
   <div class="row">
-    <div class="col-12">
+    <div class="col-3">
       <h1>Create Term</h1>
       <form action="{% url 'admin_terms' %}" method="post">
         {% csrf_token %}
@@ -15,10 +15,7 @@
         <input type="submit" value="Create" class="btn btn-primary">
       </form>
     </div>
-  </div>
-
-    <div class="row">
-      <div class="col-12">
+      <div class="col-9">
         {% if terms %}
           <h1>View all Terms</h1>
             {% for term in terms %}
