@@ -11,7 +11,7 @@
         {% for transfer in transfers %}
           <tr>
             <td>
-              <p>{{ transfer.transfer_id }} | {{ transfer.date_received }} | {{ transfer.invoice.student }}</p>
+              <p>{{ transfer.transfer_id }} | {{ transfer.date_received }} | {{ transfer.invoice.student }} | £{{ transfer.invoice.price }}.00 </p>
             </td>
           </tr>
         {% endfor %}
