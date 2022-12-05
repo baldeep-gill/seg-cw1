@@ -75,8 +75,11 @@ def is_a_term_validator(value):
     for term in all_terms:
         if value == term.name:
             return
+    validation_string = f'You need to input a valid school term!'
+    if get_next_term():
+        validation_string += f' The next upcoming/current term is: {get_next_term().name}'
     raise ValidationError(
-        _('You need to input a valid school term!')
+        _(validation_string)
     )
 
 def does_date_fall_in_an_existing_term(date_to_check):
@@ -92,6 +95,20 @@ def does_date_fall_in_given_term(date_to_check,term):
     if term.start_date <= date_to_check <= term.end_date:
         return True
     return False
+
+def are_all_terms_outdated():
+    """Returns true if every term is outdated, false otherwise
+    Will need to run a check to make sure there are terms first"""
+    date_to_check = datetime.datetime.now().timestamp()
+    for term in Term.objects.all():
+        if term.end_date.timestamp() < date_to_check:
+            return True
+    return False
+
+def are_there_any_terms():
+    """Returns false if there are no terms created,true otherwise"""
+    if Term.objects.count() == 0: return False
+    else : return True
 
 def get_next_given_day_of_week_after_date_given(date,day):
     """Takes a date and a day of the week and returns the first date after passed in date on that day

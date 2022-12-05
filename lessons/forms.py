@@ -2,7 +2,7 @@ from django import forms
 from django.core.validators import RegexValidator, MinValueValidator
 from .models import User, Student, StudentProfile, LessonRequest, Lesson, Term
 from django.db.models import Max
-from .helpers import find_next_available_student_number, day_of_the_week_validator, does_date_fall_in_an_existing_term, is_a_term_validator,does_date_fall_in_given_term,get_next_term
+from .helpers import find_next_available_student_number, day_of_the_week_validator, does_date_fall_in_an_existing_term, is_a_term_validator,does_date_fall_in_given_term,get_next_term, are_all_terms_outdated, are_there_any_terms
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateTimeField
 from django.core.exceptions import ValidationError
@@ -24,16 +24,30 @@ class BookLessonRequestForm(forms.ModelForm):
         model = Lesson
         fields = ['duration','topic','teacher']
 
-    term = forms.CharField(label="Term",validators=[is_a_term_validator],initial=get_next_term().name)
-    start_date = forms.CharField(label="Start Date",widget=forms.SelectDateWidget)
+    term = forms.CharField(label="Term",validators=[is_a_term_validator])
+    start_date = forms.DateTimeField(label="Start Date",widget=forms.SelectDateWidget)
     day = forms.CharField(label="Day of the week",validators=[day_of_the_week_validator])
     time = forms.TimeField(label="Time")
     interval_between_lessons = forms.IntegerField(label="Weeks Between lessons",validators=[MinValueValidator(1)])
     number_of_lessons = forms.IntegerField(label="Number of lessons",validators=[MinValueValidator(1)])
 
+    def __init__(self,*args,**kwargs):
+        super(BookLessonRequestForm, self).__init__(*args,**kwargs)
+        next_term = get_next_term()
+        if next_term:
+            self.fields['term'].initial = next_term.name
+            self.fields['start_date'].initial = next_term.start_date
+        else:
+            self.fields['term'].initial = "No Upcoming terms found, you need to create one first!"
 
     def clean(self):
         super().clean()
+        if Term.objects.count() == 0:
+            self.add_error('term','You have currently created no terms. You will need to create a term before booking a lesson')
+
+        if are_all_terms_outdated():
+            self.add_error('term','All your terms are outdated, add some new ones')
+
         start_date = self.cleaned_data.get('start_date')
         term_chosen = Term.objects.filter(name=self.cleaned_data.get('term')).first()
         if start_date and term_chosen:
