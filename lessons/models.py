@@ -221,7 +221,7 @@ class Transfer(models.Model):
     """Models a transfer completed by a student"""
     
     # The date and time when the transfer was received 
-    date_received = models.DateTimeField(blank=False, default=timezone.now(), validators=[present_or_past_date])
+    date_received = models.DateTimeField(blank=False, default=timezone.now, validators=[present_or_past_date])
 
     transfer_id = models.IntegerField(blank=False, unique=True)
 
