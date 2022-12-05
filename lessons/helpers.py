@@ -141,3 +141,28 @@ def get_next_term():
                 next_term = term
 
     return next_term
+
+def check_lessons_fit_in_given_dates(start_date,end_date,number_of_lessons,interval,day_of_the_week):
+    """Returns true if you can fit all the lessons between the given dates at the given interval"""
+    tdelta = datetime.timedelta(weeks=interval)
+    current_date = get_next_given_day_of_week_after_date_given(start_date,day_of_the_week)
+    # Range - 1 as we can assume a lesson is booked on the start date
+    for i in range(number_of_lessons):
+        current_date = current_date + tdelta
+        if current_date > end_date:
+            return False
+    return True
+
+def calculate_how_many_lessons_fit_in_given_dates(start_date,end_date,number_of_lessons,interval,day_of_the_week):
+    """Returns how many lessons fit with given params"""
+    tdelta = datetime.timedelta(weeks=interval)
+    current_date = get_next_given_day_of_week_after_date_given(start_date,day_of_the_week)
+    # Range - 1 as we can assume a lesson is booked on the start date
+    counter = 0
+    for i in range(number_of_lessons):
+        current_date = current_date + tdelta
+        if current_date > end_date:
+            return counter
+        counter += 1
+    return counter
+

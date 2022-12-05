@@ -2,7 +2,7 @@ from django import forms
 from django.core.validators import RegexValidator, MinValueValidator
 from .models import User, Student, StudentProfile, LessonRequest, Lesson, Term
 from django.db.models import Max
-from .helpers import find_next_available_student_number, day_of_the_week_validator, does_date_fall_in_an_existing_term, is_a_term_validator,does_date_fall_in_given_term,get_next_term, are_all_terms_outdated, are_there_any_terms
+from .helpers import find_next_available_student_number, day_of_the_week_validator, does_date_fall_in_an_existing_term, is_a_term_validator,does_date_fall_in_given_term,get_next_term, are_all_terms_outdated, are_there_any_terms, check_lessons_fit_in_given_dates, calculate_how_many_lessons_fit_in_given_dates
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateTimeField
 from django.core.exceptions import ValidationError
@@ -26,6 +26,7 @@ class BookLessonRequestForm(forms.ModelForm):
 
     term = forms.CharField(label="Term",validators=[is_a_term_validator])
     start_date = forms.DateTimeField(label="Start Date",widget=forms.SelectDateWidget)
+    end_date = forms.DateTimeField(label="End Date",widget=forms.SelectDateWidget)
     day = forms.CharField(label="Day of the week",validators=[day_of_the_week_validator])
     time = forms.TimeField(label="Time")
     interval_between_lessons = forms.IntegerField(label="Weeks Between lessons",validators=[MinValueValidator(1)])
@@ -37,9 +38,11 @@ class BookLessonRequestForm(forms.ModelForm):
         if next_term:
             self.fields['term'].initial = next_term.name
             self.fields['start_date'].initial = next_term.start_date
+            self.fields['end_date'].initial = next_term.end_date
         else:
             self.fields['term'].initial = "No Upcoming terms found, you need to create one first!"
 
+        # Auto fill in rest of fields from lesson request
         lesson_request = LessonRequest.objects.get(id=lesson_request_id)
         self.fields['duration'].initial = lesson_request.duration
         self.fields['topic'].initial = lesson_request.topic
@@ -63,6 +66,21 @@ class BookLessonRequestForm(forms.ModelForm):
                                              f'Term given starts on {term_chosen.start_date.date().__str__()} and ends on {term_chosen.end_date.date().__str__()}'
                                )
 
+        end_date = self.cleaned_data.get('end_date')
+        if end_date and term_chosen:
+            if not does_date_fall_in_given_term(end_date,term_chosen):
+                self.add_error('end_date', f'This date does not fall in the term given! '
+                                             f'Term given starts on {term_chosen.start_date.date().__str__()} and ends on {term_chosen.end_date.date().__str__()}'
+                               )
+
+        # Checking that the lessons specified in form can fit in between dates given
+        day = self.cleaned_data.get('day')
+        number_of_lessons = self.cleaned_data.get('number_of_lessons')
+        interval = self.cleaned_data.get('interval_between_lessons')
+        if start_date and end_date and day and number_of_lessons and interval:
+            if not check_lessons_fit_in_given_dates(start_date,end_date,number_of_lessons,interval,day):
+                self.add_error('number_of_lessons', f'You cannot fit this number of lessons with the given interval in between the start and end dates!'
+                               f' Maximum number of lessons with this interval and dates is {calculate_how_many_lessons_fit_in_given_dates(start_date,end_date,number_of_lessons,interval,day)}')
 
 class EditForm(forms.ModelForm):
     """Form to update lesson request"""
