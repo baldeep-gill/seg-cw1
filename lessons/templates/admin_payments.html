@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block body %}
+
+{% include 'partials/navbar.html' %}
+<div>
+  <h1>Payments page under construction</h1>
+  {% for student, balance in balances.items %}
+    <p><a href="{% url 'student_payments' student.id %}">{{ student.first_name }} owes {{ balance }} quid</a></p>
+    {% empty %}
+    <h2>No balances to see</h1>
+  {% endfor %}
+</div>
+{% endblock %}

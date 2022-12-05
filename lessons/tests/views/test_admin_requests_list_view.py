@@ -16,13 +16,13 @@ class ShowAdminRequestListViewTestCase(TestCase):
         self.admin = Admin.objects.get(email="student_admin@example.org")
 
     def test_request_url(self):
-        self.assertEqual(self.url, '/admin/requests')
-
+        self.assertEqual(self.url, '/admin/requests/')
+        
     def test_get_request_as_admin(self):
         self.client.force_login(self.admin)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "admin_lesson_list.html")
+        self.assertTemplateUsed(response, "admin_request_list.html")
     
     def test_get_request_as_student(self):
         self.client.force_login(self.student)

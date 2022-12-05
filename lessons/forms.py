@@ -30,12 +30,17 @@ class BookLessonRequestForm(forms.ModelForm):
     interval_between_lessons = forms.IntegerField(label="Weeks Between lessons",validators=[MinValueValidator(1)])
     number_of_lessons = forms.IntegerField(label="Number of lessons",validators=[MinValueValidator(1)])
 
-
 class EditForm(forms.ModelForm):
     """Form to update lesson request"""
     class Meta:
         model = LessonRequest
         fields = ['availability', 'lessonNum', 'interval', 'duration', 'topic', 'teacher']
+
+class EditLessonForm(forms.ModelForm):
+    """Form to update lesson"""
+    class Meta:
+        model = Lesson
+        fields = ['date', 'duration', 'topic', 'teacher']
 
 """Forms for the lessons app."""
 class LogInForm(forms.Form):

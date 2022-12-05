@@ -8,11 +8,13 @@
             <h1>View and edit lesson requests</h1>
             &nbsp;
             {% if lesson_requests %}
-                {% for request in lesson_requests %}
-                <div class="w-25">
-                    {% include 'partials/request_card.html' with request=request show_button=False student_card=True %}
+                <div class="d-flex">
+                    {% for request in lesson_requests %}
+                        <div class="w-25">
+                            {% include 'partials/request_card.html' with request=request show_button=False student_card=True %}
+                        </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             {% else %} 
                     <h5>No requests have been made</h5>
             {% endif %}
