@@ -69,12 +69,28 @@ def day_of_the_week_validator(value):
             _('Needs to be a day of the week')
         )
 
+def is_a_term_validator(value):
+    """Validates that the input is a term existing in the database"""
+    all_terms = Term.objects.all()
+    for term in all_terms:
+        if value == term.name:
+            return
+    raise ValidationError(
+        _('You need to input a valid school term!')
+    )
+
 def does_date_fall_in_an_existing_term(date_to_check):
     """Returns true if a date falls inside an existing term, false otherwise"""
     terms = Term.objects.all()
     for term in terms:
         if term.start_date <= date_to_check <= term.end_date:
             return True
+    return False
+
+def does_date_fall_in_given_term(date_to_check,term):
+    """Returns true if a date falls inside given term, false otherwise"""
+    if term.start_date <= date_to_check <= term.end_date:
+        return True
     return False
 
 def get_next_given_day_of_week_after_date_given(date,day):
@@ -85,3 +101,26 @@ def get_next_given_day_of_week_after_date_given(date,day):
         tdelta = datetime.timedelta(days=1)
         date = date + tdelta
     return date
+
+def get_next_term():
+    """Gets the next upcoming term
+    If already in a term, return the term we are currently in
+    Return None if there are no terms"""
+    if Term.objects.count() == 0:
+        return None
+
+    all_terms = Term.objects.all()
+    next_term = None
+    now = datetime.datetime.now()
+
+    for term in all_terms:
+        if term.start_date.timestamp() <= now.timestamp() <= term.end_date.timestamp():
+            # We are currently in this term so return it
+            return term
+
+        time_until_term = term.start_date.timestamp() - now.timestamp()
+        if time_until_term >= 0:
+            if next_term == None or time_until_term < (next_term.start_date.timestamp() - now.timestamp()):
+                next_term = term
+
+    return next_term

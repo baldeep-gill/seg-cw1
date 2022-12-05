@@ -2,7 +2,7 @@ from django import forms
 from django.core.validators import RegexValidator, MinValueValidator
 from .models import User, Student, StudentProfile, LessonRequest, Lesson, Term
 from django.db.models import Max
-from .helpers import find_next_available_student_number, day_of_the_week_validator, does_date_fall_in_an_existing_term
+from .helpers import find_next_available_student_number, day_of_the_week_validator, does_date_fall_in_an_existing_term, is_a_term_validator,does_date_fall_in_given_term,get_next_term
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateTimeField
 from django.core.exceptions import ValidationError
@@ -17,17 +17,31 @@ class LessonRequestForm(forms.ModelForm):
         }"""
 
 
+
 class BookLessonRequestForm(forms.ModelForm):
     """Form for fulfilling/booking lesson requests"""
     class Meta:
         model = Lesson
         fields = ['duration','topic','teacher']
 
-    start_date = forms.DateTimeField(label="Start Date",widget=forms.SelectDateWidget)
+    term = forms.CharField(label="Term",validators=[is_a_term_validator],initial=get_next_term().name)
+    start_date = forms.CharField(label="Start Date",widget=forms.SelectDateWidget)
     day = forms.CharField(label="Day of the week",validators=[day_of_the_week_validator])
     time = forms.TimeField(label="Time")
     interval_between_lessons = forms.IntegerField(label="Weeks Between lessons",validators=[MinValueValidator(1)])
     number_of_lessons = forms.IntegerField(label="Number of lessons",validators=[MinValueValidator(1)])
+
+
+    def clean(self):
+        super().clean()
+        start_date = self.cleaned_data.get('start_date')
+        term_chosen = Term.objects.filter(name=self.cleaned_data.get('term')).first()
+        if start_date and term_chosen:
+            if not does_date_fall_in_given_term(start_date,term_chosen):
+                self.add_error('start_date', f'This date does not fall in the term given! '
+                                             f'Term given starts on {term_chosen.start_date.date().__str__()} and ends on {term_chosen.end_date.date().__str__()}'
+                               )
+
 
 class EditForm(forms.ModelForm):
     """Form to update lesson request"""
