@@ -7,14 +7,25 @@
   <div class="row">
     <div class="col-8">
       <h2>Transactions</h2>
-      <table>
-        {% for transfer in transfers %}
+      <table class="table">
+        <thead>
           <tr>
-            <td>
-              <p>{{ transfer.transfer_id }} | {{ transfer.date_received }} | {{ transfer.invoice.student }} | £{{ transfer.invoice.price }}.00 </p>
-            </td>
+            <th scope="col">#</th>
+            <th scope="col">Date</th>
+            <th scope="col">Name</th>
+            <th scope="col">Amount</th>
           </tr>
-        {% endfor %}
+        </thead>
+        <tbody>
+          {% for transfer in transfers %}
+          <tr class="table-success">
+            <th scope="row">{{ transfer.transfer_id }}</th>
+            <td>{{ transfer.date_received }}</td>
+            <td>{{ transfer.invoice.student }}</td>
+            <td>£{{ transfer.invoice.price}}.00</td>
+          </tr>
+          {% endfor %}  
+        </tbody>
       </table>
     </div>
     <div class="col-4">
