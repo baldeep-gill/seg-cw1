@@ -63,7 +63,9 @@ class AdminAllBalancesView(TestCase):
         
         self.client.login(username=self.admin.email, password='Password123')
         response = self.client.get(self.url)
-        self.assertContains(response, 'John owes')
+        self.assertContains(response, 'John Doe')
+        self.assertContains(response, 'User has')
+        self.assertContains(response, ' outstanding')
     
     def test_balance_hidden_after_transfer_confirmed(self):
         self.invoice.save()
