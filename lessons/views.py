@@ -1,12 +1,16 @@
 import pytz
 from django.shortcuts import render, redirect
-from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm, EditLessonForm, GuardianSignUpForm, GuradianAddStudent, GuradianBookStudent
+
+from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm, EditLessonForm, GuardianSignUpForm, GuradianAddStudent, GuradianBookStudent, TermForm
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.decorators import login_required
-from .models import Admin, LessonRequest, Lesson, Student, User, Invoice, Transfer, GuardianProfile, Guardian
+
+from .models import Admin, LessonRequest, Lesson, Student, User, Invoice, Transfer, GuardianProfile, Guardian, Term
 from .helpers import only_admins, all_students, only_students, only_guardians, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student, login_prohibited, redirect_user_after_login, find_next_available_transfer_id
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 import datetime
@@ -140,7 +144,7 @@ def book_lesson_request(request, request_id):
         return redirect("admin_requests")
 
     if request.method == 'POST':
-        form = BookLessonRequestForm(request.POST)
+        form = BookLessonRequestForm(lesson_request.id,request.POST)
         if form.is_valid():
             student = student_making_request
             duration = form.cleaned_data.get('duration')
@@ -182,7 +186,7 @@ def book_lesson_request(request, request_id):
             lesson_request.delete()
             return redirect('admin_requests')
     else:
-        form = BookLessonRequestForm()
+        form = BookLessonRequestForm(lesson_request.id)
     return render(request, 'book_lesson_request.html', {'form': form,'lesson_request':lesson_request,'student':student_making_request})
 
 @login_required
@@ -453,3 +457,72 @@ def show_invoice_lessons(request, invoice_id):
     else:
         lessons_to_display = current_invoice.lessons
         return render(request, 'show_invoice_lessons.html', {'lessons': lessons_to_display, 'invoice':current_invoice})
+
+@login_required
+@only_admins
+def admin_terms(request):
+    """Shows the lessons associated with a given invoice"""
+    terms = Term.objects.all()
+
+    if request.method == 'POST':
+        form = TermForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data.get('name')
+            start_date = form.cleaned_data.get('start_date')
+            end_date = form.cleaned_data.get('end_date')
+            term = Term.objects.create(
+                name=name,
+                start_date=start_date,
+                end_date=end_date,
+            )
+            term.save()
+            form = TermForm()
+            return render(request, 'admin_terms.html',{'terms': terms,'form':form})
+
+    else:
+        form = TermForm
+    return render(request, 'admin_terms.html',{'terms': terms,'form':form})
+
+@login_required
+@only_admins
+def delete_terms(request, term_id):
+    try:
+        current_term = Term.objects.get(id=term_id)
+    except ObjectDoesNotExist:
+        return redirect('admin_terms')
+    else:
+        current_term.delete()
+        return redirect('admin_terms')
+
+@login_required
+@only_admins
+def edit_terms(request, term_id):
+    try:
+        term = Term.objects.get(id=term_id)
+    except ObjectDoesNotExist:
+        return redirect('admin_terms')
+    else:
+        if request.method == 'POST':
+            form = TermForm(instance=term, data=request.POST)
+            term_details = {
+                'name':term.name,
+                'start_date':term.start_date,
+                'end_date':term.end_date,
+            }
+            term.delete()
+            if form.is_valid():
+                form.save()
+                return redirect('admin_terms')
+            else:
+                term = Term.objects.create(
+                    name = term_details['name'],
+                    start_date = term_details['start_date'],
+                    end_date = term_details['end_date'],
+                )
+                term.save()
+        else:
+            form = TermForm(instance=term)
+        return render(request, 'edit_terms.html', {'form': form, 'term_id': term_id})
+
+
+

@@ -38,6 +38,9 @@ urlpatterns = [
     path('admin/payments/<int:student_id>', views.student_balance, name='student_payments'),
     path('admin/payments/<int:student_id>/<int:invoice_id>', views.approve_transaction, name='approve_transaction'),
     path('admin/lessons/delete/<lesson_id>', views.delete_lessons, name='delete_lessons'),
+    path('admin/terms', views.admin_terms, name='admin_terms'),
+    path('admin/terms/delete/<term_id>', views.delete_terms, name='delete_terms'),
+    path('admin/terms/edit/<term_id>', views.edit_terms, name='edit_terms'),
 
     # Student paths
     path('student/lesson_request/', views.lesson_request, name='lesson_request'),
