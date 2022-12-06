@@ -2,7 +2,10 @@ from django import forms
 from django.core.validators import RegexValidator, MinValueValidator
 from .models import User, Student, StudentProfile, LessonRequest, Lesson, Term
 from django.db.models import Max
-from .helpers import find_next_available_student_number, day_of_the_week_validator, does_date_fall_in_an_existing_term, is_a_term_validator,does_date_fall_in_given_term,get_next_term, are_all_terms_outdated, are_there_any_terms, check_lessons_fit_in_given_dates, calculate_how_many_lessons_fit_in_given_dates
+from .helpers import find_next_available_student_number, day_of_the_week_validator,\
+    does_date_fall_in_an_existing_term, is_a_term_validator,does_date_fall_in_given_term,\
+    get_next_term, are_all_terms_outdated, are_there_any_terms, check_lessons_fit_in_given_dates,\
+    calculate_how_many_lessons_fit_in_given_dates
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateTimeField
 from django.core.exceptions import ValidationError
