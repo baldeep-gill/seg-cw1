@@ -17,7 +17,7 @@ class ShowAdminRequestListViewTestCase(TestCase):
 
     def test_request_url(self):
         self.assertEqual(self.url, '/admin/requests/')
-
+        
     def test_get_request_as_admin(self):
         self.client.force_login(self.admin)
         response = self.client.get(self.url)
@@ -27,7 +27,7 @@ class ShowAdminRequestListViewTestCase(TestCase):
     def test_get_request_as_student(self):
         self.client.force_login(self.student)
         redirect_url = reverse("student_home")
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, follow=True)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
     def test_not_logged_in_get_request(self):

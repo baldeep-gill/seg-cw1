@@ -26,37 +26,52 @@ def find_next_available_transfer_id():
         next_transfer_id += Transfer.objects.last().transfer_id
     return next_transfer_id
 
-'''decorator for preventing students and admins from accessing each other's pages'''
+'''decorator for preventing admins from accessing student pages'''
+def all_students(view_function):
+    def wrapper(request, *args, **kwargs):
+        if request.user.type == 'STUDENT' or request.user.type == 'GUARDIAN':
+            return view_function(request, *args, **kwargs)
+        else:
+            return redirect('home')
+    return wrapper
+
+'''decorator for preventing admins and normal students from accessing guardian pages'''
+def only_guardians(view_function):
+    def wrapper(request, *args, **kwargs):
+        if request.user.type == 'GUARDIAN':
+            return view_function(request, *args, **kwargs)
+        else:
+            return redirect('home')
+    return wrapper
+
+'''decorator for preventing admins and guardians from accessing student only pages'''
 def only_students(view_function):
     def wrapper(request, *args, **kwargs):
-        try:
-            if Student.students.get(username=request.user.get_username()):
-                return view_function(request, *args, **kwargs)
-        except User.DoesNotExist:
-            return redirect('admin_home')
+        if request.user.type == 'STUDENT':
+            return view_function(request, *args, **kwargs)
+        else:
+            return redirect('home')
     return wrapper
 
-
-'''decorator for preventing students and admins from accessing each other's pages'''
+'''decorator for preventing students and guardians from accessing admin pages'''
 def only_admins(view_function):
     def wrapper(request, *args, **kwargs):
-        try:
-            if Admin.admins.get(username=request.user.get_username()):
-                return view_function(request, *args, **kwargs)
-
-        except User.DoesNotExist:
-            return redirect('student_home')
+        if request.user.type == 'ADMIN':
+            return view_function(request, *args, **kwargs)
+        else:
+            return redirect('home')
     return wrapper
 
-
+'''decorator for preventing anyone from accessing the wrong page by redirecting them to their intended page'''
 def login_prohibited(view_function):
     def modified_view_function(request):
         if request.user.is_authenticated:
-            try:
-                if Admin.admins.get(username=request.user.get_username()):
-                    return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN_ADMIN)
-            except User.DoesNotExist:
+            if request.user.type == "STUDENT":
                 return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN_STUDENT)
+            elif request.user.type == "ADMIN":
+                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN_ADMIN)
+            else:
+                return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN_GUARDIAN)
         else:
             return view_function(request)
     return modified_view_function
@@ -101,9 +116,9 @@ def are_all_terms_outdated():
     Will need to run a check to make sure there are terms first"""
     date_to_check = datetime.datetime.now().timestamp()
     for term in Term.objects.all():
-        if term.end_date.timestamp() < date_to_check:
-            return True
-    return False
+        if term.end_date.timestamp() > date_to_check:
+            return False
+    return True
 
 def are_there_any_terms():
     """Returns false if there are no terms created,true otherwise"""
@@ -165,4 +180,14 @@ def calculate_how_many_lessons_fit_in_given_dates(start_date,end_date,number_of_
             return counter
         counter += 1
     return counter
+
+
+def redirect_user_after_login(request):
+    """redirect each kind of user to a different home screen"""
+    if request.user.type == "STUDENT":
+        return settings.REDIRECT_URL_WHEN_LOGGED_IN_STUDENT
+    elif request.user.type == "GUARDIAN":
+        return settings.REDIRECT_URL_WHEN_LOGGED_IN_GUARDIAN
+    else:
+        return settings.REDIRECT_URL_WHEN_LOGGED_IN_ADMIN
 

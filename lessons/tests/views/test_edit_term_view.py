@@ -82,7 +82,7 @@ class EditRequestViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'admin_terms.html')
 
     def test_student_reject_access(self):
-        self.client.force_login(self.student)
+        self.client.login(username=self.student.email, password='Password123')
         redirect_url = reverse("student_home")
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, follow=True)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)

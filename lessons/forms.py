@@ -1,6 +1,9 @@
 from django import forms
 from django.core.validators import RegexValidator, MinValueValidator
-from .models import User, Student, StudentProfile, LessonRequest, Lesson, Term
+from django.utils import timezone
+
+from .models import User, Student, StudentProfile, LessonRequest, Lesson, Guardian, Term
+
 from django.db.models import Max
 from .helpers import find_next_available_student_number, day_of_the_week_validator,\
     does_date_fall_in_an_existing_term, is_a_term_validator,does_date_fall_in_given_term,\
@@ -9,6 +12,7 @@ from .helpers import find_next_available_student_number, day_of_the_week_validat
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateTimeField
 from django.core.exceptions import ValidationError
+import random
 
 class LessonRequestForm(forms.ModelForm):
     """Form for requesting a lesson"""
@@ -68,6 +72,9 @@ class BookLessonRequestForm(forms.ModelForm):
                 self.add_error('start_date', f'This date does not fall in the term given! '
                                              f'Term given starts on {term_chosen.start_date.date().__str__()} and ends on {term_chosen.end_date.date().__str__()}'
                                )
+        if term_chosen:
+            if timezone.now().timestamp() > term_chosen.end_date.timestamp():
+                self.add_error('term', f'{term_chosen.name} is out of date! Pick an in date term')
 
         end_date = self.cleaned_data.get('end_date')
         if end_date and term_chosen:
@@ -114,7 +121,6 @@ class StudentSignUpForm(forms.ModelForm):
 
         model = Student
         fields = ['first_name', 'last_name', 'email']
-        widgets = { 'bio': forms.Textarea() }
 
     new_password = forms.CharField(
         label='Password',
@@ -151,6 +157,83 @@ class StudentSignUpForm(forms.ModelForm):
 
         StudentProfile.objects.create(user=student, student_number = new_student_number)
         return student
+
+class GuardianSignUpForm(forms.ModelForm):
+    """Form enabling unregistered guardians to sign up."""
+
+    class Meta:
+        """Form options."""
+        model = Guardian
+        fields = ['first_name', 'last_name', 'email']
+
+    new_password = forms.CharField(
+        label='Password',
+        widget=forms.PasswordInput(),
+        validators=[RegexValidator(
+            regex=r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$',
+            message='Password must contain an uppercase character, a lowercase '
+                    'character and a number'
+            )]
+    )
+    password_confirmation = forms.CharField(label='Password confirmation', widget=forms.PasswordInput())
+
+    def clean(self):
+        """Clean the data and generate messages for any errors."""
+        super().clean()
+        new_password = self.cleaned_data.get('new_password')
+        password_confirmation = self.cleaned_data.get('password_confirmation')
+        if new_password != password_confirmation:
+            self.add_error('password_confirmation', 'Confirmation does not match password.')
+
+    def save(self):
+        """Create a new guardian."""
+        if Guardian.objects.last():
+            random_number = Guardian.objects.last().id + 1
+        else:
+            random_number = 1
+            
+        super().save(commit=False)
+        guardian = Guardian.objects.create_user(
+            username = self.cleaned_data.get('first_name') + self.cleaned_data.get('last_name') + f'{random_number}' ,
+            first_name=self.cleaned_data.get('first_name'),
+            last_name=self.cleaned_data.get('last_name'),
+            email=self.cleaned_data.get('email'),
+            password=self.cleaned_data.get('new_password'),
+        )
+        return guardian
+
+class GuradianAddStudent(forms.Form):
+    '''form enabling guardians to add students to their accounts'''
+    student_first_name = forms.CharField(label='The Student\'s First Name')
+    student_last_name = forms.CharField(label='The Student\' Last Name')
+    student_email = forms.EmailField(label='The Student\' Email')
+
+    def clean(self):
+        """Clean the data and generate messages for any errors."""
+        super().clean()
+        try:
+            student = Student.students.get(email=self.cleaned_data.get('student_email'))
+            if student.first_name != self.cleaned_data.get('student_first_name'):
+                self.add_error('student_first_name', 'are you sure of the spelling?')
+
+            if student.last_name != self.cleaned_data.get('student_last_name'):
+                self.add_error('student_last_name', 'are you sure of the spelling?')
+
+        except:
+            self.add_error('student_email', 'this student does not exist >~<.')
+
+
+class GuradianBookStudent(forms.ModelForm):
+    '''form enabling guardians to book lessons for students'''
+    # the student we want to book
+    def __init__(self, options, *args, **kwargs):
+        super(GuradianBookStudent, self).__init__(*args, **kwargs)
+        # options:
+        self.fields['students'] = forms.ChoiceField(choices=options, widget=forms.Select(choices=[]))
+
+    class Meta:
+        model = LessonRequest
+        fields = ['availability', 'lessonNum', 'interval', 'duration', 'topic', 'teacher']
 
 class PasswordForm(forms.Form):
     """Form enabling users to change their password."""

@@ -1,31 +1,87 @@
 import pytz
 from django.shortcuts import render, redirect
-from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm, EditLessonForm, TermForm
+
+from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm, EditLessonForm, GuardianSignUpForm, GuradianAddStudent, GuradianBookStudent, TermForm
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.decorators import login_required
-from .models import Admin, LessonRequest, Lesson, Student, User, Invoice, Transfer, Term
-from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student, login_prohibited, find_next_available_transfer_id
+
+from .models import Admin, LessonRequest, Lesson, Student, User, Invoice, Transfer, GuardianProfile, Guardian, Term
+from .helpers import only_admins, all_students, only_students, only_guardians, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student, login_prohibited, redirect_user_after_login, find_next_available_transfer_id
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
-
-
 import datetime
 
 # Create your views here.
 @login_prohibited
 def home(request):
     return render(request, 'home.html')
+
 @login_required
-@only_students
+@only_guardians
+def book_for_student(request):
+    # if we don't need anything from this
+    current_user = Guardian.objects.get(id=request.user.id)
+    flag = GuardianProfile.objects.filter(user_id=current_user.id).exists()
+
+    # options to be displayed
+    options = GuardianProfile.objects.filter(user=current_user)
+    optiontuples = tuple([(option.student_email, option.student_first_name) for option in options])
+
+    if request.method == 'POST':
+        form = GuradianBookStudent(data=request.POST, options=optiontuples)
+        if form.is_valid():
+            student = form.cleaned_data['students']
+            current_user = Student.students.get(email=student)
+            availability = form.cleaned_data.get('availability')
+            lessonNum = form.cleaned_data.get('lessonNum')
+            interval = form.cleaned_data.get('interval')
+            duration = form.cleaned_data.get('duration')
+            topic = form.cleaned_data.get('topic')
+            teacher = form.cleaned_data.get('teacher')
+            lessonRequest = LessonRequest.objects.create(
+                author=current_user,
+                availability=availability,
+                lessonNum=lessonNum,
+                interval=interval,
+                duration=duration,
+                topic=topic,
+                teacher=teacher
+            )
+            lessonRequest.save()
+            return redirect(redirect_user_after_login(request))
+    else:
+        form = GuradianBookStudent(options=optiontuples)
+    return render(request, 'guardian_book_for_student.html', {'form': form, 'users': flag})
+
+@login_required
+@all_students
+def balance(request):
+    # first we need to get the student
+    current_student_id = request.user.id
+
+    # then we retrieve all the lessons they have from the db
+    invoices = Invoice.objects.filter(student_id=current_student_id)
+    
+    # total money owed
+    total = 0
+    for invoice in invoices:
+        total += invoice.price
+
+    return render(request, 'balance.html', {'invoices': invoices, 'total':total})
+
+@login_required
+@all_students
 def lessons_success(request):
     current_student_id = request.user.id
     lessons = Lesson.objects.filter(student_id=current_student_id)
     return render(request, 'successful_lessons_list.html', {'lessons': lessons})
 
 @login_required
-@only_students
+@all_students
 def lesson_request(request):
     if request.method == 'POST':
         form = LessonRequestForm(request.POST)
@@ -47,11 +103,35 @@ def lesson_request(request):
                 teacher=teacher
             )
             lessonRequest.save()
-            return redirect('student_home')
+            return redirect(redirect_user_after_login(request))
     else:
         form = LessonRequestForm()
     return render(request, 'lesson_request.html', {'form': form})
 
+@login_required
+@only_guardians
+def add_student(request):
+    if request.method == 'POST':
+        form = GuradianAddStudent(request.POST)
+        if form.is_valid():
+            student_first_name = form.cleaned_data.get('student_first_name')
+            student_last_name = form.cleaned_data.get('student_last_name')
+            student_email = form.cleaned_data.get('student_email')
+            try:
+                if GuardianProfile.objects.get(student_email=student_email):
+                    messages.add_message(request, messages.ERROR, "you already have this student under your account.")
+            except:
+                add_student = GuardianProfile.objects.create(
+                    user = request.user,
+                    student_first_name = student_first_name,
+                    student_last_name = student_last_name,
+                    student_email = student_email
+                )
+                add_student.save()
+                return redirect('guardian_home')
+    else:
+        form = GuradianAddStudent()
+    return render(request, 'guardian_add_student.html', {'form': form})
 
 @login_required
 @only_admins
@@ -119,6 +199,11 @@ def student_home(request):
 def admin_home(request):
     return render(request, 'admin_home.html')
 
+@login_required
+@only_guardians
+def guardian_home(request):
+    return render(request, 'guardian_home.html')
+
 @login_prohibited
 def log_in(request):
     if request.method == 'POST':
@@ -129,12 +214,8 @@ def log_in(request):
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
             if user is not None:
-                if isinstance(user, Admin):
-                    login(request, user)
-                    redirect_url = next or 'admin_home'
-                else:
-                    login(request, user)
-                    redirect_url = next or 'student_home'
+                login(request, user)
+                redirect_url = next or redirect_user_after_login(request)
                 return redirect(redirect_url)
         messages.add_message(request, messages.ERROR, "User not found, please try again.")
     else:
@@ -158,7 +239,21 @@ def student_sign_up(request):
     else:
         # creating empty sign up form
         form = StudentSignUpForm()
-    return render(request, 'student_sign_up.html',{'form': form})
+    return render(request, 'student_sign_up.html',{'form': form, 'guardian':False})
+
+@login_prohibited
+def guardian_sign_up(request):
+    if request.method == 'POST':
+        form = GuardianSignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            #redirected to home after sign up so they can login
+            return render(request, 'student_sign_up_confirmation.html')
+
+    else:
+        # creating empty sign up form
+        form = GuardianSignUpForm()
+    return render(request, 'student_sign_up.html',{'form': form, 'guardian':True})
 
 @login_required
 @only_admins
@@ -173,7 +268,7 @@ def admin_lessons(request):
     return render(request, 'admin_lesson_list.html', {'lessons': lessons})
 
 @login_required
-@only_students
+@all_students
 def show_requests(request):
     user = request.user
     lesson_requests = LessonRequest.objects.filter(author=user)
@@ -218,7 +313,7 @@ def profile(request):
     return render(request, 'profile.html', {'form': form})
 
 @login_required
-@only_students
+@all_students
 def edit_requests(request, lesson_id):
     try:
         current_lesson = LessonRequest.objects.get(id=lesson_id)
@@ -235,7 +330,7 @@ def edit_requests(request, lesson_id):
         return render(request, 'edit_requests.html', {'form': form, 'lesson_id': lesson_id})
 
 @login_required
-@only_students
+@all_students
 def delete_requests(request, lesson_id):
     try:
         current_lesson = LessonRequest.objects.get(id=lesson_id)

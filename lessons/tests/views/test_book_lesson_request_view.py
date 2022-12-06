@@ -83,7 +83,7 @@ class BookLessonRequestViewTestCase(TestCase):
         """If logged in but not an admin then should redirect to student home page"""
         self.client.force_login(self.student)
         redirect_url = reverse("student_home")
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, follow=True)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
     def test_unsuccessful_book_lesson_post(self):
