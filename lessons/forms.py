@@ -20,7 +20,6 @@ class LessonRequestForm(forms.ModelForm):
         }"""
 
 
-
 class BookLessonRequestForm(forms.ModelForm):
     """Form for fulfilling/booking lesson requests"""
     class Meta:
