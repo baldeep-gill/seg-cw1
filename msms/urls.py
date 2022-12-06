@@ -49,6 +49,7 @@ urlpatterns = [
     path('student/requests/delete/<lesson_id>', views.delete_requests, name='delete_requests'),
     path('student/lessons/list', views.lessons_success, name='lesson_list'),
     path('student/balance/', views.balance, name='balance'),
+    path('student/schedule/', views.show_schedule, name='show_schedule'),
 
     # Guardian paths
     path('guardian_sign_up/', views.guardian_sign_up, name='guardian_sign_up'),

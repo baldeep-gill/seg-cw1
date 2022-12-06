@@ -453,3 +453,11 @@ def show_invoice_lessons(request, invoice_id):
     else:
         lessons_to_display = current_invoice.lessons
         return render(request, 'show_invoice_lessons.html', {'lessons': lessons_to_display, 'invoice':current_invoice})
+
+@login_required
+@all_students
+def show_schedule(request):
+    current_student_id = request.user.id
+    # only shows lessons in the future
+    lessons = Lesson.objects.filter(student_id=current_student_id, date__gte=datetime.date.today())
+    return render(request, 'lesson_schedule.html', {'lessons': lessons})
