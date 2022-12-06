@@ -459,5 +459,5 @@ def show_invoice_lessons(request, invoice_id):
 def show_schedule(request):
     current_student_id = request.user.id
     # only shows lessons in the future
-    lessons = Lesson.objects.filter(student_id=current_student_id, date__gte=datetime.date.today())
+    lessons = Lesson.objects.filter(student_id=current_student_id, date__gte=datetime.datetime.now(tz=datetime.timezone.utc))
     return render(request, 'lesson_schedule.html', {'lessons': lessons})
