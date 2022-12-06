@@ -225,6 +225,8 @@ class Transfer(models.Model):
 
     transfer_id = models.IntegerField(blank=False, unique=True)
 
+    amount_received = models.IntegerField(blank=False)
+
     
     """Administrator who verified the payment.
     ALl payments are done through the school bank account

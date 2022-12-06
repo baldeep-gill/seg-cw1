@@ -26,7 +26,8 @@ class TransferTestCase(TestCase):
             date_received = timezone.now(),
             transfer_id = find_next_available_transfer_id(),
             verifier = self.admin,
-            invoice = self.invoice
+            invoice = self.invoice,
+            amount_received = self.invoice.price
         )
 
 
@@ -75,6 +76,12 @@ class TransferTestCase(TestCase):
 
     def test_transfer_cant_be_blank(self):
         self.transfer.invoice = None
+        self._assert_invalid_transfer()
+
+    """---TEST transfer FIELD---"""
+
+    def test_amount_cant_be_blank(self):
+        self.transfer.amount_received = None
         self._assert_invalid_transfer()
 
     

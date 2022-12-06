@@ -1,11 +1,22 @@
 from django import forms
 from django.core.validators import RegexValidator, MinValueValidator
-from .models import User, Student, StudentProfile, LessonRequest, Lesson
+from .models import User, Student, StudentProfile, LessonRequest, Lesson, Transfer
 from django.db.models import Max
 from .helpers import find_next_available_student_number, day_of_the_week_validator
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateTimeField
 from django.core.exceptions import ValidationError
+
+class ConfirmTransferForm(forms.ModelForm):
+    """Form for confirming a received transfer"""
+    
+    class Meta:
+        model = Transfer
+        fields = ['date_received', 'amount_received']
+        widgets = {
+            'date_received': forms.DateTimeInput(attrs={'class':'datetimefield'})
+        }
+
 
 class LessonRequestForm(forms.ModelForm):
     """Form for requesting a lesson"""

@@ -1,6 +1,6 @@
 import pytz
 from django.shortcuts import render, redirect
-from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm
+from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm, ConfirmTransferForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
@@ -313,14 +313,49 @@ def student_balance(request, student_id):
 @login_required
 @only_admins
 def approve_transaction(request, student_id, invoice_id):
-    if request.method == 'POST':
-        current_admin = request.user
-        invoice = Invoice.objects.filter(student_id=student_id).filter(invoice_number=invoice_id)
-        next_transfer_id = find_next_available_transfer_id()
-        transfer = Transfer.objects.create(date_received=timezone.now(), transfer_id=next_transfer_id, verifier=current_admin, invoice=invoice.first())
-        transfer.save()
+    # if request.method == 'POST':
+    #     current_admin = request.user
+    #     invoice = Invoice.objects.filter(student_id=student_id).filter(invoice_number=invoice_id)
+    #     next_transfer_id = find_next_available_transfer_id()
+    #     transfer = Transfer.objects.create(date_received=timezone.now(), transfer_id=next_transfer_id, verifier=current_admin, invoice=invoice.first())
+    #     transfer.save()
+    # else:
+    #     # request method 'GET'
 
-    return redirect('student_payments', student_id=student_id)
+
+    # return redirect('student_payments', student_id=student_id)
+
+    try:
+        student_paying = User.objects.get(id=student_id)
+        invoice_being_fulfilled = Invoice.objects.filter(student_id=student_id).get(id=invoice_id)
+    except ObjectDoesNotExist:
+        return redirect('student_payments', student_id=student_id)
+
+    if request.method == 'POST':
+        form = ConfirmTransferForm(request.POST)
+        if form.is_valid():
+            current_admin = request.user
+            invoice = invoice_being_fulfilled
+            date_received = form.cleaned_data.get('date_received')
+            amount_received = form.cleaned_data.get('amount_received')
+
+
+
+            #generate an invoice for the lessons we will generate
+            new_transfer_number = find_next_available_transfer_id()
+            transfer = Transfer.objects.create(
+                date_received=date_received,
+                transfer_id=new_transfer_number,
+                amount_received=amount_received,
+                verifier=current_admin,
+                invoice=invoice)
+            transfer.save()
+            
+            return redirect('student_payments', student_id=student_id)
+    else:
+        form = ConfirmTransferForm()
+    return render(request, 'confirm_transfer.html', {'form': form,'invoice':invoice_being_fulfilled,'student':student_paying})
+
 
 @login_required
 @only_students
