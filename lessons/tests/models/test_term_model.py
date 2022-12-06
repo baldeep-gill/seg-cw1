@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from lessons.models import Term
+from django.utils import timezone
 import datetime
 import pytz
 
@@ -8,16 +9,30 @@ import pytz
 class TermTestCase(TestCase):
     """Unit tests for term model"""
 
-    fixtures = [
-        'lessons/tests/fixtures/default_term.json',
-        'lessons/tests/fixtures/other_terms.json',
-    ]
+
 
     def setUp(self):
         super(TestCase, self).setUp()
 
-        self.term = Term.objects.get(name="Summer Term")
-        self.other_term = Term.objects.get(name="Winter Term")
+        # We will create a term date that starts 3 months from now and ends 6 months from now
+        # This is so the tests never fail due to becoming outdated
+        tdelta = datetime.timedelta(weeks=12)
+        start_term_date = timezone.now() + tdelta
+        end_term_date = start_term_date + tdelta
+
+        self.term = Term.objects.create(
+            name="Summer Term",
+            start_date=start_term_date,
+            end_date=end_term_date,
+        )
+
+        other_start_term_date = end_term_date + tdelta
+        other_end_term_date = other_start_term_date + tdelta
+        self.other_term = Term.objects.create(
+            name="Winter Term",
+            start_date=other_start_term_date,
+            end_date=other_end_term_date,
+        )
 
 
     def _assert_valid_term(self):
@@ -48,7 +63,7 @@ class TermTestCase(TestCase):
         self.term.name = "x" * 51
         self._assert_invalid_term()
 
-    def test_name_must_be_unqiue(self):
+    def test_name_must_be_unique(self):
         self.term.name = self.other_term.name
         self._assert_invalid_term()
 

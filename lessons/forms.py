@@ -32,7 +32,7 @@ class BookLessonRequestForm(forms.ModelForm):
     interval_between_lessons = forms.IntegerField(label="Weeks Between lessons",validators=[MinValueValidator(1)])
     number_of_lessons = forms.IntegerField(label="Number of lessons",validators=[MinValueValidator(1)])
 
-    def __init__(self,lesson_request_id,*args,**kwargs):
+    def __init__(self,lesson_request_id=None,*args,**kwargs):
         super(BookLessonRequestForm, self).__init__(*args,**kwargs)
         next_term = get_next_term()
         if next_term:
@@ -43,12 +43,13 @@ class BookLessonRequestForm(forms.ModelForm):
             self.fields['term'].initial = "No Upcoming terms found, you need to create one first!"
 
         # Auto fill in rest of fields from lesson request
-        lesson_request = LessonRequest.objects.get(id=lesson_request_id)
-        self.fields['duration'].initial = lesson_request.duration
-        self.fields['topic'].initial = lesson_request.topic
-        self.fields['teacher'].initial = lesson_request.teacher
-        self.fields['interval_between_lessons'].initial = lesson_request.interval
-        self.fields['number_of_lessons'].initial = lesson_request.lessonNum
+        if lesson_request_id:
+            lesson_request = LessonRequest.objects.get(id=lesson_request_id)
+            self.fields['duration'].initial = lesson_request.duration
+            self.fields['topic'].initial = lesson_request.topic
+            self.fields['teacher'].initial = lesson_request.teacher
+            self.fields['interval_between_lessons'].initial = lesson_request.interval
+            self.fields['number_of_lessons'].initial = lesson_request.lessonNum
 
     def clean(self):
         super().clean()
@@ -72,6 +73,10 @@ class BookLessonRequestForm(forms.ModelForm):
                 self.add_error('end_date', f'This date does not fall in the term given! '
                                              f'Term given starts on {term_chosen.start_date.date().__str__()} and ends on {term_chosen.end_date.date().__str__()}'
                                )
+
+        if end_date and start_date:
+            if end_date <= start_date:
+                self.add_error('end_date', f'End date must be after the start date!')
 
         # Checking that the lessons specified in form can fit in between dates given
         day = self.cleaned_data.get('day')

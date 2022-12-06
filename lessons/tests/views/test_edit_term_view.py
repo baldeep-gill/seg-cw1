@@ -3,6 +3,7 @@ from django.urls import reverse
 from lessons.forms import TermForm
 from lessons.models import Student, LessonRequest, Admin, Term
 import datetime
+from django.utils import timezone
 import pytz
 
 class EditRequestViewTestCase(TestCase):
@@ -11,20 +12,30 @@ class EditRequestViewTestCase(TestCase):
     fixtures = [
         'lessons/tests/fixtures/default_student.json',
         'lessons/tests/fixtures/admin_user.json',
-        'lessons/tests/fixtures/default_term.json',
     ]
 
     def setUp(self):
         super(TestCase, self).setUp()
         self.student = Student.objects.get(email="johndoe@example.org")
         self.admin = Admin.objects.get(email="student_admin@example.org")
-        self.term = Term.objects.get(name="Summer Term")
 
         self.form_input = {
             'name':'Autumn Term',
             'start_date':'2024-10-10',
             'end_date':'2025-10-10',
         }
+
+        # We will create a term date that starts 3 months from now and ends 6 months from now
+        # This is so the tests never fail due to becoming outdated
+        tdelta = datetime.timedelta(weeks=12)
+        start_term_date = timezone.now() + tdelta
+        end_term_date = start_term_date + tdelta
+
+        self.term = Term.objects.create(
+            name="Summer Term",
+            start_date=start_term_date,
+            end_date=end_term_date,
+        )
 
         self.url = reverse('edit_terms', kwargs={'term_id': self.term.id})
 

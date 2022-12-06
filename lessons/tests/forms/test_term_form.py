@@ -3,24 +3,26 @@ from django import forms
 from django.test import TestCase
 from lessons.forms import TermForm
 from lessons.models import Term
-import pytz
+from django.utils import timezone
 import datetime
 
 class TermFormTestCase(TestCase):
     """Unit tests of the Term form."""
 
-    # fixtures = [
-    #     'lessons/tests/fixtures/default_term.json',
-    #     'lessons/tests/fixtures/other_terms.json',
-    # ]
-
     def setUp(self):
         super(TestCase, self).setUp()
+
+        # We will create a term date that starts 3 months from now and ends 6 months from now
+        # This is so the tests never fail due to becoming outdated
+        tdelta = datetime.timedelta(weeks=12)
+        self.start_term_date = timezone.now() + tdelta
+        self.end_term_date = self.start_term_date + tdelta
+
         self.term_name = 'Autumn Term'
         self.form_input = {
             'name':self.term_name,
-            'start_date':'2024-10-10',
-            'end_date':'2025-10-10',
+            'start_date':f'{self.start_term_date}',
+            'end_date':f'{self.end_term_date}',
         }
 
     def test_form_has_necessary_fields(self):
@@ -51,8 +53,8 @@ class TermFormTestCase(TestCase):
 
         term = Term.objects.get(name=self.term_name)
         self.assertEqual(term.name, self.term_name)
-        self.assertEqual(term.start_date, datetime.datetime(year=2024,day=10,month=10,tzinfo=pytz.UTC))
-        self.assertEqual(term.end_date, datetime.datetime(year=2025,day=10,month=10,tzinfo=pytz.UTC))
+        self.assertEqual(term.start_date, self.start_term_date)
+        self.assertEqual(term.end_date, self.end_term_date)
 
     def test_end_date_cant_be_before_start_date(self):
         self.form_input['end_date'] = '2010-10-10'
@@ -60,29 +62,27 @@ class TermFormTestCase(TestCase):
         self.assertFalse(form.is_valid())
 
     def test_start_date_cant_overlap_with_other_terms(self):
-        start_date = datetime.datetime(year=2024,month=10,day=10,tzinfo=pytz.UTC)
-        end_date = datetime.datetime(year=2025,month=10,day=10,tzinfo=pytz.UTC)
+        tdelta = datetime.timedelta(weeks=12)
+        new_term_end_date = self.end_term_date + tdelta
+
         Term.objects.create(
             name="Winter Term",
-            start_date=start_date,
-            end_date=end_date,
+            start_date=self.start_term_date,
+            end_date=new_term_end_date,
         )
-        self.form_input['start_date'] = '2024-10-15'
-        self.form_input['end_date'] = '2028-10-15'
         form = TermForm(data=self.form_input)
         self.assertFalse(form.is_valid())
 
 
     def test_end_date_cant_overlap_with_other_terms(self):
-        start_date = datetime.datetime(year=2024,month=10,day=10,tzinfo=pytz.UTC)
-        end_date = datetime.datetime(year=2025,month=10,day=10,tzinfo=pytz.UTC)
+        tdelta = datetime.timedelta(weeks=12)
+        new_term_start_date = self.start_term_date - tdelta
+
         Term.objects.create(
             name="Winter Term",
-            start_date=start_date,
-            end_date=end_date,
+            start_date=new_term_start_date,
+            end_date=self.end_term_date,
         )
-        self.form_input['start_date'] = '2020-10-15'
-        self.form_input['end_date'] = '2024-10-15'
         form = TermForm(data=self.form_input)
         self.assertFalse(form.is_valid())
 

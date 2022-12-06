@@ -2,6 +2,8 @@ from django.test import TestCase
 from django.urls import reverse
 from lessons.forms import EditForm
 from lessons.models import Student, LessonRequest, Admin, Term
+import datetime
+from django.utils import timezone
 
 class DeleteTermsViewTestCase(TestCase):
     """Tests for the delete terms view"""
@@ -10,7 +12,6 @@ class DeleteTermsViewTestCase(TestCase):
         'lessons/tests/fixtures/default_student.json',
         'lessons/tests/fixtures/other_students.json',
         'lessons/tests/fixtures/admin_user.json',
-        'lessons/tests/fixtures/default_term.json',
     ]
 
     def setUp(self):
@@ -18,7 +19,6 @@ class DeleteTermsViewTestCase(TestCase):
         self.student = Student.objects.get(email="johndoe@example.org")
         self.other_student = Student.objects.get(email="janedoe@example.org")
         self.admin = Admin.objects.get(email="student_admin@example.org")
-        self.term = Term.objects.get(name='Summer Term')
 
         self.form_input = {
             "availability": "Monday",
@@ -28,6 +28,19 @@ class DeleteTermsViewTestCase(TestCase):
             "topic": "Piano",
             "teacher": "Mr Bob"
         }
+
+
+        # We will create a term date that starts 3 months from now and ends 6 months from now
+        # This is so the tests never fail due to becoming outdated
+        tdelta = datetime.timedelta(weeks=12)
+        start_term_date = timezone.now() + tdelta
+        end_term_date = start_term_date + tdelta
+
+        self.term = Term.objects.create(
+            name="Summer Term",
+            start_date=start_term_date,
+            end_date=end_term_date,
+        )
 
         self.url = reverse('delete_terms', kwargs={'term_id': self.term.id})
 
