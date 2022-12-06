@@ -9,7 +9,8 @@ class DeleteRequestViewTestCase(TestCase):
     fixtures = [
         'lessons/tests/fixtures/default_student.json',
         'lessons/tests/fixtures/other_students.json',
-        'lessons/tests/fixtures/admin_user.json'
+        'lessons/tests/fixtures/admin_user.json',
+        'lessons/tests/fixtures/default_lesson_request.json'
     ]
 
     def setUp(self):
@@ -17,17 +18,7 @@ class DeleteRequestViewTestCase(TestCase):
         self.student = Student.objects.get(email="johndoe@example.org")
         self.other_student = Student.objects.get(email="janedoe@example.org")
         self.admin = Admin.objects.get(email="student_admin@example.org")
-        
-        self.lessonRequest = LessonRequest(
-            author = self.student,
-            availability = "Monday",
-            lessonNum = 2,
-            interval = 1,
-            duration = 60,
-            topic = "Piano",
-            teacher = "Mr Bob"
-        )
-        self.lessonRequest.save()
+        self.lessonRequest = LessonRequest.objects.get(author=1)
 
         self.form_input = {
             "availability": "Monday",
