@@ -12,7 +12,7 @@ The members of the team are:
 The project is called `msms` (Music School Management System).  It currently consists of a single app `lessons` where all functionality resides.
 
 ## Deployed version of the application
-The deployed version of the application can be found at *<[enter URL here](URL)>*.
+The deployed version of the application can be found at *<[https://serge21.pythonanywhere.com/](URL)>*.
 
 ## Installation instructions
 To install the software and use it in your local development environment, you must first set up and activate a local development environment.  From the root of the project:
@@ -51,3 +51,4 @@ $ python3 manage.py test
 The packages used by this application are specified in `requirements.txt`
 
 - Clucker code base
+- Django custom authentication docs https://docs.djangoproject.com/en/4.1/topics/auth/customizing/#authentication-backends

@@ -446,6 +446,7 @@ def admin_transfers(request):
 @only_admins
 def all_student_balances(request):
     all_students = Student.objects.all()
+    all_transfers = Transfer.objects.all()
     balances = {}
     non_zero_balances = 1
     for student in all_students:
@@ -464,7 +465,7 @@ def all_student_balances(request):
         if(balance > 0):
             non_zero_balances += 1
 
-    return render(request, 'admin_payments.html', {'balances': balances, 'non_zero_balances': non_zero_balances})
+    return render(request, 'admin_payments.html', {'balances': balances,'transfers': all_transfers, 'non_zero_balances': non_zero_balances})
 
 @login_required
 @only_admins
@@ -541,6 +542,14 @@ def show_invoice_lessons(request, invoice_id):
     else:
         lessons_to_display = current_invoice.lessons
         return render(request, 'show_invoice_lessons.html', {'lessons': lessons_to_display, 'invoice':current_invoice})
+
+@login_required
+@all_students
+def show_schedule(request):
+    current_student_id = request.user.id
+    # only shows lessons in the future
+    lessons = Lesson.objects.filter(student_id=current_student_id, date__gte=datetime.datetime.now(tz=datetime.timezone.utc))
+    return render(request, 'lesson_schedule.html', {'lessons': lessons})
 
 @login_required
 @only_admins

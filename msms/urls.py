@@ -54,7 +54,7 @@ urlpatterns = [
     path('student/lessons/list', views.lessons_success, name='lesson_list'),
     path('student/balance/', views.balance, name='balance'),
     path('student/transfers/', views.transfers, name='transfers'),
-    path('student/log_out/', views.log_out, name='log_out'),
+    path('student/schedule/', views.show_schedule, name='show_schedule'),
 
     # Guardian paths
     path('guardian_sign_up/', views.guardian_sign_up, name='guardian_sign_up'),
