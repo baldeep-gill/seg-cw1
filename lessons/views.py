@@ -409,6 +409,7 @@ def balance(request):
 @only_admins
 def all_student_balances(request):
     all_students = Student.objects.all()
+    all_transfers = Transfer.objects.all()
     balances = {}
     for student in all_students:
         student_invoices = Invoice.objects.filter(student=student)
@@ -421,7 +422,7 @@ def all_student_balances(request):
         if(balance != 0):
             balances[student] = balance
 
-    return render(request, 'admin_payments.html', {'balances': balances})
+    return render(request, 'admin_payments.html', {'balances': balances, 'transfers': all_transfers})
 
 @login_required
 @only_admins

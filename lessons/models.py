@@ -240,6 +240,8 @@ def present_or_past_date(value):
 
 class Transfer(models.Model):
     """Models a transfer completed by a student"""
+    class Meta:
+        ordering = ['-date_received']
     
     # The date and time when the transfer was received 
     date_received = models.DateTimeField(blank=False, default=timezone.now, validators=[present_or_past_date])
