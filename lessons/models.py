@@ -74,20 +74,7 @@ class Student(User):
     @property
     def transfers(self):
         # Make sure incomplete transfers aren't repeated when displayed separately
-
         return Transfer.objects.filter(invoice__student=self)
-
-    @property
-    def grouped_transfers(self):
-        # Make sure incomplete transfers aren't repeated when displayed separately
-        transfers_per_invoice = {}
-        for transfer in Transfer.objects.filter(invoice__student=self):
-            if(transfers_per_invoice.get(transfer.invoice)):
-                transfers_per_invoice[transfer.invoice].append(transfer)
-            else:
-                transfers_per_invoice[transfer.invoice] = [transfer]
-        
-        return transfers_per_invoice
 
     @property
     def unpaid_invoices(self):

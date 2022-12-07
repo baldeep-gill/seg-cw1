@@ -30,7 +30,7 @@ class AdminAllBalancesView(TestCase):
             date=timezone.now()
         )
         next_transfer_id = find_next_available_transfer_id()
-        self.transfer = Transfer(date_received=timezone.now(), transfer_id=next_transfer_id, verifier=self.admin, invoice=self.invoice)
+        self.transfer = Transfer(date_received=timezone.now(), amount_received=self.invoice.price, transfer_id=next_transfer_id, verifier=self.admin, invoice=self.invoice)
 
     def test_request_url(self):
         self.assertEqual(self.url, '/admin/payments')
@@ -72,7 +72,7 @@ class AdminAllBalancesView(TestCase):
         self.lesson.save()
         self.transfer.save()
         self.client.login(username=self.admin.email, password='Password123')
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, follow=True)
         self.assertContains(response, 'No balances to see')
 
 

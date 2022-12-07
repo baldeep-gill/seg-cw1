@@ -386,7 +386,6 @@ def show_invoices(request):
 def balance(request):
     # first we need to get the student
     current_student_id = request.user.id
-
     student = Student.objects.get(id=current_student_id)
 
     # then we retrieve all the lessons they have from the db
@@ -401,7 +400,6 @@ def balance(request):
         total_due += invoice.price
 
     invoices = student.unpaid_invoices | Invoice.objects.filter(invoice_number__in=underpaid_ids)
-
 
     for underpaid_invoice in underpaid_invoices:
         total_due += underpaid_invoices[underpaid_invoice]
@@ -420,11 +418,9 @@ def transfers(request):
     # invoices = Invoice.objects.filter(student_id=current_student_id)
     transfers = student.transfers
 
-
     total_paid = 0
     for transfer in transfers:
         total_paid += transfer.invoice.price
-
 
     return render(request, 'transfers.html', {'transfers': transfers, 'total_paid': total_paid})
 
