@@ -9,7 +9,7 @@ from .models import Admin, LessonRequest, Lesson, Student, User, Invoice, Transf
 from .helpers import only_admins, only_students, get_next_given_day_of_week_after_date_given, find_next_available_invoice_number_for_student, login_prohibited, find_next_available_transfer_id
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
-
+from django.db.models import Sum
 
 import datetime
 
@@ -265,12 +265,20 @@ def balance(request):
 
     # then we retrieve all the lessons they have from the db
     # invoices = Invoice.objects.filter(student_id=current_student_id)
+    underpaid_invoices = student.underpaid_invoices
+    underpaid_ids = [invoice.invoice_number for invoice in underpaid_invoices]
     invoices = student.unpaid_invoices
     
     # total money owed
     total_due = 0
     for invoice in invoices:
         total_due += invoice.price
+
+    invoices = student.unpaid_invoices | Invoice.objects.filter(invoice_number__in=underpaid_ids)
+
+
+    for underpaid_invoice in underpaid_invoices:
+        total_due += underpaid_invoices[underpaid_invoice]
 
     return render(request, 'balance.html', {'invoices': invoices, 'total_due': total_due})
 
