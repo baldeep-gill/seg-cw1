@@ -3,6 +3,11 @@
   <div class="card-body">
     <h6>Invoice Generated {{ transfer.invoice.date }}</h6>
     <h6>Transfer Received {{ transfer.date_received }}</h6>
-    <h3>£{{ transfer.invoice.price }} <i class="bi bi-check-circle text-success"></i> </h3>
+    <h3>Received £{{ transfer.amount_received }} <i class="bi bi-check-circle text-success"></i> </h3>
+    <h4>towards total invoice amount £{{ transfer.invoice.price }}</h4>
+    {% if transfer.amount_received > transfer.invoice.price %}
+      <h5>Overpaid invoice!<h5>
+    {% endif %}
     </div>
 </div>
+<hr/>
