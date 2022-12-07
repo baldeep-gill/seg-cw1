@@ -266,19 +266,35 @@ def balance(request):
     # then we retrieve all the lessons they have from the db
     # invoices = Invoice.objects.filter(student_id=current_student_id)
     invoices = student.unpaid_invoices
-    transfers = student.transfers
     
     # total money owed
     total_due = 0
     for invoice in invoices:
         total_due += invoice.price
 
+    return render(request, 'balance.html', {'invoices': invoices, 'total_due': total_due})
+
+@login_required
+@only_students
+def transfers(request):
+    # first we need to get the student
+    current_student_id = request.user.id
+
+    student = Student.objects.get(id=current_student_id)
+
+    # then we retrieve all the lessons they have from the db
+    # invoices = Invoice.objects.filter(student_id=current_student_id)
+    transfers = student.transfers
+    
+
     total_paid = 0
     for transfer in transfers:
         total_paid += transfer.invoice.price
 
 
-    return render(request, 'balance.html', {'invoices': invoices, 'transfers': transfers, 'total_paid':total_paid, 'total_due': total_due})
+    return render(request, 'transfers.html', {'transfers': transfers, 'total_paid': total_paid})
+
+
 
 
 @login_required
