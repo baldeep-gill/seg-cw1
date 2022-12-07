@@ -4,7 +4,7 @@
   <div class="row">
     <div class="col-12">
     {% if guardian %}
-    <h1>guardian Sign up</h1>
+    <h1>Guardian Sign up</h1>
       <form action="{% url 'guardian_sign_up' %}" method="post">
         {% csrf_token %}
         {% include 'partials/form.html' with form=form %}

@@ -459,6 +459,14 @@ def show_invoice_lessons(request, invoice_id):
         return render(request, 'show_invoice_lessons.html', {'lessons': lessons_to_display, 'invoice':current_invoice})
 
 @login_required
+@all_students
+def show_schedule(request):
+    current_student_id = request.user.id
+    # only shows lessons in the future
+    lessons = Lesson.objects.filter(student_id=current_student_id, date__gte=datetime.datetime.now(tz=datetime.timezone.utc))
+    return render(request, 'lesson_schedule.html', {'lessons': lessons})
+
+@login_required
 @only_admins
 def admin_terms(request):
     """Shows the lessons associated with a given invoice"""
@@ -523,6 +531,3 @@ def edit_terms(request, term_id):
         else:
             form = TermForm(instance=term)
         return render(request, 'edit_terms.html', {'form': form, 'term_id': term_id})
-
-
-

@@ -51,3 +51,4 @@ $ python3 manage.py test
 The packages used by this application are specified in `requirements.txt`
 
 - Clucker code base
+- Django custom authentication docs https://docs.djangoproject.com/en/4.1/topics/auth/customizing/#authentication-backends
