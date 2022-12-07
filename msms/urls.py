@@ -26,17 +26,22 @@ urlpatterns = [
     path('log_in/', views.log_in, name='log_in'),
     path('password/', views.password, name='password'),
     path('profile/', views.profile, name='profile'),
+    path('log_out/', views.log_out, name='log_out'),
 
     # Admin paths
     path('admin/home/', views.admin_home, name='admin_home'),
-    # path('admin/unfulfilled/requests/', views.admin_requests, name='admin_requests'),
     path('admin/book_lesson_request/<int:request_id>', views.book_lesson_request, name='book_lesson_request'),
     path('admin/requests/', views.admin_requests, name='admin_requests'),
-    path('admin/log_out/', views.log_out, name='log_out'),
+    path('admin/lessons/', views.admin_lessons, name='admin_lessons'),
+    path('admin/lessons/edit/<lesson_id>', views.edit_lessons, name='edit_lessons'),
     path('admin/payments', views.all_student_balances, name='payments'),
     path('admin/all_transfers', views.admin_transfers, name='admin_transfers'),
     path('admin/payments/<int:student_id>', views.student_balance, name='student_payments'),
     path('admin/payments/<int:student_id>/<int:invoice_id>', views.approve_transaction, name='approve_transaction'),
+    path('admin/lessons/delete/<lesson_id>', views.delete_lessons, name='delete_lessons'),
+    path('admin/terms', views.admin_terms, name='admin_terms'),
+    path('admin/terms/delete/<term_id>', views.delete_terms, name='delete_terms'),
+    path('admin/terms/edit/<term_id>', views.edit_terms, name='edit_terms'),
 
     # Student paths
     path('student/lesson_request/', views.lesson_request, name='lesson_request'),
@@ -50,4 +55,10 @@ urlpatterns = [
     path('student/balance/', views.balance, name='balance'),
     path('student/transfers/', views.transfers, name='transfers'),
     path('student/log_out/', views.log_out, name='log_out'),
+
+    # Guardian paths
+    path('guardian_sign_up/', views.guardian_sign_up, name='guardian_sign_up'),
+    path('guardian/home/', views.guardian_home, name='guardian_home'),
+    path('guardian/add/', views.add_student, name='add_student'),
+    path('guardian/book/', views.book_for_student, name='book_for_student'),
 ]

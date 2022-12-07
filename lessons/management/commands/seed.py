@@ -1,10 +1,13 @@
+import pytz
 from django.core.management.base import BaseCommand, CommandError
 from django.db.utils import IntegrityError
+from django.utils import timezone
 from faker import Faker
-from lessons.models import Student, StudentProfile, Admin, LessonRequest
+from lessons.models import Student, StudentProfile, Admin, LessonRequest, Term
 from lessons.helpers import find_next_available_student_number
 from datetime import datetime, timedelta
 from django.core.management import call_command
+import pytz
 
 class Command(BaseCommand):
     PASSWORD = "Password123"
@@ -20,6 +23,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         call_command('unseed')
         self.seedusers()
+        self.seedterms()
         self.seedlessonrequests()
     
     def seedusers(self):
@@ -40,6 +44,15 @@ class Command(BaseCommand):
         print('Seeded ' + str(Student.objects.count()) + ' students')
         print('Seeded ' + str(Admin.objects.count()) + ' admins')
 
+    def seedterms(self):
+        self._create_term('Term one',timezone.datetime(year=2022,month=9,day=1,tzinfo=pytz.UTC),timezone.datetime(year=2022,month=10,day=21,tzinfo=pytz.UTC))
+        self._create_term('Term two',timezone.datetime(year=2022,month=10,day=31,tzinfo=pytz.UTC),timezone.datetime(year=2022,month=12,day=16,tzinfo=pytz.UTC))
+        self._create_term('Term three',timezone.datetime(year=2023,month=1,day=3,tzinfo=pytz.UTC),timezone.datetime(year=2023,month=2,day=10,tzinfo=pytz.UTC))
+        self._create_term('Term four',timezone.datetime(year=2023,month=2,day=20,tzinfo=pytz.UTC),timezone.datetime(year=2023,month=3,day=31,tzinfo=pytz.UTC))
+        self._create_term('Term five',timezone.datetime(year=2023,month=4,day=17,tzinfo=pytz.UTC),timezone.datetime(year=2023,month=5,day=26,tzinfo=pytz.UTC))
+        self._create_term('Term six',timezone.datetime(year=2023,month=6,day=5,tzinfo=pytz.UTC),timezone.datetime(year=2023,month=7,day=21,tzinfo=pytz.UTC))
+        print('term seeding complete')
+        print('Seeded ' + str(Term.objects.count()) + ' terms')
         
     def seedlessonrequests(self):
         lesson_count = 0        
@@ -61,7 +74,18 @@ class Command(BaseCommand):
         username = self._username(first_name, last_name)
         if(isAdmin): self._create_named_admin_user(first_name, last_name, email, username, Command.PASSWORD)
         else: self._create_named_student_user(first_name, last_name, email, username, Command.PASSWORD)
-       
+
+    def _create_term(self,name,start_date,end_date):
+        try:
+            new_term = Term.objects.create(
+                name=name,
+                start_date=start_date,
+                end_date=end_date
+            )
+        except:
+            print(f'{name} already in database so we will not duplicate it')
+
+
     def _create_lesson(self):
         """Selects a random student user from the database"""
         user = Student.objects.order_by('?').first()

@@ -1,8 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from lessons.forms import BookLessonRequestForm
-from lessons.models import Student,Lesson,LessonRequest, Admin
+from lessons.models import Student,Lesson,LessonRequest, Admin, Term
 import datetime
+from django.utils import timezone
 
 class BookLessonRequestViewTestCase(TestCase):
     """Tests for the book lesson request view"""
@@ -26,15 +27,28 @@ class BookLessonRequestViewTestCase(TestCase):
         )
         self.lesson_request.save()
 
+        # We will create a term date that starts 3 months from now and ends 6 months from now
+        # This is so the tests never fail due to becoming outdated
+        tdelta = datetime.timedelta(weeks=12)
+        start_term_date = timezone.now() + tdelta
+        end_term_date = start_term_date + tdelta
+
+        self.term = Term.objects.create(
+            name='Summer Term',
+            start_date=start_term_date,
+            end_date=end_term_date,
+        )
+
         self.number_of_lessons_to_generate = 2
         # In python datetime, monday is assigned to value 0
         self.day_of_the_week = ("Monday",0)
-        self.start_date = datetime.datetime(2022,10,21).__str__()
         self.book_request_form_input = {
             "duration": 60,
             "topic": "Piano",
             "teacher": "Mr Bob",
-            "start_date": "2022-10-21",
+            "term": f"{self.term.name}",
+            "start_date": f"{self.term.start_date}",
+            "end_date": f"{self.term.end_date}",
             "day": f"{self.day_of_the_week[0]}",
             "time": "12:00",
             "interval_between_lessons": 1,
@@ -69,7 +83,7 @@ class BookLessonRequestViewTestCase(TestCase):
         """If logged in but not an admin then should redirect to student home page"""
         self.client.force_login(self.student)
         redirect_url = reverse("student_home")
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, follow=True)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
     def test_unsuccessful_book_lesson_post(self):

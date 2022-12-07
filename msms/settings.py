@@ -122,6 +122,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+STATIC_ROOT = '/home/serge21/Dromedary/staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -137,6 +138,7 @@ LOGIN_URL = 'log_in'
 # URL where @login_prohibited redirects to
 REDIRECT_URL_WHEN_LOGGED_IN_ADMIN = 'admin_home'
 REDIRECT_URL_WHEN_LOGGED_IN_STUDENT = 'student_home'
+REDIRECT_URL_WHEN_LOGGED_IN_GUARDIAN = 'guardian_home'
 
 # Message level tags should use Bootstrap terms
 MESSAGE_TAGS = {

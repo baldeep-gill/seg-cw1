@@ -2,6 +2,8 @@
     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
       {% if user.type == "ADMIN" %}
         {% include "partials/admin_items.html" %}
+      {% elif user.type == "GUARDIAN" %}
+        {% include "partials/guardian_items.html" %}
       {% else %}
         {% include "partials/student_items.html" %}
       {% endif %}
