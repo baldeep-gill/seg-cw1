@@ -59,22 +59,6 @@ def book_for_student(request):
         form = GuradianBookStudent(options=optiontuples)
     return render(request, 'guardian_book_for_student.html', {'form': form, 'users': flag})
 
-# @login_required
-# @all_students
-# def balance(request):
-#     # first we need to get the student
-#     current_student_id = request.user.id
-
-#     # then we retrieve all the lessons they have from the db
-#     invoices = Invoice.objects.filter(student_id=current_student_id)
-
-#     # total money owed
-#     total = 0
-#     for invoice in invoices:
-#         total += invoice.price
-
-#     return render(request, 'balance.html', {'invoices': invoices, 'total':total})
-
 @login_required
 @all_students
 def lessons_success(request):
@@ -405,6 +389,22 @@ def balance(request):
         total_due += underpaid_invoices[underpaid_invoice]
 
     return render(request, 'balance.html', {'invoices': invoices, 'total_due': total_due})
+
+@login_required
+@all_students
+def guardian_balance(request):
+    # first we need to get the student
+    current_student_id = request.user.id
+
+    # then we retrieve all the lessons they have from the db
+    invoices = Invoice.objects.filter(student_id=current_student_id)
+
+    # total money owed
+    total = 0
+    for invoice in invoices:
+        total += invoice.price
+
+    return render(request, 'balance.html', {'invoices': invoices, 'total':total})
 
 @login_required
 @only_students
