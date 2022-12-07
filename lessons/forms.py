@@ -1,8 +1,7 @@
 from django import forms
 from django.core.validators import RegexValidator, MinValueValidator
 from django.utils import timezone
-
-from .models import User, Student, StudentProfile, LessonRequest, Lesson, Guardian, Term
+from .models import User, Student, StudentProfile, LessonRequest, Lesson, Guardian, Term, Transfer
 
 from django.db.models import Max
 from .helpers import find_next_available_student_number, day_of_the_week_validator,\
@@ -13,6 +12,17 @@ from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.fields import DateTimeField
 from django.core.exceptions import ValidationError
 import random
+
+class ConfirmTransferForm(forms.ModelForm):
+    """Form for confirming a received transfer"""
+
+    class Meta:
+        model = Transfer
+        fields = ['date_received', 'amount_received']
+        widgets = {
+            'date_received': forms.DateTimeInput(attrs={'class':'datetimefield'})
+        }
+
 
 class LessonRequestForm(forms.ModelForm):
     """Form for requesting a lesson"""
@@ -190,7 +200,7 @@ class GuardianSignUpForm(forms.ModelForm):
             random_number = Guardian.objects.last().id + 1
         else:
             random_number = 1
-            
+
         super().save(commit=False)
         guardian = Guardian.objects.create_user(
             username = self.cleaned_data.get('first_name') + self.cleaned_data.get('last_name') + f'{random_number}' ,
@@ -287,5 +297,3 @@ class TermForm(forms.ModelForm):
 
         if does_date_fall_in_an_existing_term(end_date):
             self.add_error('end_date','This date falls within an existing term!')
-
-

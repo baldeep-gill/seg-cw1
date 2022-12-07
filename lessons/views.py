@@ -1,7 +1,7 @@
 import pytz
 from django.shortcuts import render, redirect
 
-from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm, EditLessonForm, GuardianSignUpForm, GuradianAddStudent, GuradianBookStudent, TermForm
+from .forms import LessonRequestForm, StudentSignUpForm, LogInForm, BookLessonRequestForm, EditForm, PasswordForm, UserForm, EditLessonForm, GuardianSignUpForm, GuradianAddStudent, GuradianBookStudent, TermForm, ConfirmTransferForm
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -13,6 +13,8 @@ from .helpers import only_admins, all_students, only_students, only_guardians, g
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
+from django.db.models import Sum
+
 import datetime
 
 # Create your views here.
@@ -57,21 +59,21 @@ def book_for_student(request):
         form = GuradianBookStudent(options=optiontuples)
     return render(request, 'guardian_book_for_student.html', {'form': form, 'users': flag})
 
-@login_required
-@all_students
-def balance(request):
-    # first we need to get the student
-    current_student_id = request.user.id
+# @login_required
+# @all_students
+# def balance(request):
+#     # first we need to get the student
+#     current_student_id = request.user.id
 
-    # then we retrieve all the lessons they have from the db
-    invoices = Invoice.objects.filter(student_id=current_student_id)
-    
-    # total money owed
-    total = 0
-    for invoice in invoices:
-        total += invoice.price
+#     # then we retrieve all the lessons they have from the db
+#     invoices = Invoice.objects.filter(student_id=current_student_id)
 
-    return render(request, 'balance.html', {'invoices': invoices, 'total':total})
+#     # total money owed
+#     total = 0
+#     for invoice in invoices:
+#         total += invoice.price
+
+#     return render(request, 'balance.html', {'invoices': invoices, 'total':total})
 
 @login_required
 @all_students
@@ -389,20 +391,55 @@ def balance(request):
 
     # then we retrieve all the lessons they have from the db
     # invoices = Invoice.objects.filter(student_id=current_student_id)
+    underpaid_invoices = student.underpaid_invoices
+    underpaid_ids = [invoice.invoice_number for invoice in underpaid_invoices]
     invoices = student.unpaid_invoices
-    transfers = student.transfers
-    
+
     # total money owed
     total_due = 0
     for invoice in invoices:
         total_due += invoice.price
+
+    invoices = student.unpaid_invoices | Invoice.objects.filter(invoice_number__in=underpaid_ids)
+
+
+    for underpaid_invoice in underpaid_invoices:
+        total_due += underpaid_invoices[underpaid_invoice]
+
+    return render(request, 'balance.html', {'invoices': invoices, 'total_due': total_due})
+
+@login_required
+@only_students
+def transfers(request):
+    # first we need to get the student
+    current_student_id = request.user.id
+
+    student = Student.objects.get(id=current_student_id)
+
+    # then we retrieve all the lessons they have from the db
+    # invoices = Invoice.objects.filter(student_id=current_student_id)
+    transfers = student.transfers
+
 
     total_paid = 0
     for transfer in transfers:
         total_paid += transfer.invoice.price
 
 
-    return render(request, 'balance.html', {'invoices': invoices, 'transfers': transfers, 'total_paid':total_paid, 'total_due': total_due})
+    return render(request, 'transfers.html', {'transfers': transfers, 'total_paid': total_paid})
+
+@login_required
+@only_admins
+def admin_transfers(request):
+    # then we retrieve all the lessons they have from the db
+    # invoices = Invoice.objects.filter(student_id=current_student_id)
+    transfers = Transfer.objects.all()
+    total_revenue = transfers.aggregate(Sum('amount_received'))['amount_received__sum']
+
+
+    return render(request, 'all_transfers.html', {'transfers': transfers, 'total_revenue': total_revenue})
+
+
 
 
 @login_required
@@ -411,41 +448,88 @@ def all_student_balances(request):
     all_students = Student.objects.all()
     all_transfers = Transfer.objects.all()
     balances = {}
+    non_zero_balances = 1
     for student in all_students:
         student_invoices = Invoice.objects.filter(student=student)
         balance = 0
         for invoice in student_invoices:
             if(Transfer.objects.filter(invoice=invoice).count() == 0):
                 balance += invoice.price
-      
-        # Ensures only people with pending payments show up
-        if(balance != 0):
-            balances[student] = balance
+        
+        underpaid_invoices = student.underpaid_invoices
 
-    return render(request, 'admin_payments.html', {'balances': balances, 'transfers': all_transfers})
+        for underpaid_invoice in underpaid_invoices:
+            balance += underpaid_invoices[underpaid_invoice]
+
+        balances[student] = balance
+        if(balance > 0):
+            non_zero_balances += 1
+
+    return render(request, 'admin_payments.html', {'balances': balances,'transfers': all_transfers, 'non_zero_balances': non_zero_balances})
 
 @login_required
 @only_admins
 def student_balance(request, student_id):
     student = Student.objects.filter(id=student_id).first()
-    
+
     transfer_list = student.transfers
     invoice_list = student.unpaid_invoices
+    underpaid_invoices_and_paid_amount = student.underpaid_invoices
+    print(student.grouped_transfers)
     # student.invoices.exclude(id__in=transfer_list.values('invoice_id'))
-    
-    return render(request, 'admin_student_payments.html', {'invoices': invoice_list, 'transfers': transfer_list, 'student': student})
+
+    return render(request, 'admin_student_payments.html', {'invoices': invoice_list, 'underpaid_invoices': underpaid_invoices_and_paid_amount, 'transfers': transfer_list, 'student': student})
 
 @login_required
 @only_admins
 def approve_transaction(request, student_id, invoice_id):
-    if request.method == 'POST':
-        current_admin = request.user
-        invoice = Invoice.objects.filter(student_id=student_id).filter(invoice_number=invoice_id)
-        next_transfer_id = find_next_available_transfer_id()
-        transfer = Transfer.objects.create(date_received=timezone.now(), transfer_id=next_transfer_id, verifier=current_admin, invoice=invoice.first())
-        transfer.save()
+    # if request.method == 'POST':
+    #     current_admin = request.user
+    #     invoice = Invoice.objects.filter(student_id=student_id).filter(invoice_number=invoice_id)
+    #     next_transfer_id = find_next_available_transfer_id()
+    #     transfer = Transfer.objects.create(date_received=timezone.now(), transfer_id=next_transfer_id, verifier=current_admin, invoice=invoice.first())
+    #     transfer.save()
+    # else:
+    #     # request method 'GET'
 
-    return redirect('student_payments', student_id=student_id)
+
+    # return redirect('student_payments', student_id=student_id)
+
+    try:
+        student_paying = Student.objects.get(id=student_id)
+        invoice_being_fulfilled = Invoice.objects.filter(student_id=student_id).get(id=invoice_id)
+    except ObjectDoesNotExist:
+        return redirect('student_payments', student_id=student_id)
+
+    if request.method == 'POST':
+        form = ConfirmTransferForm(request.POST)
+        if form.is_valid():
+            current_admin = request.user
+            invoice = invoice_being_fulfilled
+            date_received = form.cleaned_data.get('date_received')
+            amount_received = form.cleaned_data.get('amount_received')
+
+
+
+            #generate an invoice for the lessons we will generate
+            new_transfer_number = find_next_available_transfer_id()
+            transfer = Transfer.objects.create(
+                date_received=date_received,
+                transfer_id=new_transfer_number,
+                amount_received=amount_received,
+                verifier=current_admin,
+                invoice=invoice)
+            transfer.save()
+
+            return redirect('student_payments', student_id=student_id)
+    else:
+        form = ConfirmTransferForm()
+
+    already_paid = None
+    if student_paying.underpaid_invoices.get(invoice_being_fulfilled):
+        already_paid = student_paying.underpaid_invoices.get(invoice_being_fulfilled)
+    return render(request, 'confirm_transfer.html', {'form': form,'invoice':invoice_being_fulfilled,'student':student_paying, 'already_paid_amount': already_paid})
+
 
 @login_required
 @only_students
