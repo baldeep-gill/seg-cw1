@@ -15,6 +15,7 @@ class User(AbstractUser):
     class Types(models.TextChoices):
         ADMIN = "ADMIN", 'Admin'
         STUDENT = "STUDENT", 'Student'
+        GUARDIAN = "GUARDIAN", 'Guardian'
     
     '''defualt role'''
     base_role = Types.ADMIN
@@ -83,6 +84,26 @@ class Student(User):
     class Meta:
         proxy = True
 
+'''Guardian users'''
+# manages all guardians 
+class GuardianManager(BaseUserManager):
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).filter(type=User.Types.GUARDIAN)
+
+# A new table to store the student number and extra information about the user later on
+class GuardianProfile(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    student_first_name = models.CharField(max_length=50, blank=False)
+    student_last_name = models.CharField(max_length=50, blank=False)
+    student_email = models.EmailField(unique=True, blank=False)
+
+# Guardian user
+class Guardian(User):
+    base_role = User.Types.GUARDIAN
+    guardians = GuardianManager()
+
+    class Meta:
+        proxy = True
 
 '''Admin users'''
 # manages all Admins 
@@ -302,6 +323,33 @@ class Lesson(models.Model):
     def price_per_minute(self):
         """Returns the cost of this lesson per minute in pounds/£"""
         return 1
+
+
+class Term(models.Model):
+    """Models a school term"""
+
+    # Name of term, ie 'term 1' or 'Summer term'
+    name = models.CharField(
+        max_length = 50,
+        unique = True,
+        blank=False
+    )
+
+    # Start date of term
+    start_date = models.DateTimeField(
+        blank=False,
+    )
+
+    # End date of term
+    end_date = models.DateTimeField(
+        blank=False,
+    )
+
+
+
+
+
+
 
 
 
