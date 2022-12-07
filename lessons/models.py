@@ -323,5 +323,32 @@ class Lesson(models.Model):
         return 1
 
 
+class Term(models.Model):
+    """Models a school term"""
+
+    # Name of term, ie 'term 1' or 'Summer term'
+    name = models.CharField(
+        max_length = 50,
+        unique = True,
+        blank=False
+    )
+
+    # Start date of term
+    start_date = models.DateTimeField(
+        blank=False,
+    )
+
+    # End date of term
+    end_date = models.DateTimeField(
+        blank=False,
+    )
+
+
+
+
+
+
+
+
 
 
