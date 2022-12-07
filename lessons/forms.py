@@ -1,7 +1,7 @@
 from django import forms
 from django.core.validators import RegexValidator, MinValueValidator
 from django.utils import timezone
-from .models import User, Student, StudentProfile, LessonRequest, Lesson, Guardian, Term
+from .models import User, Student, StudentProfile, LessonRequest, Lesson, Guardian, Term, Transfer
 
 from django.db.models import Max
 from .helpers import find_next_available_student_number, day_of_the_week_validator,\
