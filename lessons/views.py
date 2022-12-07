@@ -306,9 +306,11 @@ def student_balance(request, student_id):
     
     transfer_list = student.transfers
     invoice_list = student.unpaid_invoices
+    underpaid_invoices_and_paid_amount = student.underpaid_invoices
+    print(student.grouped_transfers)
     # student.invoices.exclude(id__in=transfer_list.values('invoice_id'))
     
-    return render(request, 'admin_student_payments.html', {'invoices': invoice_list, 'transfers': transfer_list, 'student': student})
+    return render(request, 'admin_student_payments.html', {'invoices': invoice_list, 'underpaid_invoices': underpaid_invoices_and_paid_amount, 'transfers': transfer_list, 'student': student})
 
 @login_required
 @only_admins
@@ -326,7 +328,7 @@ def approve_transaction(request, student_id, invoice_id):
     # return redirect('student_payments', student_id=student_id)
 
     try:
-        student_paying = User.objects.get(id=student_id)
+        student_paying = Student.objects.get(id=student_id)
         invoice_being_fulfilled = Invoice.objects.filter(student_id=student_id).get(id=invoice_id)
     except ObjectDoesNotExist:
         return redirect('student_payments', student_id=student_id)
@@ -354,7 +356,11 @@ def approve_transaction(request, student_id, invoice_id):
             return redirect('student_payments', student_id=student_id)
     else:
         form = ConfirmTransferForm()
-    return render(request, 'confirm_transfer.html', {'form': form,'invoice':invoice_being_fulfilled,'student':student_paying})
+    
+    already_paid = None
+    if student_paying.underpaid_invoices.get(invoice_being_fulfilled):
+        already_paid = student_paying.underpaid_invoices.get(invoice_being_fulfilled)
+    return render(request, 'confirm_transfer.html', {'form': form,'invoice':invoice_being_fulfilled,'student':student_paying, 'already_paid_amount': already_paid})
 
 
 @login_required

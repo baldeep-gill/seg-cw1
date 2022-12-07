@@ -2,11 +2,28 @@
     <h5 class="card-header">Invoice {{ invoice.unique_reference_number }}</h5>
     <div class="card-body">
       <h6>Generated {{ invoice.date }}</h6>
-      <h3>£{{ invoice.price }}</h3>
-      <div class="align-left">
-          <a type="submit" class="btn btn-success mt-2" href="{% url 'approve_transaction' student_id=student.id invoice_id=invoice.invoice_number %}">
-              Accept
-          </a>
-      </div>
+      {% if partially_received_amount %}
+        <h3>£{{ partially_received_amount }} received out of £{{ invoice.price }}
+      {% else %}
+        <h3>£{{ invoice.price }}</h3>
+      {% endif %}
+        {% if invoice.associated_transfers %}
+        <table>
+            {% for transfer in invoice.associated_transfers %}
+                <tr>
+                    <td>£{{ transfer.amount_received }}</td>
+                    <td>{{ transfer.date_received }}</td>
+                    <td>✅</td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+      {% if not hide_button or not invoice.paid %}
+        <div class="align-left">
+            <a type="submit" class="btn btn-success mt-2" href="{% url 'approve_transaction' student_id=student.id invoice_id=invoice.invoice_number %}">
+                Accept
+            </a>
+        </div>
+     {% endif %}
       </div>
   </div>

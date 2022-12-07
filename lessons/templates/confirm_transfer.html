@@ -9,7 +9,7 @@
 
             <h1> Invoice </h1>
             <div class="m-3">
-                {% include 'partials/invoice_card.html' with invoice=invoice %}
+                {% include 'partials/invoice_card.html' with invoice=invoice partially_received_amount=already_paid_amount hide_button=True %}
             </div>
         </div>
 

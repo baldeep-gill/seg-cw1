@@ -72,13 +72,46 @@ class Student(User):
     
     @property
     def transfers(self):
+        # Make sure incomplete transfers aren't repeated when displayed separately
+
         return Transfer.objects.filter(invoice__student=self)
+
+    @property
+    def grouped_transfers(self):
+        # Make sure incomplete transfers aren't repeated when displayed separately
+        transfers_per_invoice = {}
+        for transfer in Transfer.objects.filter(invoice__student=self):
+            if(transfers_per_invoice.get(transfer.invoice)):
+                transfers_per_invoice[transfer.invoice].append(transfer)
+            else:
+                transfers_per_invoice[transfer.invoice] = [transfer]
+        
+        return transfers_per_invoice
 
     @property
     def unpaid_invoices(self):
         transfer_list = self.transfers
         invoice_list = self.invoices.exclude(id__in=transfer_list.values('invoice_id'))
         return invoice_list
+
+    @property
+    def underpaid_invoices(self):
+        transfer_list = self.transfers
+        # invoice_list = self.invoices.filter(id__in=transfer_list.values('invoice_id'))
+        underpaid_invoices = {}
+        for transfer in transfer_list:
+            if transfer.amount_received < transfer.invoice.price:
+                if(underpaid_invoices.get(transfer.invoice)):
+                    underpaid_invoices[transfer.invoice] += transfer.amount_received
+                    if(underpaid_invoices[transfer.invoice] >= transfer.invoice.price):
+                        # Removes invoice from the list of underpaid invoices if the invoice is paid fully or overpaid
+                        del underpaid_invoices[transfer.invoice]
+                else:
+                    underpaid_invoices[transfer.invoice] = transfer.amount_received
+        
+        
+
+        return underpaid_invoices
 
     class Meta:
         proxy = True
@@ -205,11 +238,31 @@ class Invoice(models.Model):
         
     @property
     def paid(self):
-        transfer = Transfer.objects.filter(invoice=self)
+        transfer = self.associated_transfers()
+        if transfer:
+            return self.amount_paid() >= self.price()
+        else:
+            return False
+    
+    @property
+    def at_least_partially_paid(self):
+        transfer = self.associated_transfers()
         if transfer:
             return True
         else:
             return False
+
+    @property
+    def associated_transfers(self):
+        return Transfer.objects.filter(invoice=self).all()
+
+    @property
+    def amount_paid(self):
+        amount = 0
+        for transfer in Transfer.objects.filter(invoice=self):
+            amount += transfer.amount_received
+        
+        return amount
 
 
 def present_or_past_date(value):
