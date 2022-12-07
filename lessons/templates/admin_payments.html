@@ -3,25 +3,6 @@
 
 {% include 'partials/navbar.html' %}
 <div class="container">
-  <h1>Student balances</h1>
-  {% for student, balance in balances.items %}
-    {% if balance > 0 %}
-        <div class="w-25">{% include 'partials/balance_card.html' with student=student balance=balance %}</div>
-    {% endif %}  
-    {% endfor %}
-    {% if non_zero_balances == 0 %}
-      <h2>No balances to see</h1>
-    {% endif %}
-</div>
-<div class="container">
-  <h1>Students with no balance</h1>
-  <div class="d-flex flex-wrap">
-    {% for student,  balance in balances.items %}
-    {% if balance == 0 %}
-      <div class="w-25">{% include 'partials/balance_card.html' with student=student balance=balance %}</div>
-      {% endif %}  
-    {% endfor %}
-
   <h1>View payments</h1>
   <div class="row">
     <div class="col-8">
@@ -41,7 +22,7 @@
             <th scope="row">{{ transfer.transfer_id }}</th>
             <td>{{ transfer.date_received }}</td>
             <td>{{ transfer.invoice.student.full_name }}</td>
-            <td>£{{ transfer.invoice.price}}.00</td>
+            <td>£{{ transfer.amount_received}}.00</td>
           </tr>
           {% endfor %}  
         </tbody>
@@ -54,7 +35,7 @@
           <h5 class="card-header"><img src="{{ student.mini_gravatar }}" class="rounded-circle profile-image"> {{ student.full_name }}</h5>
           <div class="card-body">
             <p>User has <b>£{{balance}}.00</b> outstanding</p>
-            <h7><a href="{% url 'student_payments' student.id %}">View user profile</a></h7>
+            <h7><a href="{% url 'student_payments' student.id %}">View user invoices</a></h7>
           </div>
         </div>
       {% empty %}

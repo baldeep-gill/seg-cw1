@@ -436,10 +436,7 @@ def admin_transfers(request):
     transfers = Transfer.objects.all()
     total_revenue = transfers.aggregate(Sum('amount_received'))['amount_received__sum']
 
-
     return render(request, 'all_transfers.html', {'transfers': transfers, 'total_revenue': total_revenue})
-
-
 
 
 @login_required
@@ -461,8 +458,8 @@ def all_student_balances(request):
         for underpaid_invoice in underpaid_invoices:
             balance += underpaid_invoices[underpaid_invoice]
 
-        balances[student] = balance
         if(balance > 0):
+            balances[student] = balance
             non_zero_balances += 1
 
     return render(request, 'admin_payments.html', {'balances': balances,'transfers': all_transfers, 'non_zero_balances': non_zero_balances})
@@ -475,29 +472,15 @@ def student_balance(request, student_id):
     transfer_list = student.transfers
     invoice_list = student.unpaid_invoices
     underpaid_invoices_and_paid_amount = student.underpaid_invoices
-    print(student.grouped_transfers)
-    # student.invoices.exclude(id__in=transfer_list.values('invoice_id'))
 
     return render(request, 'admin_student_payments.html', {'invoices': invoice_list, 'underpaid_invoices': underpaid_invoices_and_paid_amount, 'transfers': transfer_list, 'student': student})
 
 @login_required
 @only_admins
 def approve_transaction(request, student_id, invoice_id):
-    # if request.method == 'POST':
-    #     current_admin = request.user
-    #     invoice = Invoice.objects.filter(student_id=student_id).filter(invoice_number=invoice_id)
-    #     next_transfer_id = find_next_available_transfer_id()
-    #     transfer = Transfer.objects.create(date_received=timezone.now(), transfer_id=next_transfer_id, verifier=current_admin, invoice=invoice.first())
-    #     transfer.save()
-    # else:
-    #     # request method 'GET'
-
-
-    # return redirect('student_payments', student_id=student_id)
-
     try:
         student_paying = Student.objects.get(id=student_id)
-        invoice_being_fulfilled = Invoice.objects.filter(student_id=student_id).get(id=invoice_id)
+        invoice_being_fulfilled = Invoice.objects.filter(student_id=student_id).get(invoice_number=invoice_id)
     except ObjectDoesNotExist:
         return redirect('student_payments', student_id=student_id)
 
@@ -508,8 +491,6 @@ def approve_transaction(request, student_id, invoice_id):
             invoice = invoice_being_fulfilled
             date_received = form.cleaned_data.get('date_received')
             amount_received = form.cleaned_data.get('amount_received')
-
-
 
             #generate an invoice for the lessons we will generate
             new_transfer_number = find_next_available_transfer_id()
