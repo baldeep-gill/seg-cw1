@@ -59,21 +59,21 @@ def book_for_student(request):
         form = GuradianBookStudent(options=optiontuples)
     return render(request, 'guardian_book_for_student.html', {'form': form, 'users': flag})
 
-@login_required
-@all_students
-def balance(request):
-    # first we need to get the student
-    current_student_id = request.user.id
+# @login_required
+# @all_students
+# def balance(request):
+#     # first we need to get the student
+#     current_student_id = request.user.id
 
-    # then we retrieve all the lessons they have from the db
-    invoices = Invoice.objects.filter(student_id=current_student_id)
+#     # then we retrieve all the lessons they have from the db
+#     invoices = Invoice.objects.filter(student_id=current_student_id)
 
-    # total money owed
-    total = 0
-    for invoice in invoices:
-        total += invoice.price
+#     # total money owed
+#     total = 0
+#     for invoice in invoices:
+#         total += invoice.price
 
-    return render(request, 'balance.html', {'invoices': invoices, 'total':total})
+#     return render(request, 'balance.html', {'invoices': invoices, 'total':total})
 
 @login_required
 @all_students
@@ -447,18 +447,24 @@ def admin_transfers(request):
 def all_student_balances(request):
     all_students = Student.objects.all()
     balances = {}
+    non_zero_balances = 1
     for student in all_students:
         student_invoices = Invoice.objects.filter(student=student)
         balance = 0
         for invoice in student_invoices:
             if(Transfer.objects.filter(invoice=invoice).count() == 0):
                 balance += invoice.price
+        
+        underpaid_invoices = student.underpaid_invoices
 
-        # Ensures only people with pending payments show up
-        if(balance != 0):
-            balances[student] = balance
+        for underpaid_invoice in underpaid_invoices:
+            balance += underpaid_invoices[underpaid_invoice]
 
-    return render(request, 'admin_payments.html', {'balances': balances})
+        balances[student] = balance
+        if(balance > 0):
+            non_zero_balances += 1
+
+    return render(request, 'admin_payments.html', {'balances': balances, 'non_zero_balances': non_zero_balances})
 
 @login_required
 @only_admins

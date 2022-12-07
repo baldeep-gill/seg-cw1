@@ -1,0 +1,8 @@
+<div class="card bg-dark border-secondary text-light mb-8">
+  <a href="{% url 'student_payments' student.id %}"> <h5 class="card-header">{{ student.first_name }} {{ student.last_name }}</h5></a>
+  <div class="card-body">
+    {% if balance > 0 %}
+      <h4>£{{ balance }}</h4>
+    {% endif %}
+    </div>
+</div>
