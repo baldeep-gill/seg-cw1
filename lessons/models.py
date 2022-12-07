@@ -238,15 +238,15 @@ class Invoice(models.Model):
         
     @property
     def paid(self):
-        transfer = self.associated_transfers()
+        transfer = self.associated_transfers
         if transfer:
-            return self.amount_paid() >= self.price()
+            return self.amount_paid >= self.price
         else:
             return False
     
     @property
     def at_least_partially_paid(self):
-        transfer = self.associated_transfers()
+        transfer = self.associated_transfers
         if transfer:
             return True
         else:
@@ -254,7 +254,7 @@ class Invoice(models.Model):
 
     @property
     def associated_transfers(self):
-        return Transfer.objects.filter(invoice=self).all()
+        return Transfer.objects.filter(invoice=self)
 
     @property
     def amount_paid(self):
