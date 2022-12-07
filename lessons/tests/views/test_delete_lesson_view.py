@@ -57,7 +57,7 @@ class DeleteLessonViewTestCase(TestCase):
     def test_reject_student_access(self):
         self.client.force_login(self.student)
         redirect_url = reverse("student_home")
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, follow=True)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
     
     def test_not_logged_in_get_lesson(self):
