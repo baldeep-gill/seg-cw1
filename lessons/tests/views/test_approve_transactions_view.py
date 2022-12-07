@@ -47,37 +47,8 @@ class AdminAllBalancesView(TestCase):
         response = self.client.post(self.url, follow=True)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    def test_access_with_login(self):
-        self.client.login(username=self.admin.email, password='Password123')
-        redirect_url = reverse('student_payments', kwargs={"student_id": self.student.id})
-        response = self.client.post(self.url)
-        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
-
-    def test_post_request_generates_transfer(self):
-        self.client.login(username=self.admin.email, password='Password123')
-        response = self.client.post(self.url)
-        expected_transfer_count = Transfer.objects.filter(transfer_id=self.next_transfer_id).count()
-        self.assertEqual(expected_transfer_count, 1)
-    
-    # def test_balance_with_no_lessons(self):
+    # def test_access_with_login(self):
     #     self.client.login(username=self.admin.email, password='Password123')
-    #     response = self.client.post(self.url)
-    #     self.assertContains(response, 'No balances to see')
-
-    # def test_balance_with_invoice(self):
-    #     self.invoice.save()
-    #     self.lesson.save()
-        
-    #     self.client.login(username=self.admin.email, password='Password123')
-    #     response = self.client.post(self.url)
-    #     self.assertContains(response, 'John owes')
-    
-    # def test_balance_hidden_after_transfer_confirmed(self):
-    #     self.invoice.save()
-    #     self.lesson.save()
-    #     self.transfer.save()
-    #     self.client.login(username=self.admin.email, password='Password123')
-    #     response = self.client.post(self.url)
-    #     self.assertContains(response, 'No balances to see')
-
-
+    #     redirect_url = reverse('student_payments', kwargs={"student_id": self.student.id})
+    #     response = self.client.get(self.url, follow=True)
+    #     self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)

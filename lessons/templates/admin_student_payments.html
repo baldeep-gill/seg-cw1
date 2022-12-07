@@ -10,7 +10,7 @@
       <h1>No invoices or transfers</h1>
     {% endif %}
     <div class="row">
-      <div class="col-6">
+      <div class="col-4">
         <h2>Invoices</h2>
         {% for invoice in invoices %}
           {% include 'partials/invoice_card.html' with invoice=invoice %}
@@ -18,13 +18,21 @@
           <h5>No unpaid invoices</h5>
         {% endfor %}
       </div>
-      <div class="col-6">
+      <div class="col-4">
         <h2>Transfers</h2>
         {% for transfer in transfers %}
             {% include 'partials/transfer_card.html' with transfer=transfer %}
         {% endfor %}
       </div>
+      {% if underpaid_invoices %}
+        <div class="col-4">
+          <h2>Incomplete Transfers</h2>
+          {% for invoice, paid_amount in underpaid_invoices.items %}
+              {% include 'partials/invoice_card.html' with invoice=invoice partially_received_amount=paid_amount %}
+          {% endfor %}
+        </div>
+      {% endif %}
     </div>
-  </div>
+  </div> 
 </div>
 {% endblock %}

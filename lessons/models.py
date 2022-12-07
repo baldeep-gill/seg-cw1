@@ -73,6 +73,7 @@ class Student(User):
     
     @property
     def transfers(self):
+        # Make sure incomplete transfers aren't repeated when displayed separately
         return Transfer.objects.filter(invoice__student=self)
 
     @property
@@ -80,6 +81,25 @@ class Student(User):
         transfer_list = self.transfers
         invoice_list = self.invoices.exclude(id__in=transfer_list.values('invoice_id'))
         return invoice_list
+
+    @property
+    def underpaid_invoices(self):
+        transfer_list = self.transfers
+        # invoice_list = self.invoices.filter(id__in=transfer_list.values('invoice_id'))
+        underpaid_invoices = {}
+        for transfer in transfer_list:
+            if transfer.amount_received < transfer.invoice.price:
+                if(underpaid_invoices.get(transfer.invoice)):
+                    underpaid_invoices[transfer.invoice] += transfer.amount_received
+                    if(underpaid_invoices[transfer.invoice] >= transfer.invoice.price):
+                        # Removes invoice from the list of underpaid invoices if the invoice is paid fully or overpaid
+                        del underpaid_invoices[transfer.invoice]
+                else:
+                    underpaid_invoices[transfer.invoice] = transfer.amount_received
+        
+        
+
+        return underpaid_invoices
 
     class Meta:
         proxy = True
@@ -226,11 +246,31 @@ class Invoice(models.Model):
         
     @property
     def paid(self):
-        transfer = Transfer.objects.filter(invoice=self)
+        transfer = self.associated_transfers
+        if transfer:
+            return self.amount_paid >= self.price
+        else:
+            return False
+    
+    @property
+    def at_least_partially_paid(self):
+        transfer = self.associated_transfers
         if transfer:
             return True
         else:
             return False
+
+    @property
+    def associated_transfers(self):
+        return Transfer.objects.filter(invoice=self)
+
+    @property
+    def amount_paid(self):
+        amount = 0
+        for transfer in Transfer.objects.filter(invoice=self):
+            amount += transfer.amount_received
+        
+        return amount
 
 
 def present_or_past_date(value):
@@ -247,6 +287,8 @@ class Transfer(models.Model):
     date_received = models.DateTimeField(blank=False, default=timezone.now, validators=[present_or_past_date])
 
     transfer_id = models.IntegerField(blank=False, unique=True)
+
+    amount_received = models.IntegerField(blank=False)
 
     
     """Administrator who verified the payment.
