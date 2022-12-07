@@ -302,6 +302,17 @@ def transfers(request):
 
     return render(request, 'transfers.html', {'transfers': transfers, 'total_paid': total_paid})
 
+@login_required
+@only_admins
+def admin_transfers(request):
+    # then we retrieve all the lessons they have from the db
+    # invoices = Invoice.objects.filter(student_id=current_student_id)
+    transfers = Transfer.objects.all()
+    total_revenue = transfers.aggregate(Sum('amount_received'))['amount_received__sum']
+    
+
+    return render(request, 'all_transfers.html', {'transfers': transfers, 'total_revenue': total_revenue})
+
 
 
 

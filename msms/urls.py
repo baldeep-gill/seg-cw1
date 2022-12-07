@@ -29,11 +29,12 @@ urlpatterns = [
 
     # Admin paths
     path('admin/home/', views.admin_home, name='admin_home'),
-    path('admin/unfulfilled/requests/', views.admin_requests, name='admin_requests'),
+    # path('admin/unfulfilled/requests/', views.admin_requests, name='admin_requests'),
     path('admin/book_lesson_request/<int:request_id>', views.book_lesson_request, name='book_lesson_request'),
     path('admin/requests/', views.admin_requests, name='admin_requests'),
     path('admin/log_out/', views.log_out, name='log_out'),
     path('admin/payments', views.all_student_balances, name='payments'),
+    path('admin/all_transfers', views.admin_transfers, name='admin_transfers'),
     path('admin/payments/<int:student_id>', views.student_balance, name='student_payments'),
     path('admin/payments/<int:student_id>/<int:invoice_id>', views.approve_transaction, name='approve_transaction'),
 
