@@ -8,7 +8,8 @@
         <h3>£{{ invoice.price }}</h3>
       {% endif %}
         {% if invoice.associated_transfers %}
-        <table>
+        <p>
+        <table class="table text-light">
             {% for transfer in invoice.associated_transfers %}
                 <tr>
                     <td>£{{ transfer.amount_received }}</td>
@@ -17,6 +18,7 @@
                 </tr>
             {% endfor %}
         </table>
+      </p>
         {% endif %}
       {% if not hide_button or not invoice.paid %}
         <div class="align-left">
