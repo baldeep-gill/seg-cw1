@@ -10,17 +10,23 @@
                     <h1 class="cover-heading">Admin Home</h1>
                     <p class="cover-text">Do your admin stuff here</p>
                     <p>
-                      <a href="#" class="btn btn-lg btn-secondary">
+                      <a href="{% url 'admin_requests' %}" class="btn btn-lg btn-secondary">
                         See unfulfilled requests
                       </a>
                     </p>
                     <p>
-                      <a href="{% url 'admin_requests' %}" class="btn btn-lg btn-secondary">
-                        See all requests
+                      <a href="{% url 'admin_lessons' %}" class="btn btn-lg btn-secondary">
+                      See booked lessons
                       </a>
                     </p>
                     <p>
-                      <a href='#' class="btn btn-lg btn-secondary">
+                      <a href="{% url 'payments' %}" class="btn btn-lg btn-secondary">
+                        See all payments
+                      </a>
+                    </p>
+                    <p>
+                      <a href="{% url 'admin_terms' %}" class="btn btn-lg btn-secondary">
+                        Terms
                       </a>
                     </p>
                   </div>

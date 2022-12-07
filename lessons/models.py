@@ -2,9 +2,12 @@
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy
 from libgravatar import Gravatar
 from django.core.validators import MinValueValidator, MaxValueValidator
+import pytz
+from django.utils import timezone
 
 '''The base user that all users inherit'''
 class User(AbstractUser):
@@ -12,6 +15,7 @@ class User(AbstractUser):
     class Types(models.TextChoices):
         ADMIN = "ADMIN", 'Admin'
         STUDENT = "STUDENT", 'Student'
+        GUARDIAN = "GUARDIAN", 'Guardian'
     
     '''defualt role'''
     base_role = Types.ADMIN
@@ -63,9 +67,43 @@ class Student(User):
         '''this refers to the table in the database'''
         return self.studentprofile
 
+    @property
+    def invoices(self):
+        return Invoice.objects.filter(student=self)
+    
+    @property
+    def transfers(self):
+        return Transfer.objects.filter(invoice__student=self)
+
+    @property
+    def unpaid_invoices(self):
+        transfer_list = self.transfers
+        invoice_list = self.invoices.exclude(id__in=transfer_list.values('invoice_id'))
+        return invoice_list
+
     class Meta:
         proxy = True
 
+'''Guardian users'''
+# manages all guardians 
+class GuardianManager(BaseUserManager):
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).filter(type=User.Types.GUARDIAN)
+
+# A new table to store the student number and extra information about the user later on
+class GuardianProfile(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    student_first_name = models.CharField(max_length=50, blank=False)
+    student_last_name = models.CharField(max_length=50, blank=False)
+    student_email = models.EmailField(unique=True, blank=False)
+
+# Guardian user
+class Guardian(User):
+    base_role = User.Types.GUARDIAN
+    guardians = GuardianManager()
+
+    class Meta:
+        proxy = True
 
 '''Admin users'''
 # manages all Admins 
@@ -144,10 +182,12 @@ class LessonRequest(models.Model):
     )
 
 
+
+
 class Invoice(models.Model):
     """Models an invoice for a set of lessons"""
 
-    # Invoice who the student is for
+    # Invoice who student is for
     student = models.ForeignKey(
         Student,
         on_delete = models.CASCADE,
@@ -166,34 +206,80 @@ class Invoice(models.Model):
 
     # Unique reference number which can be used to identify individual invoices
     # Is of the form student_number-invoice number
-    unique_reference_number = models.CharField(
-        blank = False,
-        unique=True,
-        max_length=80
-    )
+    @property
+    def unique_reference_number(self):
+        return f'{self.student.id}-{self.invoice_number}'
 
     @property
     def lessons(self):
+        """Returns all the lessons belonging to this invoice"""
         return Lesson.objects.filter(invoice=self)
 
     @property
     def price(self):
+        """Returns the total price associated with this invoice
+        Sum of the prices of the lessons"""
         price = 0
         for lesson in self.lessons:
-            price += lesson.duration * lesson.price_per_minute
+            price += lesson.price
         return price
+        
+    @property
+    def paid(self):
+        transfer = Transfer.objects.filter(invoice=self)
+        if transfer:
+            return True
+        else:
+            return False
+
+
+def present_or_past_date(value):
+    if value > timezone.now():
+        raise ValidationError("The date cannot be in the future!")
+    return value
+
+class Transfer(models.Model):
+    """Models a transfer completed by a student"""
+    class Meta:
+        ordering = ['-date_received']
+    
+    # The date and time when the transfer was received 
+    date_received = models.DateTimeField(blank=False, default=timezone.now, validators=[present_or_past_date])
+
+    transfer_id = models.IntegerField(blank=False, unique=True)
+
+    
+    """Administrator who verified the payment.
+    ALl payments are done through the school bank account
+    and have to be checked by an administrator user"""
+    verifier = models.ForeignKey(
+        Admin,
+        on_delete = models.CASCADE,
+        blank = False,
+    )
+
+    invoice = models.ForeignKey(
+        Invoice, 
+        on_delete = models.CASCADE,
+        blank = False
+    )
+    
+    @property
+    def lessons(self):
+        return Lesson.objects.filter(invoice=self.invoice())
+
 
 class Lesson(models.Model):
     """Models a booked lesson for a student"""
 
-    # Lesson who the student is for
+    # Lesson who the student is for, Lesson can't exist without an associated student
     student = models.ForeignKey(
         Student,
         on_delete = models.CASCADE,
         blank = False,
     )
 
-    # Invoice lesson is part of
+    # Invoice lesson is part of, Lesson can't exist without an associated invoice
     invoice = models.ForeignKey(
         Invoice,
         on_delete = models.CASCADE,
@@ -202,7 +288,7 @@ class Lesson(models.Model):
 
     # Date and time of lesson
     date = models.DateTimeField(
-        blank=False
+        blank=False,
     )
 
     # Duration of each lesson in minutes
@@ -219,18 +305,50 @@ class Lesson(models.Model):
     # What the lesson is about
     topic = models.CharField(
         max_length = 50,
+        blank=False
     )
 
     # Who teaches the lesson
     teacher = models.CharField(
-        blank = True,
-        max_length = 80,
+        blank = False,
+        max_length = 50,
     )
+
+    @property
+    def price(self):
+        """Calculates the price of this individual lesson"""
+        return self.price_per_minute * self.duration
 
     @property
     def price_per_minute(self):
         """Returns the cost of this lesson per minute in pounds/£"""
         return 1
+
+
+class Term(models.Model):
+    """Models a school term"""
+
+    # Name of term, ie 'term 1' or 'Summer term'
+    name = models.CharField(
+        max_length = 50,
+        unique = True,
+        blank=False
+    )
+
+    # Start date of term
+    start_date = models.DateTimeField(
+        blank=False,
+    )
+
+    # End date of term
+    end_date = models.DateTimeField(
+        blank=False,
+    )
+
+
+
+
+
 
 
 

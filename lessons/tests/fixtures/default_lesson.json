@@ -1,0 +1,12 @@
+[
+  {
+    "model": "lessons.lesson",
+    "pk" : 1,
+    "fields" : {
+      "student": 1,
+      "invoice": 1,
+      "date": "2022-12-03 12:00:00Z",
+      "duration": 100
+    }
+  }
+]

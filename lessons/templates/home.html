@@ -1,18 +1,20 @@
 {% extends 'base.html' %}
 {% block body %}
-
-
-{% include 'partials/navbar.html' %}
-<div>
-    <div class="container vh-100">
+<div id="cover-image">
+  <div class="container vh-100">
         <div class="row h-100">
             <div class="col-12 my-auto">
                 <div class="card cover-card offset-sm-2 offset-md-4 offset-lg-7">
                     <h1 class="cover-heading">MSMS</h1>
-                    <p class="cover-text">The true place for anything music related</p>
+                    <p class="cover-text">The Music School Management System</p>
                     <p>
                       <a href="{% url 'student_sign_up' %}" class="btn btn-lg btn-secondary">
-                        Sign up
+                        Sign up as a student
+                      </a>
+                    </p>
+                    <p>
+                      <a href="{% url 'guardian_sign_up' %}" class="btn btn-lg btn-secondary">
+                        Sign up as a guardian
                       </a>
                     </p>
                     <p>

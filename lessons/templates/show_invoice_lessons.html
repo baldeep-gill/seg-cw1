@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block body %}
+
+{% include 'partials/navbar.html' %}
+
+<div class="container">
+    <div class="row">
+      <div class="col-12">
+        {% if lessons %}
+          <h1>Lessons in Invoice</h1>
+            <hr />
+            {% for lesson in lessons %}
+              <div style="padding-bottom:10px;">
+                {% include 'partials/lesson_list.html' with lesson=lesson %}
+              </div>
+            
+            {% endfor %}
+        {% else %}
+          <h1> This invoice has no associated lessons</h1>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

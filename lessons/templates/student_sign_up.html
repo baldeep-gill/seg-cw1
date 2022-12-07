@@ -3,12 +3,22 @@
 <div class="container">
   <div class="row">
     <div class="col-12">
-      <h1>Student Sign up</h1>
+    {% if guardian %}
+    <h1>Guardian Sign up</h1>
+      <form action="{% url 'guardian_sign_up' %}" method="post">
+        {% csrf_token %}
+        {% include 'partials/form.html' with form=form %}
+        <input type="submit" value="Sign up" class="btn btn-primary">
+      </form>
+    {% else %}
+    <h1>Student Sign up</h1>
       <form action="{% url 'student_sign_up' %}" method="post">
         {% csrf_token %}
         {% include 'partials/form.html' with form=form %}
         <input type="submit" value="Sign up" class="btn btn-primary">
       </form>
+    {% endif %}
+      
     </div>
   </div>
 </div>

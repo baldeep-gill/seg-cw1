@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
 from pathlib import Path
+from django.contrib.messages import constants as message_constants
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -121,6 +122,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+STATIC_ROOT = '/home/serge21/Dromedary/staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -133,7 +135,17 @@ AUTH_USER_MODEL = 'lessons.User'
 # Login URL for redirecting users from login protected views
 LOGIN_URL = 'log_in'
 
+# URL where @login_prohibited redirects to
+REDIRECT_URL_WHEN_LOGGED_IN_ADMIN = 'admin_home'
+REDIRECT_URL_WHEN_LOGGED_IN_STUDENT = 'student_home'
+REDIRECT_URL_WHEN_LOGGED_IN_GUARDIAN = 'guardian_home'
+
+# Message level tags should use Bootstrap terms
+MESSAGE_TAGS = {
+    message_constants.DEBUG: 'dark',
+    message_constants.ERROR: 'danger',
+}
+
 AUTHENTICATION_BACKENDS = [
     'lessons.backends.EmailLogin',
-    'django.contrib.auth.backends.ModelBackend'
 ]

@@ -7,20 +7,13 @@ class LessonRequestTestCase(TestCase):
     
     fixtures = [
         'lessons/tests/fixtures/default_student.json',
+        'lessons/tests/fixtures/default_lesson_request.json',
     ]
 
     def setUp(self):
         super(TestCase, self).setUp()
         self.student = Student.objects.get(email="johndoe@example.org")
-        self.lessonRequest = LessonRequest(
-            author = self.student,
-            availability = "Monday",
-            lessonNum = 2,
-            interval = 1,
-            duration = 60,
-            topic = "Piano",
-            teacher = "bob"
-        )
+        self.lessonRequest = LessonRequest.objects.get(author=1)
 
     def _assert_valid_request(self):
         try:

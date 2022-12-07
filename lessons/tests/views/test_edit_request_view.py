@@ -1,27 +1,22 @@
 from django.test import TestCase
 from django.urls import reverse
 from lessons.forms import EditForm
-from lessons.models import Student, LessonRequest
+from lessons.models import Student, LessonRequest, Admin
 
 class EditRequestViewTestCase(TestCase):
     """Tests for the edit request views"""
 
-    fixtures = ['lessons/tests/fixtures/default_student.json']
+    fixtures = [
+        'lessons/tests/fixtures/default_student.json',
+        'lessons/tests/fixtures/admin_user.json',
+        'lessons/tests/fixtures/default_lesson_request.json'
+    ]
 
     def setUp(self):
         super(TestCase, self).setUp()
         self.student = Student.objects.get(email="johndoe@example.org")
-        
-        self.lessonRequest = LessonRequest(
-            author = self.student,
-            availability = "Monday",
-            lessonNum = 2,
-            interval = 1,
-            duration = 60,
-            topic = "Piano",
-            teacher = "Mr Bob"
-        )
-        self.lessonRequest.save()
+        self.admin = Admin.objects.get(email="student_admin@example.org")
+        self.lessonRequest = LessonRequest.objects.get(author=1)
 
         self.form_input = {
             "availability": "Monday",
@@ -73,7 +68,7 @@ class EditRequestViewTestCase(TestCase):
         self.assertTrue(form.is_bound)
         self.lessonRequest.refresh_from_db()
         self.assertEqual(self.lessonRequest.availability, "Monday")
-        self.assertEqual(self.lessonRequest.lessonNum, 2)
+        self.assertEqual(self.lessonRequest.lessonNum, 3)
         self.assertEqual(self.lessonRequest.interval, 1)
         self.assertEqual(self.lessonRequest.duration, 60)
         self.assertEqual(self.lessonRequest.topic, "Piano")
@@ -96,3 +91,9 @@ class EditRequestViewTestCase(TestCase):
         self.assertEqual(self.lessonRequest.duration, 60)
         self.assertEqual(self.lessonRequest.topic, "Piano")
         self.assertEqual(self.lessonRequest.teacher, "Mr Bob")
+
+    def test_admin_reject_access(self):
+        self.client.force_login(self.admin)
+        redirect_url = reverse("admin_home")
+        response = self.client.get(self.url, follow=True)
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)

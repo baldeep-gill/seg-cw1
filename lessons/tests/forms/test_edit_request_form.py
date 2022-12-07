@@ -7,11 +7,14 @@ class EditRequestFormTestCase(TestCase):
 
     fixtures = [
         'lessons/tests/fixtures/default_student.json',
+        'lessons/tests/fixtures/default_lesson_request.json',
     ]
 
     def setUp(self):
         super(TestCase, self).setUp()
         self.student = Student.objects.get(email="johndoe@example.org")
+        self.lessonRequest = LessonRequest.objects.get(author=1)
+
         self.form_input = {
             "availability": "Monday",
             "lessonNum": 2,
@@ -20,16 +23,7 @@ class EditRequestFormTestCase(TestCase):
             "topic": "piano",
             "teacher": "Mr Bob"
         }
-
-        self.lessonRequest = LessonRequest(
-            author = self.student,
-            availability = "Monday",
-            lessonNum = 2,
-            interval = 1,
-            duration = 60,
-            topic = "Piano",
-            teacher = "bob"
-        )
+        
 
     def test_request_edit(self):
         self.form_input['availability'] = "Tuesday"

@@ -5,14 +5,14 @@ The members of the team are:
 - *Syraj Alkhalil k21007329*
 - *Baldeep Gill k21034937*
 - *Harry Davis k21049391*
-- *<name of team member 4>*
-- *<name of team member 5>*
+- *Qadir Ijaz Fernandez k21095034*
+- *Muhsin Mohamed k21088331*
 
 ## Project structure
 The project is called `msms` (Music School Management System).  It currently consists of a single app `lessons` where all functionality resides.
 
 ## Deployed version of the application
-The deployed version of the application can be found at *<[enter URL here](URL)>*.
+The deployed version of the application can be found at *<[https://serge21.pythonanywhere.com/](URL)>*.
 
 ## Installation instructions
 To install the software and use it in your local development environment, you must first set up and activate a local development environment.  From the root of the project:
@@ -50,4 +50,5 @@ $ python3 manage.py test
 ## Sources
 The packages used by this application are specified in `requirements.txt`
 
-*Declare are other sources here.*
+- Clucker code base
+- Django custom authentication docs https://docs.djangoproject.com/en/4.1/topics/auth/customizing/#authentication-backends
