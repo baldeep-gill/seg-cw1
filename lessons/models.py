@@ -85,7 +85,7 @@ class Student(User):
     @property
     def underpaid_invoices(self):
         transfer_list = self.transfers
-        # invoice_list = self.invoices.filter(id__in=transfer_list.values('invoice_id'))
+
         underpaid_invoices = {}
         for transfer in transfer_list:
             if transfer.amount_received < transfer.invoice.price:
@@ -124,6 +124,40 @@ class Guardian(User):
 
     class Meta:
         proxy = True
+
+    @property
+    def invoices(self):
+        return Invoice.objects.filter(student=self)
+    
+    @property
+    def transfers(self):
+        # Make sure incomplete transfers aren't repeated when displayed separately
+        return Transfer.objects.filter(invoice__student=self)
+
+    @property
+    def unpaid_invoices(self):
+        transfer_list = self.transfers
+        invoice_list = self.invoices.exclude(id__in=transfer_list.values('invoice_id'))
+        return invoice_list
+
+    @property
+    def underpaid_invoices(self):
+        transfer_list = self.transfers
+
+        underpaid_invoices = {}
+        for transfer in transfer_list:
+            if transfer.amount_received < transfer.invoice.price:
+                if(underpaid_invoices.get(transfer.invoice)):
+                    underpaid_invoices[transfer.invoice] += transfer.amount_received
+                    if(underpaid_invoices[transfer.invoice] >= transfer.invoice.price):
+                        # Removes invoice from the list of underpaid invoices if the invoice is paid fully or overpaid
+                        del underpaid_invoices[transfer.invoice]
+                else:
+                    underpaid_invoices[transfer.invoice] = transfer.amount_received
+        
+        
+
+        return underpaid_invoices
 
 '''Admin users'''
 # manages all Admins 
@@ -271,6 +305,10 @@ class Invoice(models.Model):
             amount += transfer.amount_received
         
         return amount
+    
+    @property
+    def amount_pending(self):
+        return self.price - self.amount_paid
 
 
 def present_or_past_date(value):
