@@ -415,16 +415,13 @@ def guardian_balance(request):
     return render(request, 'balance.html', {'invoices': invoices, 'total_due':total})
 
 @login_required
-@only_students
+@all_students
 def transfers(request):
     # first we need to get the student
     current_student_id = request.user.id
 
-    student = Student.objects.get(id=current_student_id)
-
     # then we retrieve all the lessons they have from the db
-    # invoices = Invoice.objects.filter(student_id=current_student_id)
-    transfers = student.transfers
+    transfers = Transfer.objects.filter(invoice__student_id=current_student_id)
 
     total_paid = 0
     for transfer in transfers:
