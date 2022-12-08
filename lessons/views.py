@@ -372,8 +372,6 @@ def balance(request):
     current_student_id = request.user.id
     student = Student.objects.get(id=current_student_id)
 
-    # then we retrieve all the lessons they have from the db
-    # invoices = Invoice.objects.filter(student_id=current_student_id)
     underpaid_invoices = student.underpaid_invoices
     underpaid_ids = [invoice.invoice_number for invoice in underpaid_invoices]
     invoices = student.unpaid_invoices
@@ -386,7 +384,7 @@ def balance(request):
     invoices = student.unpaid_invoices | Invoice.objects.filter(invoice_number__in=underpaid_ids)
 
     for underpaid_invoice in underpaid_invoices:
-        total_due += underpaid_invoices[underpaid_invoice]
+        total_due += underpaid_invoice.amount_pending
 
     return render(request, 'balance.html', {'invoices': invoices, 'total_due': total_due})
 
@@ -397,14 +395,24 @@ def guardian_balance(request):
     current_student_id = request.user.id
 
     # then we retrieve all the lessons they have from the db
-    invoices = Invoice.objects.filter(student_id=current_student_id)
+    # invoices = Invoice.objects.filter(student_id=current_student_id)
+    client = Guardian.objects.get(id=current_student_id)
+    invoices = client.unpaid_invoices
+
+    underpaid_invoices = client.underpaid_invoices
+    underpaid_ids = [invoice.invoice_number for invoice in underpaid_invoices]
 
     # total money owed
     total = 0
     for invoice in invoices:
         total += invoice.price
 
-    return render(request, 'balance.html', {'invoices': invoices, 'total':total})
+    invoices = client.unpaid_invoices | Invoice.objects.filter(invoice_number__in=underpaid_ids)
+
+    for underpaid_invoice in underpaid_invoices:
+        total += underpaid_invoice.amount_pending
+
+    return render(request, 'balance.html', {'invoices': invoices, 'total_due':total})
 
 @login_required
 @only_students
