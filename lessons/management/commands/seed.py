@@ -55,24 +55,19 @@ class Command(BaseCommand, TestCase):
         while user_count < Command.USER_COUNT:
             print(f'Seeding user {user_count}',  end='\r')
             try:
-                # seeds 1 admin after 100 clients
-                seedAdmin = user_count == 100
-                if(seedAdmin):
-                    self._create_admin()
-                else:
-                    client_children = 0
-                    if self.faker.random.random() < Command.PROBABILITY_OF_CLIENT_HAVING_CHILDREN:
-                        client_children = self.faker.random.randint(1, 3)
-                    self._create_client(children=client_children)
-                        
-
+                client_children = 0
+                if self.faker.random.random() < Command.PROBABILITY_OF_CLIENT_HAVING_CHILDREN:
+                    client_children = self.faker.random.randint(1, 3)
+                self._create_client(children=client_children)
             except (IntegrityError):
                 continue
             user_count += 1
+        # Create 1 additional admin
+        self._create_admin()
         print('User seeding complete')
-        print('Seeded ' + str(User.objects.filter(type="STUDENT").count()) + ' students')
-        print('Seeded ' + str(User.objects.filter(type="ADMIN").count()) + ' admins')
-        print('Seeded ' + str(User.objects.filter(type="GUARDIAN").count()) + ' guardians')
+        print('Seeded ' + str(Student.students.count()) + ' students')
+        print('Seeded ' + str(Admin.admins.count()) + ' admins')
+        print('Seeded ' + str(Guardian.guardians.count()) + ' guardians')
 
     def seedfulfilledlessonsfornamedusers(self, userlist):
         for user in userlist:
@@ -216,7 +211,7 @@ class Command(BaseCommand, TestCase):
         last_name = self.faker.last_name()
         email = self._email(first_name, last_name)
         username = self._username(first_name, last_name)
-        self._create_named_client_user(first_name, last_name, email, username, Command.PASSWORD)
+        self._create_named_admin_user(first_name, last_name, email, username, Command.PASSWORD)
 
     def _create_student(self):
         first_name = self.faker.first_name()
