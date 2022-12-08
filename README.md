@@ -11,6 +11,13 @@ The members of the team are:
 ## Project structure
 The project is called `msms` (Music School Management System).  It currently consists of a single app `lessons` where all functionality resides.
 
+##NOTE:
+the director is a django superuser it can be accessed via the following *[URL](https://serge21.pythonanywhere.com/django/admin)*.
+```
+the username is: admin@admin.com
+the password is: admin
+```
+
 ## Deployed version of the application
 The deployed version of the application can be found at *[URL](https://serge21.pythonanywhere.com/)*.
 
