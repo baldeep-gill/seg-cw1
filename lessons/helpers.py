@@ -22,8 +22,8 @@ def find_next_available_invoice_number_for_student(student):
 def find_next_available_transfer_id():
     """Will find the next available invoice number for a given student"""
     next_transfer_id = 1
-    if Transfer.objects.last():
-        next_transfer_id += Transfer.objects.last().transfer_id
+    if Transfer.objects.first():
+        next_transfer_id += Transfer.objects.first().transfer_id
     return next_transfer_id
 
 '''decorator for preventing admins from accessing student pages'''
