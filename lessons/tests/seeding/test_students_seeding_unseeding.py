@@ -1,7 +1,7 @@
 # TODO Uncomment this when want to test seeder
 
 from django.test import TestCase
-from lessons.models import Student, Admin, User, StudentProfile
+from lessons.models import Student, Admin, User, StudentProfile, Guardian
 from django.core.management import call_command
 
 # Create your tests here.
@@ -12,11 +12,11 @@ class UserSeedTestCase(TestCase):
         call_command('seed')
         # the seeder creates 100 student users using Faker
         # as well as 1 user with specified information (John Doe)
-        student_count = Student.students.count()
+        client_count = Guardian.guardians.count()
         admins_count = Admin.admins.count()
         user_count = User.objects.count()
         student_profile_count = StudentProfile.objects.count()
-        self.assertEqual(student_count, 101)
+        self.assertEqual(client_count, 102)
         self.assertEqual(admins_count, 2)
         self.assertEqual(student_profile_count, 101)
         self.assertEqual(user_count, 103)
