@@ -4,7 +4,7 @@
 The members of the team are:
 - *S. Alkhalil*
 - *Baldeep Gill*
-- *H.avis*
+- *H. Davis*
 - *Q.I. Fernandez*
 - *M. Mohamed*
 
