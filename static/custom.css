@@ -1,0 +1,76 @@
+.h-100 {
+    min-height: 100vh;
+    height: 100vh;
+}
+
+#cover-image {
+    background: url('images/background.png') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+}
+
+.content {
+    padding-top: 10px;
+}
+
+/*
+ * Cover page
+ */
+h1.cover-heading {
+    font-size: 4rem;
+}
+  
+p.cover-text {
+    font-size: 1.7rem;
+}
+
+.cover-card {
+    background-color: rgba(245, 245, 245, 0.6);
+    max-width: 30rem;
+    padding-top: 30px;
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-bottom: 30px;
+    border-radius: 15%;
+}
+
+.cover-card-block {
+    opacity: 1
+}
+
+/*
+ * forms
+ */
+.nolabel label {
+    display: none;
+}
+  
+ul.errorlist {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+/*
+ * Hyperlinks
+ */
+.content a {
+    text-decoration: none;
+    color: #0d6efd;
+}
+.content a:hover {
+    text-decoration: underline;
+    color: #0d6efd;
+}
+
+.post-author a {
+    text-decoration: none;
+    color: black;
+}
+.post-author a:hover {
+    text-decoration: underline;
+    color: black;
+}
+  

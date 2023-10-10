@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block body %}
+    {% include 'partials/navbar.html' %}
+<div class="container">
+    <div class="row content">
+
+        <div class="col-sm-12 col-md-4">
+            <h1> Student Details </h1>
+            {% include 'partials/user_profile.html' with user=student %}
+
+            <h1> Request Details </h1>
+            <div class="m-3">
+                {% include 'partials/request_card.html' with request=lesson_request show_button=False %}
+            </div>
+        </div>
+
+
+        <div class="col-sm-12 col-md-8">
+            <h1>Book this lesson request</h1>
+            <form action="{% url 'book_lesson_request' lesson_request.id%}" method="post">
+                {% csrf_token %}
+                {{ form.media }}
+                {% include 'partials/form.html' with form=form %}
+                <input type="submit" value="Submit" class="btn btn-primary">
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+{% endblock %}

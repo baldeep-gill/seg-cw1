@@ -1,0 +1,15 @@
+[
+    {
+      "model": "lessons.lessonRequest",
+      "pk" : 1,
+      "fields" : {
+        "author": 1,
+        "availability": "Monday",
+        "lessonNum": 3,
+        "interval": 1,
+        "duration": 60,
+        "topic": "Piano",
+        "teacher": "Mr Bob"
+      }
+    }
+  ]

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block body %}
+
+{% include 'partials/navbar.html' %}
+<div>
+    <div class="container vh-100">
+        <div class="row h-100">
+            <div class="col-12 my-auto">
+                <div class="card cover-card offset-sm-2 offset-md-4 offset-lg-7">
+                    <h1 class="cover-heading">Guardian Home</h1>
+                    <p class="cover-text">Do your guardian stuff here</p>
+                    <p>
+                        <a href="{% url 'lesson_request' %}" class="btn btn-lg btn-secondary">
+                            Book lessons for you
+                        </a>
+                    </p>
+                    <p>
+                        <a href="{% url 'book_for_student' %}" class="btn btn-lg btn-secondary">
+                            Book lessons for your students 
+                        </a>
+                    </p>
+                  </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

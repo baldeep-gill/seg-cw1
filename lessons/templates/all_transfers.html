@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block body %}
+{% include 'partials/navbar.html' %}
+
+<div class="container">
+    <div class="row">
+      <div class="col-12">
+        <div class="card bg-dark border-secondary text-light">
+            <h5 class="card-header"><i class="bi bi-check-circle text-success"></i> Confirmed transfers </h5>
+
+            <div class="card-body">
+                {% if transfers %}
+                <div class="d-flex justify-content-around">
+                    <div>
+                        <h6><i class="bi bi-hash"></i> <b>Invoice number</b></h6>
+                        {% for transfer in transfers %}
+                            <p>{{ transfer.invoice.invoice_number }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <h6><i class="bi bi-bookmark-fill"></i> <b>Unique Reference Number</b></h6>
+                        {% for transfer in transfers %}
+                            <p>{{ transfer.invoice.unique_reference_number }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <h6><i class="bi bi-cash"></i> <b>Price</b></h6>
+                        {% for transfer in transfers %}
+                            <p>£ {{ transfer.amount_received }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <h6><i class="bi bi-cash"></i> <b>Received</b></h6>
+                        {% for transfer in transfers %}
+                            <p>{{ transfer.date_received }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <h6><i class="bi bi-person-fill"></i> <b>User</b></h6>
+                        {% for transfer in transfers %}
+                            <p><a href="{% url 'student_payments' student_id=transfer.invoice.student.id %}">{{ transfer.invoice.student.first_name }} {{ transfer.invoice.student.last_name }}</a></p>
+                        {% endfor %}
+                    </div>
+                </div>
+                <hr />
+
+                <div clas="container">
+                    <h3> <b>Total</b>:  £  {{ total_revenue }} </h3>
+                </div>
+                {% else %}
+                    <h6> No transfers paid yet </h6>
+                {% endif %}
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+{% endblock %}

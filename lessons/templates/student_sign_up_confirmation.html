@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Congratulations! You have successfully signed up!</h1>
+      <p> You can now log in from the home page</p>
+      <p><a href="{% url 'home' %}" class="btn btn-lg btn-secondary">Return to home page</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+<div class="card bg-dark border-secondary text-light mb-8">
+    
+    <h5 class="card-header">{{ lesson.topic }}</h5>
+    <div class="card-body">
+      <div class="d-flex justify-content-around">
+
+        <div>
+          <h6><i class="bi bi-calendar-event"></i> <b>Date</b></h6>
+          <p>{{ lesson.date }}</p>
+        </div>
+    
+        <div>
+          <h6><i class="bi bi-heart-fill"></i> <b>Requesting</b></h6>
+          <p>{{ lesson.teacher }}</p>
+        </div>
+
+        <div>
+          <h6><i class="bi bi-stopwatch-fill"></i> <b>Duration</b></h6>
+          <p>{{ lesson.duration }}</p>
+        </div>
+
+      {% if is_admin %}
+      <div>
+        <h6><i class="bi bi-person-fill"></i> <b>Student Name</b></h6>
+        <p>{{ lesson.student }}</p>
+      </div>
+      <div>
+          <a href="{% url 'edit_lessons' lesson.id %}" class="btn btn-secondary text-light"><i class="bi bi-pen-fill"></i> Edit</a>
+          <a href="{% url 'delete_lessons' lesson.id %}" class="btn btn-danger text-light"><i class="bi bi-trash"></i> Delete</a>
+      </div>
+      {% endif %}
+
+          <div>
+          <h6><i class="bi bi-cash"></i> <b>Price</b></h6>
+          <p>{{ lesson.price }}</p>
+        </div>
+  
+      </div>
+  </div>
+</div>
+  
